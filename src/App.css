@@ -1,12 +1,11 @@
 .main-page-container, form {
   display: grid;
   place-items: center;
-  width: 100vw;
-  max-width: 20em;
+  padding:2em;  
 }
 
 button{
-  margin:1em
+  margin:1em;
 }
 
 

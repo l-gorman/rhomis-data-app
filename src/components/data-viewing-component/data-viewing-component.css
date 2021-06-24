@@ -1,8 +1,16 @@
 .table-container {
-    overflow: scroll;
     max-width: 90vw;
-    border-color: black;
-    border: 1pt;
-    border-style: solid;
-    padding: 2em;
+    margin: 1em;
 }
+
+.download-button {
+    margin: 1em;
+    align-items: flex-start;
+}
+
+.button-container {
+    width: 90vw;
+
+    display: grid;
+    place-items: start end;}
+
