@@ -72,7 +72,7 @@ function renderTable(data) {
 }
 
 function generateCSV(data) {
-    console.log(data)
+    //console.log(data)
     if (data === null) {
         return;
     }
@@ -162,6 +162,8 @@ async function getData(url, projectID) {
         return null
     }
 
+
+
 }
 
 
@@ -170,13 +172,13 @@ async function getData(url, projectID) {
 // Full data viewer component
 export default function DataViewer() {
     const [processedData, setProcessedData] = useState(null)
-    const [indicatorData, setIndicatorData] = useState(null)
-
-
-    const [downloadLink, setDownloadLink] = useState('')
     const [processedDataCSV, setProcessedDataCSV] = useState('')
-    const [indicatorCSV, setIndicatorCSV] = useState('')
+    const [processedDataDownloadLink, setProcessedDataDownloadLink] = useState('')
 
+
+    const [indicatorData, setIndicatorData] = useState(null)
+    const [indicatorDataCSV, setDataIndicatorCSV] = useState('')
+    const [indicatorDataDownloadLink, setIndicatorDataDownloadLink] = useState('')
 
 
 
@@ -184,34 +186,59 @@ export default function DataViewer() {
     useEffect(() => {
 
         // Create an async function to initalize variables
-        const fetchData = async (url, projectID) => {
-            const data = await getData(url, projectID);
-            setProcessedData(data);
+        const fetchProcessedData = async (url, projectID) => {
+            const processed_data_fetch = await getData(url, projectID);
+            setProcessedData(processed_data_fetch);
         }
-        fetchData("http://localhost:3000/api/processed-data/", "test_project")
+        fetchProcessedData("http://localhost:3000/api/processed-data/", "test_project")
+
+
+        const fetchIndicatorData = async (url, projectID) => {
+            const indicator_data_fetch = await getData(url, projectID);
+            setIndicatorData(indicator_data_fetch);
+
+        }
+        fetchIndicatorData("http://localhost:3000/api/indicator-data/", "test_project")
+
 
     }, [])
 
     useEffect(() => {
         setProcessedDataCSV(generateCSV(processedData))
-        generateDownloadLink(processedData)
+        generateDataDownloadLink("processedData")
     }, [processedData])
 
+    useEffect(() => {
+        setDataIndicatorCSV(generateCSV(indicatorData))
+        generateDataDownloadLink("indicatorData")
+    }, [indicatorData])
+
     // Generate a 
-    function generateDownloadLink(datastring) {
+    function generateDataDownloadLink(data_type) {
 
         //console.log("Trying to download")
-        const list = ["apple", "banana", "pear"]
-        const data = new Blob([processedDataCSV], { type: 'text/plain' })
 
+        if (data_type === "processedData") {
+            const data = new Blob([processedDataCSV], { type: 'text/plain' })
 
-        // this part avoids memory leaks
-        if (downloadLink !== '') {
-            window.URL.revokeObjectURL(downloadLink)
+            // this part avoids memory leaks
+            if (processedDataDownloadLink !== '') {
+                window.URL.revokeObjectURL(processedDataDownloadLink)
+            }
+            // update the download link state
+            setProcessedDataDownloadLink(window.URL.createObjectURL(data))
         }
 
-        // update the download link state
-        setDownloadLink(window.URL.createObjectURL(data))
+        if (data_type === "indicatorData") {
+
+            const data = new Blob([indicatorDataCSV], { type: 'text/plain' })
+
+            if (indicatorDataDownloadLink !== '') {
+                window.URL.revokeObjectURL(indicatorDataDownloadLink)
+            }
+            // update the download link state
+            setIndicatorDataDownloadLink(window.URL.createObjectURL(data))
+        }
     }
 
 
@@ -225,11 +252,25 @@ export default function DataViewer() {
             <div className="button-container">
                 <a
                     // Name of the file to download
-                    download='data.csv'
+                    download='rhomis_processed_data.csv'
                     // link to the download URL
-                    href={downloadLink}
+                    href={processedDataDownloadLink}
                 >
-                    <Button className="download-button">Download Data</ Button></a>
+                    <Button className="download-button">Download Processed RHoMIS Data</ Button></a>
+            </div>
+
+            <h1>Indicator Dataset</h1>
+            <div className="table-container">
+                {renderTable(indicatorData)}
+            </div>
+            <div className="button-container">
+                <a
+                    // Name of the file to download
+                    download='rhomis_indicator_data.csv'
+                    // link to the download URL
+                    href={indicatorDataDownloadLink}
+                >
+                    <Button className="download-button">Download RHoMIS Indicator Data</ Button></a>
             </div>
 
         </>
