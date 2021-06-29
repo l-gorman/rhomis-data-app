@@ -180,6 +180,40 @@ export default function DataViewer() {
     const [indicatorDataCSV, setDataIndicatorCSV] = useState('')
     const [indicatorDataDownloadLink, setIndicatorDataDownloadLink] = useState('')
 
+    const [csvsAvailable, setcsvAvailable] = useState(false)
+
+
+
+    const processedDataButton = () => {
+        if (csvsAvailable) {
+            return (<div className="button-container">
+                <a
+                    // Name of the file to download
+                    download='rhomis_processed_data.csv'
+                    // link to the download URL
+                    href={processedDataDownloadLink}
+                >
+                    <Button className="download-button">Download Processed RHoMIS Data</ Button></a>
+            </div>
+            )
+        }
+    }
+
+    const indicatorDataButton = () => {
+        if (csvsAvailable) {
+            return (<div className="button-container">
+                <a
+                    // Name of the file to download
+                    download='rhomis_indicator_data.csv'
+                    // link to the download URL
+                    href={indicatorDataDownloadLink}
+                >
+                    <Button className="download-button">Download RHoMIS Indicator Data</ Button></a>
+            </div>
+
+            )
+        }
+    }
 
 
     // Running only when the page loads
@@ -201,7 +235,26 @@ export default function DataViewer() {
         fetchIndicatorData("http://localhost:3000/api/indicator-data/", "test_project")
 
 
+        setProcessedDataCSV(generateCSV(processedData))
+        generateDataDownloadLink("processedData")
+
+        setDataIndicatorCSV(generateCSV(indicatorData))
+        generateDataDownloadLink("indicatorData")
+
+
     }, [])
+
+    function generateCSVButton() {
+        setProcessedDataCSV(generateCSV(processedData))
+        console.log(processedDataCSV)
+        generateDataDownloadLink("processedData")
+
+        setDataIndicatorCSV(generateCSV(indicatorData))
+        generateDataDownloadLink("indicatorData")
+
+        setcsvAvailable(true)
+
+    }
 
     useEffect(() => {
         setProcessedDataCSV(generateCSV(processedData))
@@ -245,34 +298,23 @@ export default function DataViewer() {
     // Return Body of the main function
     return (
         <>
+            <div>
+                <Button onClick={() => generateCSVButton()}>GenerateCSV</Button>
+            </div>
             <h1>Processed Dataset</h1>
             <div className="table-container">
                 {renderTable(processedData)}
             </div>
-            <div className="button-container">
-                <a
-                    // Name of the file to download
-                    download='rhomis_processed_data.csv'
-                    // link to the download URL
-                    href={processedDataDownloadLink}
-                >
-                    <Button className="download-button">Download Processed RHoMIS Data</ Button></a>
-            </div>
+            {processedDataButton()}
+
+
+
 
             <h1>Indicator Dataset</h1>
             <div className="table-container">
                 {renderTable(indicatorData)}
             </div>
-            <div className="button-container">
-                <a
-                    // Name of the file to download
-                    download='rhomis_indicator_data.csv'
-                    // link to the download URL
-                    href={indicatorDataDownloadLink}
-                >
-                    <Button className="download-button">Download RHoMIS Indicator Data</ Button></a>
-            </div>
-
+            {indicatorDataButton()}
         </>
     )
 }
