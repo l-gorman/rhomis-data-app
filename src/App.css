@@ -1,12 +1,16 @@
-.main-page-container, form {
-  display: grid;
-  place-items: center;
-  padding:2em;  
+.main-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top:2em;
 }
 
-button{
-  margin:1em;
+h1{
+  padding: 20px;
+  text-align: center;
 }
+
+
 
 
 

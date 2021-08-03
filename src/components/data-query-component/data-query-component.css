@@ -1,0 +1,48 @@
+
+
+
+
+
+
+.filter-button {
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+
+.end-button-container{
+    width: 80vw;
+    display: grid;
+    place-items: end;
+}
+
+.end-button{
+    margin: 20px;
+}
+
+
+
+
+.sub-page-container {
+    width:80vw;
+}
+
+.button-row{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
