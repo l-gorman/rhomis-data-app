@@ -332,7 +332,7 @@ export default function DataQueryComponent() {
     // Return Body of the main function
     return (
         <div className="sub-page-container">
-            <h1>Query RHoMIS Datasets</h1>
+            <h1>RHoMIS 2.0 Data Querying</h1>
             <Card >
                 <Card.Header className="bg-dark text-white">Data Filters</Card.Header>
 
