@@ -256,6 +256,7 @@ function filterButtons(projectInformationAvailable, projectInformation, projectI
                             <DropdownButton className="filter-button" onSelect={(e) => setDataType(e)} title="Select Data to View">
                                 <Dropdown.Item eventKey="processedData">Whole Survey</Dropdown.Item>
                                 <Dropdown.Item eventKey="indicatorData">Indicator Data</Dropdown.Item>
+                                <Dropdown.Item eventKey="metaData">Meta Data</Dropdown.Item>
                             </DropdownButton>
                         </div>
                     </div>
