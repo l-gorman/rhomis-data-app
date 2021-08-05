@@ -11,7 +11,7 @@ function renderTable(data) {
 
     if (data !== null) {
 
-        var full_data_set = data.slice(1, 10)
+        var full_data_set = data.slice(0, 9)
         var column_names = []
 
 
@@ -213,6 +213,14 @@ function dataDownloadButton(dataDownloadLink, csvsAvailable, dataType, projectID
     }
 }
 
+function dropDownTitle(titleType, value) {
+    if (value === null) {
+        return (titleType)
+    }
+    return (value)
+
+}
+
 function filterButtons(projectInformationAvailable, projectInformation, projectID, setProjectID, formID, setFormID, dataType, setDataType) {
     if (projectInformationAvailable) {
 
@@ -240,23 +248,25 @@ function filterButtons(projectInformationAvailable, projectInformation, projectI
                     <div>
                         <div className="button-row">
 
-                            <DropdownButton className="filter-button" onSelect={(e) => setProjectID(e)} title="Project ID">
+                            <DropdownButton className="filter-button" onSelect={(e) => setProjectID(e)} title={dropDownTitle("Project ID", projectID)}>
                                 {projectIDs.map((projectID) => {
                                     return (<Dropdown.Item eventKey={projectID}>{projectID}</Dropdown.Item>)
                                 })}
 
                             </DropdownButton>
 
-                            <DropdownButton className="filter-button" onSelect={(e) => setFormID(e)} title="Form ID">
+                            <DropdownButton className="filter-button" onSelect={(e) => setFormID(e)} title={dropDownTitle("Form ID", formID)}>
                                 {formIDs.map((formID) => {
                                     return (<Dropdown.Item eventKey={formID}>{formID}</Dropdown.Item>)
                                 })}
                             </DropdownButton>
 
-                            <DropdownButton className="filter-button" onSelect={(e) => setDataType(e)} title="Select Data to View">
+                            <DropdownButton className="filter-button" onSelect={(e) => setDataType(e)} title={dropDownTitle("Select Data to View", dataType)}>
                                 <Dropdown.Item eventKey="processedData">Whole Survey</Dropdown.Item>
                                 <Dropdown.Item eventKey="indicatorData">Indicator Data</Dropdown.Item>
                                 <Dropdown.Item eventKey="metaData">Meta Data</Dropdown.Item>
+                                <Dropdown.Item eventKey="cropData">Crop Data</Dropdown.Item>
+                                <Dropdown.Item eventKey="livestockData">Livestock Data</Dropdown.Item>
                             </DropdownButton>
                         </div>
                     </div>
