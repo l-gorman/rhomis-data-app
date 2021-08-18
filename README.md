@@ -2,6 +2,8 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+* Looking at setting different environments for development, testing, and production. See this [link](https://serverless-stack.com/chapters/environments-in-create-react-app.html)
+
 ## Available Scripts
 
 In the project directory, you can run:
