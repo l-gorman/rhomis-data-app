@@ -1,6 +1,29 @@
 
 
 .child-login-container{
+    display: grid;
+    align-items:center;    
+    min-width: 500px;
+    width:40%;
+    height: 100%;
+}
+
+.card-style{
     display: flex;
     flex-direction: column;
+}
+
+.button-container{
+    width:100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    
+
+}
+
+.login-buttons{
+margin-left: 10px;
+    /* margin-right: 10px; */
+
 }
