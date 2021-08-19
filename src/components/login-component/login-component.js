@@ -154,7 +154,7 @@ async function Login(props) {
 
     const response = await axios({
         method: "post",
-        url: process.env.REACT_APP_API_URL + "api/user/login",
+        url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/login",
         data: {
             email: props.email,
             password: props.password
@@ -179,7 +179,7 @@ async function RegisterUser(event, firstName, surname, email, password) {
 
     const response = await axios({
         method: "post",
-        url: process.env.REACT_APP_API_URL + "api/user/register",
+        url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/register",
         data: {
             username: username,
             email: email,
