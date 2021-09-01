@@ -330,7 +330,7 @@ function fetchDataButton(projectInformationAvailable, dataType, projectID, formI
 
 
 // Full data viewer component
-export default function DataQueryComponent(dataInit = null,
+function DataQueryComponent(dataInit = null,
     dataDownloadInit = null,
     csvsAvailableInit = false,
     projectInformationAvailableInit = null,
@@ -359,8 +359,8 @@ export default function DataQueryComponent(dataInit = null,
 
     // Return Body of the main function
     return (
-        <div className="sub-page-container">
-            <h1>RHoMIS 2.0 Data Querying</h1>
+        <div id="data-query-container" className="sub-page-container">
+            <h1 id="data-query-title">RHoMIS 2.0 Data Querying</h1>
             <Card >
                 <Card.Header className="bg-dark text-white">Data Filters</Card.Header>
 
@@ -376,3 +376,21 @@ export default function DataQueryComponent(dataInit = null,
         </div >
     )
 }
+
+
+// Export all of the functions as want to ensure
+// that they work for testing purposes
+export {
+    DataQueryComponent,
+    renderTable,
+    generateCSV,
+    fetchProjectInformation,
+    fetchData,
+    generateDataDownloadLink,
+    dataDownloadButton,
+    dropDownTitle,
+    filterButtons,
+    projectInformationButton,
+    fetchDataButton
+}
+

@@ -1,20 +1,26 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
+import { Button, Card, Form } from 'react-bootstrap'
+import axios from 'axios'
 
 import "./login-component.css"
 
 
-function CheckCredentials(username, password) {
 
-    if (password === "" & username === "") {
-        alert("No username or password given")
+function CheckCredentials(firstName, surname, email, password) {
+
+    if (firstName === null) {
+        alert("No first name given")
         return false
     }
-
-    if (username === "") {
-        alert("No username given")
+    if (surname === null) {
+        alert("No surname given")
         return false
     }
-    if (password === "") {
+    if (email === null) {
+        alert("No email given")
+        return false
+    }
+    if (password === null) {
         alert("No password given")
         return false
     }
@@ -22,56 +28,208 @@ function CheckCredentials(username, password) {
     return true
 }
 
+function LoginCard(props) {
+    return (
+        <Card className="card-style">
+            <Card.Header className="bg-dark text-white">
+                <h2>Login</h2>
+            </Card.Header>
+            <Card.Body>
+                <Form>
+                    <Form.Group>
+                        <Form.Label htmlFor="email">Email</Form.Label>
+                        <Form.Control id="email" type="text" onChange={(event) => props.setEmail(event.target.value)} />
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Label htmlFor="password">Password</Form.Label>
+                        <Form.Control type="password" onChange={(event) => props.setPassword(event.target.value)} />
+                    </Form.Group>
+                    <div className="button-container">
+                        <Button className="login-buttons"
+                            variant="dark"
+                            onClick={(event) => props.Login({
+                                event: event,
+                                email: props.email,
+                                password: props.password, setAuthToken: props.setAuthToken
+                            })}>Login</Button>
+                    </div>
+                    <a href="#" onClick={(event) => { props.setCardType(!props.cardType) }}>Click here</a> for registration
 
-function RegisterUser(event, username, password) {
-    event.preventDefault()
-    const credentialsGiven = CheckCredentials(username, password)
-
-    console.log("RegisterUser pressed")
-    console.log("Credentials given: " + credentialsGiven)
+                </Form>
+            </Card.Body>
+        </Card >
+    )
 
 }
 
-function Login(event, username, password) {
-    event.preventDefault()
-    const credentialsGiven = CheckCredentials(username, password)
-    console.log("Login pressed")
-    console.log("Credentials given: " + credentialsGiven)
+function RegistrationCard(props) {
+
+    return (
+        <Card className="card-style">
+            <Card.Header className="bg-dark text-white">
+                <h2>Registration</h2>
+            </Card.Header>
+            <Card.Body>
+                <Form>
+                    <Form.Group>
+                        <Form.Label htmlFor="firstName">First Name</Form.Label>
+                        <Form.Control id="firstName" type="text" onChange={(event) => props.setFirstName(event.target.value)} />
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Label htmlFor="surname">Surname</Form.Label>
+                        <Form.Control id="surname" type="text" onChange={(event) => props.setSurname(event.target.value)} />
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Label htmlFor="email">Email</Form.Label>
+                        <Form.Control id="email" type="text" onChange={(event) => props.setEmail(event.target.value)} />
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Label htmlFor="password">Password</Form.Label>
+                        <Form.Control type="password" onChange={(event) => props.setPassword(event.target.value)} />
+                    </Form.Group>
+                    <div className="button-container">
+                        <Button className="login-buttons" variant="dark" onClick={(event) => props.RegisterUser(event, props.firstName, props.surname, props.email, props.password)}>Register</Button>
+                    </div>
+                    <a href="#" onClick={(event) => { props.setCardType(!props.cardType) }}>Click here</a> for login
+
+                </Form>
+            </Card.Body>
+        </Card>
+    )
+}
+
+function RenderCard(props) {
+    if (props.cardType === true) {
+        return (
+            <RegistrationCard
+
+                cardType={props.cardType}
+                setCardType={props.setCardType}
+
+                setFirstName={props.setFirstName}
+                firstName={props.firstName}
+
+                setSurname={props.setSurname}
+                surname={props.surname}
+
+                setEmail={props.setEmail}
+                email={props.email}
+
+                setPassword={props.setPassword}
+                password={props.password}
+
+                RegisterUser={props.RegisterUser}
+
+            />
+
+        )
+    }
+
+    if (props.cardType === false) {
+        return (
+            <LoginCard
+                cardType={props.cardType}
+                setCardType={props.setCardType}
+
+                setEmail={props.setEmail}
+                email={props.email}
+
+                setPassword={props.setPassword}
+                password={props.password}
+
+                Login={props.Login}
+                setAuthToken={props.setAuthToken}
+            />
+
+        )
+    }
+    return "x"
+}
+
+async function Login(props) {
+    props.event.preventDefault()
+    //const credentialsGiven = CheckCredentials(email, password)
+
+    const response = await axios({
+        method: "post",
+        url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/login",
+        data: {
+            email: props.email,
+            password: props.password
+        }
+    })
+
+    if (response.status === 200) {
+        props.setAuthToken(response.data)
+    }
+    console.log(response)
+
+
 
 }
 
-export default function LoginComponent() {
+async function RegisterUser(event, firstName, surname, email, password) {
+    // Stop the page from refreshing
+    event.preventDefault()
+    // check all of the details given
+    //const credentialsGiven = CheckCredentials(firstName, surname, email, password)
+    const username = firstName + "_" + surname
 
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("")
+    const response = await axios({
+        method: "post",
+        url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/register",
+        data: {
+            username: username,
+            email: email,
+            password: password
+        }
+    })
 
-    useEffect(() => {
-        console.log("Username = " + username);
 
-    }, [username]);
+    console.log(response)
+    //console.log("Credentials given: " + credentialsGiven)
 
-    useEffect(() => {
-        console.log("Password = " + password);
+}
 
-    }, [password]);
 
+export default function LoginComponent(props) {
+
+    const [firstName, setFirstName] = useState(null);
+    const [surname, setSurname] = useState(null);
+
+    const [cardType, setCardType] = useState(false)
+
+    const [password, setPassword] = useState(null);
+    const [email, setEmail] = useState(null);
 
 
     return (
         <div className="child-login-container">
-            <h1>Login</h1>
-            <form>
-                <label htmlFor="username">Username</label>
-                <input id="username" type="text" onChange={(event) => setUsername(event.target.value)} />
-                <label htmlFor="password">Password</label>
-                <input type="password" onChange={(event) => setPassword(event.target.value)} />
-                <div>
-                    <button onClick={(event) => Login(event, username, password)}>Login</button>
-                    <button onClick={(event) => RegisterUser(event, username, password)}>Register</button>
-                </div>
 
-            </form>
-        </div>
+            <RenderCard
+                setFirstName={setFirstName}
+                firstName={firstName}
+
+                setSurname={setSurname}
+                surname={surname}
+
+                setEmail={setEmail}
+                email={email}
+
+                setPassword={setPassword}
+                password={password}
+
+                setCardType={setCardType}
+                cardType={cardType}
+
+                RegisterUser={RegisterUser}
+                Login={Login}
+
+                setAuthToken={props.setAuthToken}
+            />
+
+
+        </div >
 
     )
 }
