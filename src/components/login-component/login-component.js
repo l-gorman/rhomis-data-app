@@ -28,8 +28,6 @@ function CheckCredentials(firstName, surname, email, password) {
     return true
 }
 
-
-
 function LoginCard(props) {
     return (
         <Card className="card-style">
