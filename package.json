@@ -1,6 +1,5 @@
 {
   "name": "rhomis-data-manager",
-  "homepage": "https://app.l-gorman.com",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
