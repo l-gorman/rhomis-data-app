@@ -352,6 +352,39 @@ function fetchDataButton(projectInformationAvailable, dataType, projectName, for
 }
 
 
+async function processData(projectName, formID, authToken) {
+    const response = await axios({
+        method: "post",
+        url: process.env.REACT_APP_API_URL + "api/process-data",
+        data: {
+            projectName: projectName,
+            formName: formID
+        },
+        headers: {
+            'Authorization': authToken
+        }
+    })
+
+    return (response)
+
+}
+
+function processDataButton(projectInformationAvailable, projectName, formID, authToken) {
+    if (projectInformationAvailable) {
+        return (
+            <div className="end-button-container">
+                < Button className="end-button" onClick={async () => {
+
+                    const dataProcessedResponse = await processData(projectName, formID, authToken)
+                    console.log(dataProcessedResponse)
+                }
+                }>Process Data</Button >
+            </div>
+        )
+    }
+}
+
+
 
 // Full data viewer component
 function DataQueryComponent(props) {
@@ -374,6 +407,7 @@ function DataQueryComponent(props) {
     const [projectName, setProjectName] = useState(null)
 
     const [formID, setFormID] = useState(null)
+
     //authToken
     // Return Body of the main function
 
@@ -398,7 +432,7 @@ function DataQueryComponent(props) {
                 {filterButtons(projectInformationAvailable, projectInformation, projectName, setProjectName, formID, setFormID, dataType, setDataType)}
 
                 {projectInformationButton(projectInformation, setProjectInformation, projectInformationAvailable, setProjectInformationAvailable, props.authToken)}
-
+                {processDataButton(projectInformationAvailable, projectName, formID, props.authToken)}
                 {fetchDataButton(projectInformationAvailable, dataType, projectName, formID, dataDownloadLink, setDataDownloadLink, setData, setcsvAvailable, props.authToken)}
             </Card>
 
