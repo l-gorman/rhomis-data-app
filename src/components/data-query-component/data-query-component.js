@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { Table, Button, Dropdown, DropdownButton, Card } from 'react-bootstrap'
 import "./data-query-component.css"
@@ -266,6 +266,9 @@ function filterButtons(projectInformationAvailable, projectInformation, projectN
 
 
 
+
+
+
         return (
             <>
                 <Card.Body>
@@ -281,15 +284,20 @@ function filterButtons(projectInformationAvailable, projectInformation, projectN
                             </DropdownButton>
 
                             <DropdownButton className="filter-button" onSelect={(e) => setFormID(e)} title={dropDownTitle("Form ID", formID)}>
-                                {formIDs.map((formID) => {
-                                    return (<Dropdown.Item eventKey={formID}>{formID}</Dropdown.Item>)
-                                })}
+
+
+                                {
+                                    formIDs.map((formID) => {
+
+                                        return (<Dropdown.Item eventKey={formID}>{formID}</Dropdown.Item>)
+
+                                    })}
                             </DropdownButton>
 
                             <DropdownButton className="filter-button" onSelect={(e) => setDataType(e)} title={dropDownTitle("Select Data to View", dataType)}>
                                 <Dropdown.Item eventKey="processedData">Whole Survey</Dropdown.Item>
                                 <Dropdown.Item eventKey="indicatorData">Indicator Data</Dropdown.Item>
-                                <Dropdown.Item eventKey="metaData">Meta Data</Dropdown.Item>
+                                {/* <Dropdown.Item eventKey="metaData">Meta Data</Dropdown.Item> */}
                                 <Dropdown.Item eventKey="cropData">Crop Data</Dropdown.Item>
                                 <Dropdown.Item eventKey="livestockData">Livestock Data</Dropdown.Item>
                             </DropdownButton>
@@ -368,6 +376,19 @@ function DataQueryComponent(props) {
     const [formID, setFormID] = useState(null)
     //authToken
     // Return Body of the main function
+
+    // useEffect(() => {
+    //     async function fetchInitialData() {
+    //         const newProjectInfo = await fetchProjectInformation(authToken)
+    //         setProjectInformation(newProjectInfo)
+    //         setProjectInformationAvailable(true)
+    //     }
+    //     fetchInitialData()
+
+    // }, [])
+
+
+
     return (
         <div id="data-query-container" className="sub-page-container">
             <h1 id="data-query-title">RHoMIS 2.0 Data Querying</h1>
