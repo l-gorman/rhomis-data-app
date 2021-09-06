@@ -8,7 +8,7 @@ import LoginComponent from "./components/login-component/login-component"
 import { DataQueryComponent } from "./components/data-query-component/data-query-component"
 
 function RenderComponent(props) {
-  if (props.authToken !== null) return <DataQueryComponent />
+  if (props.authToken !== null) return <DataQueryComponent authToken={props.authToken} />
   if (props.authToken === null) return <LoginComponent authToken={props.authToken} setAuthToken={props.setAuthToken} />
   return null
 

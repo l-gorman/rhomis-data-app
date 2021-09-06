@@ -155,14 +155,21 @@ function generateCSV(data) {
 
 
 // Getting project meta-data
-async function fetchProjectInformation() {
+async function fetchProjectInformation(authToken) {
     // Basic get request for metadata
-    const response = await axios.get(process.env.REACT_APP_API_URL + "api/meta-data")
-    return (response.data)
+    const response = await axios({
+        method: "get",
+        url: process.env.REACT_APP_API_URL + "api/meta-data",
+        headers: {
+            'Authorization': authToken
+        }
+    })
+    //const response = await axios.get(process.env.REACT_APP_API_URL + "api/meta-data")
+    return (response.data[0])
 }
 
 // Getting all data as normal
-async function fetchData(dataType, projectID, formID) {
+async function fetchData(dataType, projectName, formID, authToken) {
     // Basic post request, fetching information by: 
     //dataType: type of data we are looking for (e.g. indicator data),
 
@@ -171,8 +178,11 @@ async function fetchData(dataType, projectID, formID) {
         url: process.env.REACT_APP_API_URL + "api/data",
         data: {
             dataType: dataType,
-            projectID: projectID,
+            projectID: projectName,
             formID: formID
+        },
+        headers: {
+            'Authorization': authToken
         }
     })
 
@@ -203,12 +213,12 @@ function generateDataDownloadLink(dataToDownload, dataDownloadLink) {
 }
 
 // A simple button to download the data
-function dataDownloadButton(dataDownloadLink, csvsAvailable, dataType, projectID, formID) {
+function dataDownloadButton(dataDownloadLink, csvsAvailable, dataType, projectName, formID) {
     if (csvsAvailable) {
         return (<div className="end-button-container">
             <a
                 // Name of the file to download
-                download={projectID + '_' + formID + '_' + dataType + '_' + '.csv'}
+                download={projectName + '_' + formID + '_' + dataType + '_' + '.csv'}
                 // link to the download URL
                 href={dataDownloadLink}
             >
@@ -230,20 +240,26 @@ function dropDownTitle(titleType, value) {
 }
 
 // Buttons to filter projects based on meta-data 
-function filterButtons(projectInformationAvailable, projectInformation, projectID, setProjectID, formID, setFormID, dataType, setDataType) {
+function filterButtons(projectInformationAvailable, projectInformation, projectName, setProjectName, formID, setFormID, dataType, setDataType) {
     if (projectInformationAvailable) {
 
-        const projectIDs = projectInformation.map(project => project.projectID)
-            .filter((value, index, self) => self.indexOf(value) === index)
+        console.log(projectInformation)
+        const projectNames = projectInformation.projects.map(project => project.projectName)
 
         // Making sure only the forms belonging to this project are shown.
         const formIDs = []
-        if (projectID !== null) {
-            projectInformation.forEach((project) => {
-                if (project.projectID === projectID) {
-                    formIDs.push(project.formID)
-                }
-            })
+
+        if (projectName !== null) {
+            const project = projectInformation.projects.filter(project => project.projectName === projectName)
+            const projectID = project[0].projectId
+            if (projectID !== null) {
+
+                projectInformation.forms.forEach((form) => {
+                    if (form.projectId === projectID) {
+                        formIDs.push(form.name)
+                    }
+                })
+            }
         }
 
 
@@ -257,9 +273,9 @@ function filterButtons(projectInformationAvailable, projectInformation, projectI
                     <div>
                         <div className="button-row">
 
-                            <DropdownButton className="filter-button" onSelect={(e) => setProjectID(e)} title={dropDownTitle("Project ID", projectID)}>
-                                {projectIDs.map((projectID) => {
-                                    return (<Dropdown.Item eventKey={projectID}>{projectID}</Dropdown.Item>)
+                            <DropdownButton className="filter-button" onSelect={(e) => setProjectName(e)} title={dropDownTitle("Project Name", projectName)}>
+                                {projectNames.map((projectName) => {
+                                    return (<Dropdown.Item eventKey={projectName}>{projectName}</Dropdown.Item>)
                                 })}
 
                             </DropdownButton>
@@ -287,7 +303,7 @@ function filterButtons(projectInformationAvailable, projectInformation, projectI
 
 }
 
-function projectInformationButton(projectInformation, setProjectInformation, projectInformationAvailable, setProjectInformationAvailable) {
+function projectInformationButton(projectInformation, setProjectInformation, projectInformationAvailable, setProjectInformationAvailable, authToken) {
 
     if (!projectInformationAvailable) {
         return (
@@ -300,7 +316,7 @@ function projectInformationButton(projectInformation, setProjectInformation, pro
                 <div className="end-button-container">
 
                     <Button className="end-button" onClick={async () => {
-                        const newProjectInfo = await fetchProjectInformation()
+                        const newProjectInfo = await fetchProjectInformation(authToken)
                         setProjectInformation(newProjectInfo)
                         setProjectInformationAvailable(true)
                     }}>Get Project Information</Button>
@@ -311,12 +327,12 @@ function projectInformationButton(projectInformation, setProjectInformation, pro
     }
 }
 
-function fetchDataButton(projectInformationAvailable, dataType, projectID, formID, dataDownloadLink, setDataDownloadLink, setData, setcsvAvailable) {
+function fetchDataButton(projectInformationAvailable, dataType, projectName, formID, dataDownloadLink, setDataDownloadLink, setData, setcsvAvailable, authToken) {
     if (projectInformationAvailable) {
         return (
             <div className="end-button-container">
                 < Button className="end-button" onClick={async () => {
-                    const newData = await fetchData(dataType, projectID, formID)
+                    const newData = await fetchData(dataType, projectName, formID, authToken)
                     setDataDownloadLink(generateDataDownloadLink(newData, dataDownloadLink))
                     setData(newData)
                     setcsvAvailable(true)
@@ -330,14 +346,7 @@ function fetchDataButton(projectInformationAvailable, dataType, projectID, formI
 
 
 // Full data viewer component
-function DataQueryComponent(dataInit = null,
-    dataDownloadInit = null,
-    csvsAvailableInit = false,
-    projectInformationAvailableInit = null,
-    projectInformationInit = null,
-    dataTypeInit = null,
-    projectIDInit = null,
-    formIDInit = null) {
+function DataQueryComponent(props) {
 
     // The data we are hoping to view and download
     const [data, setData] = useState(null)
@@ -354,9 +363,10 @@ function DataQueryComponent(dataInit = null,
 
     // Data type we are looking for
     const [dataType, setDataType] = useState(null)
-    const [projectID, setProjectID] = useState(null)
-    const [formID, setFormID] = useState(null)
+    const [projectName, setProjectName] = useState(null)
 
+    const [formID, setFormID] = useState(null)
+    //authToken
     // Return Body of the main function
     return (
         <div id="data-query-container" className="sub-page-container">
@@ -364,15 +374,15 @@ function DataQueryComponent(dataInit = null,
             <Card >
                 <Card.Header className="bg-dark text-white">Data Filters</Card.Header>
 
-                {filterButtons(projectInformationAvailable, projectInformation, projectID, setProjectID, formID, setFormID, dataType, setDataType)}
+                {filterButtons(projectInformationAvailable, projectInformation, projectName, setProjectName, formID, setFormID, dataType, setDataType)}
 
-                {projectInformationButton(projectInformation, setProjectInformation, projectInformationAvailable, setProjectInformationAvailable)}
+                {projectInformationButton(projectInformation, setProjectInformation, projectInformationAvailable, setProjectInformationAvailable, props.authToken)}
 
-                {fetchDataButton(projectInformationAvailable, dataType, projectID, formID, dataDownloadLink, setDataDownloadLink, setData, setcsvAvailable)}
+                {fetchDataButton(projectInformationAvailable, dataType, projectName, formID, dataDownloadLink, setDataDownloadLink, setData, setcsvAvailable, props.authToken)}
             </Card>
 
             {renderTable(data)}
-            {dataDownloadButton(dataDownloadLink, csvsAvailable, dataType, projectID, formID)}
+            {dataDownloadButton(dataDownloadLink, csvsAvailable, dataType, projectName, formID)}
         </div >
     )
 }
