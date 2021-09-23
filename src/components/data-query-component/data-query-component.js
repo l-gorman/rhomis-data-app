@@ -1,13 +1,24 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import axios from 'axios'
 import { Table, Button, Dropdown, DropdownButton, Card } from 'react-bootstrap'
 import "./data-query-component.css"
+import { Route, Redirect } from 'react-router-dom'
+
+import AuthContext from '../authentication-component/AuthContext';
 
 // Function to render a table coming in from mongoDB
 function renderTable(data) {
+    console.log(data)
     if (data === null) {
         return (<h1>No Data found</h1>)
     }
+
+    if (data.length === undefined) {
+        return (<h1>No Data found</h1>)
+    }
+
+
+
     if (data !== null) {
         var full_data_set = data.slice(0, 9)
         var column_names = []
@@ -76,12 +87,19 @@ function generateCSV(data) {
         return;
     }
 
+    // console.log("length " + data.length)
+    if (data.length === undefined) {
+        return;
+    }
+
     // Creating an empty list to include all of the lines of the csv
     var csv_lines = []
     // Checking if the data is in order
 
     // This is the full RHoMIS Data set
     var full_data_set = data
+
+
 
     // Identifying the column headers
     // Some households have more columns than other. This merges column
@@ -153,19 +171,20 @@ function generateCSV(data) {
     return (csv_string)
 }
 
-
 // Getting project meta-data
 async function fetchProjectInformation(authToken) {
     // Basic get request for metadata
     const response = await axios({
         method: "get",
-        url: process.env.REACT_APP_API_URL + "api/meta-data",
+        url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/meta-data",
         headers: {
             'Authorization': authToken
         }
     })
     //const response = await axios.get(process.env.REACT_APP_API_URL + "api/meta-data")
-    return (response.data[0])
+    console.log(response.data)
+    //return (undefined)
+    return (response.data)
 }
 
 // Getting all data as normal
@@ -244,35 +263,32 @@ function filterButtons(projectInformationAvailable, projectInformation, projectN
     if (projectInformationAvailable) {
 
         console.log(projectInformation)
-        const projectNames = projectInformation.projects.map(project => project.projectName)
+        const projectNames = projectInformation.projects.map(project => project.name)
 
         // Making sure only the forms belonging to this project are shown.
         const formIDs = []
 
         if (projectName !== null) {
-            const project = projectInformation.projects.filter(project => project.projectName === projectName)
-            const projectID = project[0].projectId
+            const project = projectInformation.projects.filter(project => project.name === projectName)
+            console.log(project)
+            const projectID = project[0].centralID
             if (projectID !== null) {
+                formIDs.push(project[0].forms)
 
-                projectInformation.forms.forEach((form) => {
-                    if (form.projectId === projectID) {
-                        formIDs.push(form.name)
-                    }
-                })
+
+                // projectInformation.forms.forEach((form) => {
+                //     if (form.project === projectID) {
+                //         formIDs.push(form.name)
+                //     }
+                // })
             }
         }
-
-
-
-
-
-
 
 
         return (
             <>
                 <Card.Body>
-                    <p>Please use the filters below to select the data you would like to access. Then click "fetch" data to access a preview of the dataset and make it available for download</p>
+                    <p>Please use the filters below to select the data you would like to access. If the data has not been processed, or you are unsure whether it has been processed, click the "Process Data" button. Then click "fetch" data to access a preview of the dataset and make it available for download</p>
                     <div>
                         <div className="button-row">
 
@@ -297,7 +313,7 @@ function filterButtons(projectInformationAvailable, projectInformation, projectN
                             <DropdownButton className="filter-button" onSelect={(e) => setDataType(e)} title={dropDownTitle("Select Data to View", dataType)}>
                                 <Dropdown.Item eventKey="processedData">Whole Survey</Dropdown.Item>
                                 <Dropdown.Item eventKey="indicatorData">Indicator Data</Dropdown.Item>
-                                {/* <Dropdown.Item eventKey="metaData">Meta Data</Dropdown.Item> */}
+                                <Dropdown.Item eventKey="metaData">Meta Data</Dropdown.Item>
                                 <Dropdown.Item eventKey="cropData">Crop Data</Dropdown.Item>
                                 <Dropdown.Item eventKey="livestockData">Livestock Data</Dropdown.Item>
                             </DropdownButton>
@@ -325,8 +341,13 @@ function projectInformationButton(projectInformation, setProjectInformation, pro
 
                     <Button className="end-button" onClick={async () => {
                         const newProjectInfo = await fetchProjectInformation(authToken)
-                        setProjectInformation(newProjectInfo)
-                        setProjectInformationAvailable(true)
+                        console.log("newProjectInfo")
+
+                        console.log(newProjectInfo)
+                        if (newProjectInfo !== undefined) {
+                            setProjectInformation(newProjectInfo)
+                            setProjectInformationAvailable(true)
+                        }
                     }}>Get Project Information</Button>
                 </div>
 
@@ -351,7 +372,6 @@ function fetchDataButton(projectInformationAvailable, dataType, projectName, for
     }
 }
 
-
 async function processData(projectName, formID, authToken) {
     const response = await axios({
         method: "post",
@@ -359,6 +379,25 @@ async function processData(projectName, formID, authToken) {
         data: {
             projectName: projectName,
             formName: formID
+        },
+        headers: {
+            'Authorization': authToken
+        }
+    })
+
+    return (response)
+
+}
+
+async function generateData(projectName, formID, authToken) {
+    const response = await axios({
+        method: "post",
+        url: process.env.REACT_APP_API_URL + "api/generate-data",
+        data: {
+            projectName: projectName,
+            formName: formID,
+            numberOfResponses: 10
+
         },
         headers: {
             'Authorization': authToken
@@ -384,10 +423,30 @@ function processDataButton(projectInformationAvailable, projectName, formID, aut
     }
 }
 
+function generateDataButton(projectInformationAvailable, projectName, formID, authToken) {
+    if (projectInformationAvailable) {
+        return (
+            <div className="end-button-container">
+                < Button className="end-button" onClick={async () => {
 
+                    const dataGeneratedResponse = await generateData(projectName, formID, authToken)
+                    console.log(dataGeneratedResponse)
+                }
+                }>Generate Data</Button >
+            </div>
+        )
+    }
+}
 
 // Full data viewer component
 function DataQueryComponent(props) {
+
+
+
+    const [authToken, setAuthToken] = useContext(AuthContext)
+
+
+
 
     // The data we are hoping to view and download
     const [data, setData] = useState(null)
@@ -425,15 +484,22 @@ function DataQueryComponent(props) {
 
     return (
         <div id="data-query-container" className="sub-page-container">
+
             <h1 id="data-query-title">RHoMIS 2.0 Data Querying</h1>
             <Card >
                 <Card.Header className="bg-dark text-white">Data Filters</Card.Header>
 
                 {filterButtons(projectInformationAvailable, projectInformation, projectName, setProjectName, formID, setFormID, dataType, setDataType)}
+                {projectInformationButton(projectInformation, setProjectInformation, projectInformationAvailable, setProjectInformationAvailable, authToken)}
+                {generateDataButton(projectInformationAvailable, projectName, formID, authToken)}
+                {processDataButton(projectInformationAvailable, projectName, formID, authToken)}
+                {fetchDataButton(projectInformationAvailable, dataType, projectName, formID, dataDownloadLink, setDataDownloadLink, setData, setcsvAvailable, authToken)}
 
+                {/* {filterButtons(projectInformationAvailable, projectInformation, projectName, setProjectName, formID, setFormID, dataType, setDataType)}
                 {projectInformationButton(projectInformation, setProjectInformation, projectInformationAvailable, setProjectInformationAvailable, props.authToken)}
+                {generateDataButton(projectInformationAvailable, projectName, formID, props.authToken)}
                 {processDataButton(projectInformationAvailable, projectName, formID, props.authToken)}
-                {fetchDataButton(projectInformationAvailable, dataType, projectName, formID, dataDownloadLink, setDataDownloadLink, setData, setcsvAvailable, props.authToken)}
+                {fetchDataButton(projectInformationAvailable, dataType, projectName, formID, dataDownloadLink, setDataDownloadLink, setData, setcsvAvailable, props.authToken)} */}
             </Card>
 
             {renderTable(data)}

@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
+/**/
+
+import React, { useState, useContext } from 'react'
 import { Button, Card, Form } from 'react-bootstrap'
 import axios from 'axios'
 
 import "./login-component.css"
 
-
+import AuthContext from '../authentication-component/AuthContext';
 
 function CheckCredentials(firstName, surname, email, password) {
 
@@ -29,10 +31,11 @@ function CheckCredentials(firstName, surname, email, password) {
 }
 
 function LoginCard(props) {
+    const [authToken, setAuthToken] = useContext(AuthContext)
     return (
         <Card className="card-style">
             <Card.Header className="bg-dark text-white">
-                <h2>Login</h2>
+                <h2>RHoMIS 2.0 Login</h2>
             </Card.Header>
             <Card.Body>
                 <Form>
@@ -47,11 +50,19 @@ function LoginCard(props) {
                     <div className="button-container">
                         <Button className="login-buttons"
                             variant="dark"
-                            onClick={(event) => props.Login({
-                                event: event,
-                                email: props.email,
-                                password: props.password, setAuthToken: props.setAuthToken
-                            })}>Login</Button>
+                            onClick={async (event) => {
+                                const token = await Login({
+                                    event: event,
+                                    email: props.email,
+                                    password: props.password,
+                                    // setAuthToken: props.setAuthToken
+                                })
+
+
+                                setAuthToken(token)
+
+
+                            }}>Login</Button>
                     </div>
                     <a href="#" onClick={(event) => { props.setCardType(!props.cardType) }}>Click here</a> for registration
 
@@ -88,7 +99,7 @@ function RegistrationCard(props) {
                         <Form.Control type="password" onChange={(event) => props.setPassword(event.target.value)} />
                     </Form.Group>
                     <div className="button-container">
-                        <Button className="login-buttons" variant="dark" onClick={(event) => props.RegisterUser(event, props.firstName, props.surname, props.email, props.password)}>Register</Button>
+                        <Button className="login-buttons" variant="dark" onClick={(event) => RegisterUser(event, props.firstName, props.surname, props.email, props.password)}>Register</Button>
                     </div>
                     <a href="#" onClick={(event) => { props.setCardType(!props.cardType) }}>Click here</a> for login
 
@@ -118,7 +129,6 @@ function RenderCard(props) {
                 setPassword={props.setPassword}
                 password={props.password}
 
-                RegisterUser={props.RegisterUser}
 
             />
 
@@ -137,8 +147,7 @@ function RenderCard(props) {
                 setPassword={props.setPassword}
                 password={props.password}
 
-                Login={props.Login}
-                setAuthToken={props.setAuthToken}
+            // setAuthToken={props.setAuthToken}
             />
 
         )
@@ -160,12 +169,12 @@ async function Login(props) {
     })
 
     if (response.status === 200) {
-        props.setAuthToken(response.data)
+        // sessionStorage.setItem('token', response.data);
+        // props.setAuthToken(response.data)
+        return (response.data)
+
     }
     console.log(response)
-
-
-
 }
 
 async function RegisterUser(event, firstName, surname, email, password) {
@@ -193,6 +202,8 @@ async function RegisterUser(event, firstName, surname, email, password) {
 
 
 export default function LoginComponent(props) {
+    // Note, cannot pass this into an event handler
+    // const { authToken, setAuthToken } = useContext(AuthContext)
 
     const [firstName, setFirstName] = useState(null);
     const [surname, setSurname] = useState(null);
@@ -222,10 +233,9 @@ export default function LoginComponent(props) {
                 setCardType={setCardType}
                 cardType={cardType}
 
-                RegisterUser={RegisterUser}
-                Login={Login}
 
-                setAuthToken={props.setAuthToken}
+            // setAuthToken={props.setAuthToken}
+            // setAuthToken={setAuthToken}
             />
 
 
