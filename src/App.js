@@ -42,12 +42,12 @@ function App() {
             </Route>
 
             {/* Checking if logged in, otherwise redirect */}
-            {authToken ? <Route exact path="/data-querying">
+            {authToken ? <Route path="/data-querying">
               <DataQueryComponent />
             </Route> : <Redirect to="/login" />}
 
             {/* Checking if logged in, otherwise redirect */}
-            {authToken ? <Route exact path="/data-querying">
+            {authToken ? <Route exact path="/">
               <ProjectManagementComponent />
             </Route> : <Redirect to="/login" />}
           </AuthContext.Provider>
