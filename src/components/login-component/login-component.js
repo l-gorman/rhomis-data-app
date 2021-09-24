@@ -8,16 +8,16 @@ import "./login-component.css"
 
 import AuthContext from '../authentication-component/AuthContext';
 
-function CheckCredentials(firstName, surname, email, password) {
+function CheckCredentials(email, password) {
 
-    if (firstName === null) {
-        alert("No first name given")
-        return false
-    }
-    if (surname === null) {
-        alert("No surname given")
-        return false
-    }
+    // if (firstName === null) {
+    //     alert("No first name given")
+    //     return false
+    // }
+    // if (surname === null) {
+    //     alert("No surname given")
+    //     return false
+    // }
     if (email === null) {
         alert("No email given")
         return false
@@ -82,14 +82,14 @@ function RegistrationCard(props) {
             </Card.Header>
             <Card.Body>
                 <Form>
-                    <Form.Group>
+                    {/* <Form.Group>
                         <Form.Label htmlFor="firstName">First Name</Form.Label>
                         <Form.Control id="firstName" type="text" onChange={(event) => props.setFirstName(event.target.value)} />
                     </Form.Group>
                     <Form.Group>
                         <Form.Label htmlFor="surname">Surname</Form.Label>
                         <Form.Control id="surname" type="text" onChange={(event) => props.setSurname(event.target.value)} />
-                    </Form.Group>
+                    </Form.Group> */}
                     <Form.Group>
                         <Form.Label htmlFor="email">Email</Form.Label>
                         <Form.Control id="email" type="text" onChange={(event) => props.setEmail(event.target.value)} />
@@ -99,7 +99,7 @@ function RegistrationCard(props) {
                         <Form.Control type="password" onChange={(event) => props.setPassword(event.target.value)} />
                     </Form.Group>
                     <div className="button-container">
-                        <Button className="login-buttons" variant="dark" onClick={(event) => RegisterUser(event, props.firstName, props.surname, props.email, props.password)}>Register</Button>
+                        <Button className="login-buttons" variant="dark" onClick={(event) => RegisterUser(event, props.email, props.password)}>Register</Button>
                     </div>
                     <a href="#" onClick={(event) => { props.setCardType(!props.cardType) }}>Click here</a> for login
 
@@ -117,11 +117,11 @@ function RenderCard(props) {
                 cardType={props.cardType}
                 setCardType={props.setCardType}
 
-                setFirstName={props.setFirstName}
-                firstName={props.firstName}
+                // setFirstName={props.setFirstName}
+                // firstName={props.firstName}
 
-                setSurname={props.setSurname}
-                surname={props.surname}
+                // setSurname={props.setSurname}
+                // surname={props.surname}
 
                 setEmail={props.setEmail}
                 email={props.email}
@@ -177,18 +177,18 @@ async function Login(props) {
     console.log(response)
 }
 
-async function RegisterUser(event, firstName, surname, email, password) {
+async function RegisterUser(event, email, password) {
     // Stop the page from refreshing
     event.preventDefault()
     // check all of the details given
     //const credentialsGiven = CheckCredentials(firstName, surname, email, password)
-    const username = firstName + "_" + surname
+    // const username = firstName + "_" + surname
 
     const response = await axios({
         method: "post",
         url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/register",
         data: {
-            username: username,
+            // username: username,
             email: email,
             password: password
         }
@@ -205,8 +205,8 @@ export default function LoginComponent(props) {
     // Note, cannot pass this into an event handler
     // const { authToken, setAuthToken } = useContext(AuthContext)
 
-    const [firstName, setFirstName] = useState(null);
-    const [surname, setSurname] = useState(null);
+    // const [firstName, setFirstName] = useState(null);
+    // const [surname, setSurname] = useState(null);
 
     const [cardType, setCardType] = useState(false)
 
@@ -218,11 +218,11 @@ export default function LoginComponent(props) {
         <div className="child-login-container">
 
             <RenderCard
-                setFirstName={setFirstName}
-                firstName={firstName}
+                // setFirstName={setFirstName}
+                // firstName={firstName}
 
-                setSurname={setSurname}
-                surname={surname}
+                // setSurname={setSurname}
+                // surname={surname}
 
                 setEmail={setEmail}
                 email={email}
