@@ -1,4 +1,7 @@
 
+.waring{
+    color: red;
+}
 
 .child-login-container{
     display: grid;

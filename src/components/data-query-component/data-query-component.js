@@ -441,7 +441,7 @@ function generateDataButton(projectInformationAvailable, projectName, formID, au
 // Full data viewer component
 function DataQueryComponent(props) {
 
-
+    const [requestError, setRequestError] = useState(null)
 
     const [authToken, setAuthToken] = useContext(AuthContext)
 
@@ -454,7 +454,6 @@ function DataQueryComponent(props) {
     const [dataDownloadLink, setDataDownloadLink] = useState('')
     // A boolean indicating whether or not the csv is ready to download
     const [csvsAvailable, setcsvAvailable] = useState(false)
-
     // Boolean indicating whether or not project information has been downloaded yet
     const [projectInformationAvailable, setProjectInformationAvailable] = useState(false)
 

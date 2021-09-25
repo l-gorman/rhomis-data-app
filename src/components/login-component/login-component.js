@@ -7,8 +7,9 @@ import axios from 'axios'
 import "./login-component.css"
 
 import AuthContext from '../authentication-component/AuthContext';
+// import { set } from 'msw/lib/types/context';
 
-function CheckCredentials(email, password) {
+function CheckCredentials(props) {
 
     // if (firstName === null) {
     //     alert("No first name given")
@@ -18,12 +19,12 @@ function CheckCredentials(email, password) {
     //     alert("No surname given")
     //     return false
     // }
-    if (email === null) {
-        alert("No email given")
+    if (props.email === null) {
+        props.setRequestError("No email given")
         return false
     }
-    if (password === null) {
-        alert("No password given")
+    if (props.password === null) {
+        props.setRequestError("No password given")
         return false
     }
 
@@ -47,6 +48,7 @@ function LoginCard(props) {
                         <Form.Label htmlFor="password">Password</Form.Label>
                         <Form.Control type="password" onChange={(event) => props.setPassword(event.target.value)} />
                     </Form.Group>
+                    {props.requestError ? <p className="warning">{props.requestError}</p> : null}
                     <div className="button-container">
                         <Button className="login-buttons"
                             variant="dark"
@@ -55,6 +57,9 @@ function LoginCard(props) {
                                     event: event,
                                     email: props.email,
                                     password: props.password,
+                                    requestError: props.requestError,
+                                    setRequestError: props.setRequestError
+
                                     // setAuthToken: props.setAuthToken
                                 })
 
@@ -82,14 +87,6 @@ function RegistrationCard(props) {
             </Card.Header>
             <Card.Body>
                 <Form>
-                    {/* <Form.Group>
-                        <Form.Label htmlFor="firstName">First Name</Form.Label>
-                        <Form.Control id="firstName" type="text" onChange={(event) => props.setFirstName(event.target.value)} />
-                    </Form.Group>
-                    <Form.Group>
-                        <Form.Label htmlFor="surname">Surname</Form.Label>
-                        <Form.Control id="surname" type="text" onChange={(event) => props.setSurname(event.target.value)} />
-                    </Form.Group> */}
                     <Form.Group>
                         <Form.Label htmlFor="email">Email</Form.Label>
                         <Form.Control id="email" type="text" onChange={(event) => props.setEmail(event.target.value)} />
@@ -98,14 +95,24 @@ function RegistrationCard(props) {
                         <Form.Label htmlFor="password">Password</Form.Label>
                         <Form.Control type="password" onChange={(event) => props.setPassword(event.target.value)} />
                     </Form.Group>
+                    {props.requestError ? <p>{props.requestError}</p> : null}
+
                     <div className="button-container">
-                        <Button className="login-buttons" variant="dark" onClick={(event) => RegisterUser(event, props.email, props.password)}>Register</Button>
+                        <Button className="login-buttons" variant="dark" onClick={(event) => {
+                            RegisterUser({
+                                event: event,
+                                email: props.email,
+                                password: props.password,
+                                requestError: props.requestError,
+                                setRequestError: props.setRequestError
+                            })
+                        }}>Register</Button>
                     </div>
                     <a href="#" onClick={(event) => { props.setCardType(!props.cardType) }}>Click here</a> for login
 
                 </Form>
             </Card.Body>
-        </Card>
+        </Card >
     )
 }
 
@@ -117,17 +124,15 @@ function RenderCard(props) {
                 cardType={props.cardType}
                 setCardType={props.setCardType}
 
-                // setFirstName={props.setFirstName}
-                // firstName={props.firstName}
-
-                // setSurname={props.setSurname}
-                // surname={props.surname}
 
                 setEmail={props.setEmail}
                 email={props.email}
 
                 setPassword={props.setPassword}
                 password={props.password}
+
+                requestError={props.requestError}
+                setRequestError={props.setRequestError}
 
 
             />
@@ -147,55 +152,71 @@ function RenderCard(props) {
                 setPassword={props.setPassword}
                 password={props.password}
 
-            // setAuthToken={props.setAuthToken}
+                requestError={props.requestError}
+                setRequestError={props.setRequestError}
             />
 
         )
     }
-    return "x"
+    return <h1>Error loading application</h1>
 }
 
 async function Login(props) {
     props.event.preventDefault()
-    //const credentialsGiven = CheckCredentials(email, password)
+    props.setRequestError(null)
 
-    const response = await axios({
-        method: "post",
-        url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/login",
-        data: {
-            email: props.email,
-            password: props.password
-        }
-    })
+    const credentialsGiven = CheckCredentials({ email: props.email, password: props.password, requestError: props.requestError, setRequestError: props.setRequestError })
 
-    if (response.status === 200) {
-        // sessionStorage.setItem('token', response.data);
-        // props.setAuthToken(response.data)
+    console.log("logging in user")
+    try {
+        const response = await axios({
+            method: "post",
+            url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/login",
+            data: {
+                email: props.email,
+                password: props.password
+            }
+        })
+        console.log(response)
+
         return (response.data)
 
+    } catch (err) {
+        props.setRequestError(err.response.data)
+
+        return (err.response.data)
+
     }
-    console.log(response)
 }
 
-async function RegisterUser(event, email, password) {
+async function RegisterUser(props) {
     // Stop the page from refreshing
-    event.preventDefault()
+    props.event.preventDefault()
+    props.setRequestError(null)
+
     // check all of the details given
-    //const credentialsGiven = CheckCredentials(firstName, surname, email, password)
+    const credentialsGiven = CheckCredentials({ email: props.email, password: props.password, requestError: props.requestError, setRequestError: props.setRequestError })
     // const username = firstName + "_" + surname
 
-    const response = await axios({
-        method: "post",
-        url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/register",
-        data: {
-            // username: username,
-            email: email,
-            password: password
-        }
-    })
+    try {
+        const response = await axios({
+            method: "post",
+            url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/register",
+            data: {
+                // username: username,
+                email: props.email,
+                password: props.password
+            }
+        })
+        console.log(response)
+
+    } catch (err) {
+        props.setRequestError(err.response.data)
+        return (err.response.data)
+
+    }
 
 
-    console.log(response)
     //console.log("Credentials given: " + credentialsGiven)
 
 }
@@ -207,6 +228,8 @@ export default function LoginComponent(props) {
 
     // const [firstName, setFirstName] = useState(null);
     // const [surname, setSurname] = useState(null);
+
+    const [requestError, setRequestError] = useState(null)
 
     const [cardType, setCardType] = useState(false)
 
@@ -232,6 +255,9 @@ export default function LoginComponent(props) {
 
                 setCardType={setCardType}
                 cardType={cardType}
+
+                requestError={requestError}
+                setRequestError={setRequestError}
 
 
             // setAuthToken={props.setAuthToken}
