@@ -36,10 +36,10 @@ function RenderProjectInformation(props) {
     //props.projects (array of objects)
     //props.forms
 
-    console.log("project info avail:" + props.projectInformationAvailable)
-    console.log("project info:")
-    console.log(props.projectInformation)
-    console.log(props.projectInformation.forms.length === 0)
+    // console.log("project info avail:" + props.projectInformationAvailable)
+    // console.log("project info:")
+    // console.log(props.projectInformation)
+    // console.log(props.projectInformation.forms.length === 0)
     if (props.projectInformationAvailable) {
 
         return (
