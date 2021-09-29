@@ -1,6 +1,6 @@
 import { React } from 'react'
 import { Navbar, Nav } from 'react-bootstrap'
-import { Link, NavLink } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 /* 
 Setting up a standard react navbar to navigation component. Please
@@ -17,12 +17,12 @@ export default function MainNavbar() {
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
 
-                        <NavLink as={Link} activeClassName="current" to="/">Project Management</NavLink>
-                        <NavLink as={Link} to="/data-querying">Data Query</NavLink>
+                        <Nav.Link as={Link} to="/">Project Management</Nav.Link>
+                        <Nav.Link as={Link} to="/data-querying">Data Query</Nav.Link>
                     </Nav>
                     <Nav className="ml-auto">
-                        <NavLink as={Link} className="justify-content-end" to="/login">Account  </NavLink>
-                        <NavLink as={Link} className="justify-content-end" to="/login">Logout</NavLink>
+                        <Nav.Link as={Link} className="justify-content-end" to="/login">Account  </Nav.Link>
+                        <Nav.Link as={Link} className="justify-content-end" to="/login">Logout</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
             </Navbar >
