@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react'
 
-import { Form, Table, Button, Dropdown, DropdownButton, Card } from 'react-bootstrap'
+import { Form, Button, Card } from 'react-bootstrap'
 
 import axios from 'axios'
 
-import { Route, Redirect } from 'react-router-dom'
 
 import AuthContext from '../authentication-component/AuthContext'
 

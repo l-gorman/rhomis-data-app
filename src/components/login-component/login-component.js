@@ -3,7 +3,7 @@
 import React, { useState, useContext } from 'react'
 import { Button, Card, Form } from 'react-bootstrap'
 import axios from 'axios'
-
+import { useHistory } from 'react-router'
 import "./login-component.css"
 
 import AuthContext from '../authentication-component/AuthContext';
@@ -53,18 +53,30 @@ function LoginCard(props) {
                         <Button className="login-buttons"
                             variant="dark"
                             onClick={async (event) => {
-                                const token = await Login({
+                                const tokenResponse = await Login({
                                     event: event,
                                     email: props.email,
                                     password: props.password,
                                     requestError: props.requestError,
-                                    setRequestError: props.setRequestError
+                                    setRequestError: props.setRequestError,
+
 
                                     // setAuthToken: props.setAuthToken
                                 })
+                                if (tokenResponse.status === 400) {
+                                    return
+                                }
 
+                                if (tokenResponse.status === 200) {
+                                    setAuthToken(tokenResponse.data)
 
-                                setAuthToken(token)
+                                    console.log("Setting token")
+
+                                    console.log(tokenResponse.data)
+                                    props.history.push("/")
+
+                                }
+
 
 
                             }}>Login</Button>
@@ -95,7 +107,7 @@ function RegistrationCard(props) {
                         <Form.Label htmlFor="password">Password</Form.Label>
                         <Form.Control type="password" onChange={(event) => props.setPassword(event.target.value)} />
                     </Form.Group>
-                    {props.requestError ? <p>{props.requestError}</p> : null}
+                    {props.requestError ? <p className="warning">{props.requestError}</p> : null}
 
                     <div className="button-container">
                         <Button className="login-buttons" variant="dark" onClick={(event) => {
@@ -104,7 +116,9 @@ function RegistrationCard(props) {
                                 email: props.email,
                                 password: props.password,
                                 requestError: props.requestError,
-                                setRequestError: props.setRequestError
+                                setRequestError: props.setRequestError,
+                                history: props.history,
+                                setCardType: props.setCardType
                             })
                         }}>Register</Button>
                     </div>
@@ -121,6 +135,7 @@ function RenderCard(props) {
         return (
             <RegistrationCard
 
+
                 cardType={props.cardType}
                 setCardType={props.setCardType}
 
@@ -134,6 +149,7 @@ function RenderCard(props) {
                 requestError={props.requestError}
                 setRequestError={props.setRequestError}
 
+                history={props.history}
 
             />
 
@@ -154,6 +170,8 @@ function RenderCard(props) {
 
                 requestError={props.requestError}
                 setRequestError={props.setRequestError}
+
+                history={props.history}
             />
 
         )
@@ -177,14 +195,14 @@ async function Login(props) {
                 password: props.password
             }
         })
-        console.log(response)
 
-        return (response.data)
+        return (response)
 
     } catch (err) {
+        console.log(err.response)
         props.setRequestError(err.response.data)
 
-        return (err.response.data)
+        return (err.response)
 
     }
 }
@@ -208,9 +226,11 @@ async function RegisterUser(props) {
                 password: props.password
             }
         })
+        props.setCardType(!props.cardType)
         console.log(response)
 
     } catch (err) {
+        console.log(err)
         props.setRequestError(err.response.data)
         return (err.response.data)
 
@@ -228,6 +248,8 @@ export default function LoginComponent(props) {
 
     // const [firstName, setFirstName] = useState(null);
     // const [surname, setSurname] = useState(null);
+
+    const history = useHistory()
 
     const [requestError, setRequestError] = useState(null)
 
@@ -259,6 +281,7 @@ export default function LoginComponent(props) {
                 requestError={requestError}
                 setRequestError={setRequestError}
 
+                history={history}
 
             // setAuthToken={props.setAuthToken}
             // setAuthToken={setAuthToken}
