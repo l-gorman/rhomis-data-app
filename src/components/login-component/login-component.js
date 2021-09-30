@@ -10,15 +10,6 @@ import AuthContext from '../authentication-component/AuthContext';
 // import { set } from 'msw/lib/types/context';
 
 function CheckCredentials(props) {
-
-    // if (firstName === null) {
-    //     alert("No first name given")
-    //     return false
-    // }
-    // if (surname === null) {
-    //     alert("No surname given")
-    //     return false
-    // }
     if (props.email === null) {
         props.setRequestError("No email given")
         return false
@@ -241,8 +232,7 @@ async function RegisterUser(props) {
 
 }
 
-
-export default function LoginComponent(props) {
+function LoginComponent(props) {
     // Note, cannot pass this into an event handler
     // const { authToken, setAuthToken } = useContext(AuthContext)
 
@@ -291,4 +281,15 @@ export default function LoginComponent(props) {
         </div >
 
     )
+}
+
+export {
+    LoginComponent,
+    CheckCredentials,
+    LoginCard,
+    RegistrationCard,
+    RenderCard,
+    Login,
+    RegisterUser
+
 }

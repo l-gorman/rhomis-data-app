@@ -6,9 +6,11 @@ import { Route, Redirect } from 'react-router-dom'
 
 import AuthContext from '../authentication-component/AuthContext';
 
+
+
 // Function to render a table coming in from mongoDB
 function renderTable(data) {
-    console.log(data)
+    // console.log(data)
     if (data === null) {
         return (<h1>No Data found</h1>)
     }
@@ -173,6 +175,7 @@ function generateCSV(data) {
 
 // Getting project meta-data
 async function fetchProjectInformation(authToken) {
+    // console.log("Auth Token: " + authToken)
     // Basic get request for metadata
     const response = await axios({
         method: "get",
@@ -181,8 +184,13 @@ async function fetchProjectInformation(authToken) {
             'Authorization': authToken
         }
     })
+    // console.log("response")
+
+    // console.log(response)
     //const response = await axios.get(process.env.REACT_APP_API_URL + "api/meta-data")
-    console.log(response.data)
+    // console.log("response")
+
+    // console.log(response.data)
     //return (undefined)
     return (response.data)
 }
@@ -262,7 +270,7 @@ function dropDownTitle(titleType, value) {
 function filterButtons(projectInformationAvailable, projectInformation, projectName, setProjectName, formID, setFormID, dataType, setDataType) {
     if (projectInformationAvailable) {
 
-        console.log(projectInformation)
+        // console.log(projectInformation)
         const projectNames = projectInformation.projects.map(project => project.name)
 
         // Making sure only the forms belonging to this project are shown.
@@ -270,7 +278,7 @@ function filterButtons(projectInformationAvailable, projectInformation, projectN
 
         if (projectName !== null) {
             const project = projectInformation.projects.filter(project => project.name === projectName)
-            console.log(project)
+            // console.log(project)
             const projectID = project[0].centralID
             if (projectID !== null) {
                 formIDs.push(project[0].forms)
@@ -294,7 +302,7 @@ function filterButtons(projectInformationAvailable, projectInformation, projectN
 
                             <DropdownButton className="filter-button" onSelect={(e) => setProjectName(e)} title={dropDownTitle("Project Name", projectName)}>
                                 {projectNames.map((projectName) => {
-                                    return (<Dropdown.Item eventKey={projectName}>{projectName}</Dropdown.Item>)
+                                    return (<Dropdown.Item key={projectName} eventKey={projectName}>{projectName}</Dropdown.Item>)
                                 })}
 
                             </DropdownButton>
@@ -305,7 +313,7 @@ function filterButtons(projectInformationAvailable, projectInformation, projectN
                                 {
                                     formIDs.map((formID) => {
 
-                                        return (<Dropdown.Item eventKey={formID}>{formID}</Dropdown.Item>)
+                                        return (<Dropdown.Item key={formID} eventKey={formID}>{formID}</Dropdown.Item>)
 
                                     })}
                             </DropdownButton>
@@ -339,11 +347,11 @@ function projectInformationButton(projectInformation, setProjectInformation, pro
 
                 <div className="end-button-container">
 
-                    <Button className="end-button" onClick={async () => {
+                    <Button data-testid="fetchProjectButton" className="end-button" onClick={async () => {
                         const newProjectInfo = await fetchProjectInformation(authToken)
-                        console.log("newProjectInfo")
+                        // console.log("newProjectInfo")
 
-                        console.log(newProjectInfo)
+                        // console.log(newProjectInfo)
                         if (newProjectInfo !== undefined) {
                             setProjectInformation(newProjectInfo)
                             setProjectInformationAvailable(true)
@@ -415,7 +423,7 @@ function processDataButton(projectInformationAvailable, projectName, formID, aut
                 < Button className="end-button" onClick={async () => {
 
                     const dataProcessedResponse = await processData(projectName, formID, authToken)
-                    console.log(dataProcessedResponse)
+                    // console.log(dataProcessedResponse)
                 }
                 }>Process Data</Button >
             </div>
@@ -430,7 +438,7 @@ function generateDataButton(projectInformationAvailable, projectName, formID, au
                 < Button className="end-button" onClick={async () => {
 
                     const dataGeneratedResponse = await generateData(projectName, formID, authToken)
-                    console.log(dataGeneratedResponse)
+                    // console.log(dataGeneratedResponse)
                 }
                 }>Generate Data</Button >
             </div>
@@ -465,21 +473,6 @@ function DataQueryComponent(props) {
     const [projectName, setProjectName] = useState(null)
 
     const [formID, setFormID] = useState(null)
-
-    //authToken
-    // Return Body of the main function
-
-    // useEffect(() => {
-    //     async function fetchInitialData() {
-    //         const newProjectInfo = await fetchProjectInformation(authToken)
-    //         setProjectInformation(newProjectInfo)
-    //         setProjectInformationAvailable(true)
-    //     }
-    //     fetchInitialData()
-
-    // }, [])
-
-
 
     return (
         <div id="data-query-container" className="sub-page-container">

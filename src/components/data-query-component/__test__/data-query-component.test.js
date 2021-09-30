@@ -1,49 +1,83 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { DataQueryComponent } from '../data-query-component';
 import { render, fireEvent, waitFor, screen } from '@testing-library/react'
 
-import { rest } from 'msw';
-import { setupServer } from 'msw/node';
+import { mockMetaDataResponse } from '../../../__mocks__/data-query-mocks'
+
+import nock from 'nock'
+
+import axios from 'axios';
+axios.defaults.adapter = require('axios/lib/adapters/http');
+
+// import { rest } from 'msw';
+// import { setupServer } from 'msw/node';
 import '@testing-library/jest-dom';
 
-// Setting up a mock server for doing
-// mock api requests
-const server = setupServer(
-    // Specifying an endpoint for the metadata requests
-    rest.get(process.env.REACT_APP_API_URL + 'api/metadata', (req, res, context) => {
-        return res(context.json({
-            greeting: 'hello there'
-        }))
-    })
-)
+import AuthContext from '../../authentication-component/AuthContext';
+
+// jest.mock('axios')
 
 
-// Specifying what needs to be done before,
-// during, and after each requests
-// The mock server has to be s
-beforeAll(() => server.listen())
-afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
-
-
-test("Data query component renders without crashing", () => {
-
+// A function to render the mock application with some test context
+function MockApp() {
+    const [authToken, setAuthToken] = useState(null);
     // Loading the functions
-    const { getByText } = render(<DataQueryComponent />)
 
-    // Checking for the title
-    expect(getByText("RHoMIS 2.0 Data Querying")).not.toBeNull();
-    // Also simply could write this:
-    // getByText("RHoMIS 2.0 Data Querying")
-    // but I prefer to be a bit more explicit
-
-    // Checking for the card title
-    expect(getByText("Data Filters")).not.toBeNull();
+    return (
+        <AuthContext.Provider value={["testAuthToken", setAuthToken]}>
+            <DataQueryComponent />
+        </AuthContext.Provider>
+    )
+}
 
 
-})
+describe("DATA QUERY COMPONENT", function () {
+
+    afterEach(nock.cleanAll)
+    afterAll(function () {
+        nock.restore
+    })
+
+    it("Renders without crashing", function () {
+        const { getByText } = render(<MockApp />)
+        // Checking for the title
+        expect(getByText("RHoMIS 2.0 Data Querying")).not.toBeNull();
+        // Also simply could write this:
+        // getByText("RHoMIS 2.0 Data Querying")
+        // but I prefer to be a bit more explicit
+
+        // Checking for the card title
+        expect(getByText("No Data found")).not.toBeNull();
+
+        expect(getByText("Get Project Information")).not.toBeNull();
+
+    });
 
 
-test("Can fetch data and update filters accordingly", () => {
-    expect(true).toBe(true)
+    it("Can fetch metadata and update filters accordingly", async function () {
+        // const response = { data: mockMetaDataResponse }
+        // console.log(process.env.REACT_APP_AUTHENTICATOR_URL)
+
+        let scope = nock(process.env.REACT_APP_AUTHENTICATOR_URL)
+            // Obtaining central authentication token
+            .get('/api/meta-data')
+            .matchHeader('Authorization', 'testAuthToken')
+            .reply(200, mockMetaDataResponse)
+
+
+
+
+
+        // console.log(mockMetaDataResponse)
+        // axios.mockResolvedValue(response);
+        const { getByText } = render(<MockApp />)
+        const button = screen.getByTestId('fetchProjectButton')
+        // fireEvent(node: HTMLElement, event: Event)
+
+        fireEvent.click(button)
+        await waitFor(() => expect(getByText("Project Name")).not.toBeNull());
+        // expect(handleClick).toHaveBeenCalledTimes(1)
+
+        // expect(true).toBe(true)
+    });
 })

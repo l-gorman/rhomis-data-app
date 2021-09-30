@@ -17,7 +17,7 @@ import {
 } from "react-router-dom";
 
 // Import the various components
-import LoginComponent from "./components/login-component/login-component"
+import { LoginComponent } from "./components/login-component/login-component"
 import { DataQueryComponent } from "./components/data-query-component/data-query-component"
 import ProjectManagementComponent from "./components/project-management-component/project-management-component"
 import MainNavbar from './components/navigation-bar/navigation-bar-component'

@@ -3,6 +3,9 @@ import { render, screen } from '@testing-library/react'
 
 import App from './App';
 
-it("App renders without crashing", () => {
-  render(<App />)
-});
+describe("APP", function () {
+  it("Renders without crashing", () => {
+    render(<App />)
+  });
+})
+
