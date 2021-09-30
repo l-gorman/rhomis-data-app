@@ -6,8 +6,6 @@ import { Route, Redirect } from 'react-router-dom'
 
 import AuthContext from '../authentication-component/AuthContext';
 
-
-
 // Function to render a table coming in from mongoDB
 function renderTable(data) {
     // console.log(data)
@@ -96,12 +94,9 @@ function generateCSV(data) {
 
     // Creating an empty list to include all of the lines of the csv
     var csv_lines = []
-    // Checking if the data is in order
 
     // This is the full RHoMIS Data set
     var full_data_set = data
-
-
 
     // Identifying the column headers
     // Some households have more columns than other. This merges column
@@ -118,16 +113,13 @@ function generateCSV(data) {
             var new_column = household_column_names[column_index]
             // Checking whether the new column has previously been encountered 
             if (!column_names.some(column => column === new_column)) {
-
                 // If this is the first househould, adds the new element at the column index
                 // not deleting any items
                 if (household_index === 0) {
                     column_names.splice(column_index, 0, new_column)
                 }
-
                 // Checks if this is a household after the first household
                 if (household_index > 0) {
-
                     // Check if the previous column was in the column index
                     if (!household_column_names[column_index - 1] !== undefined) {
                         // Looks at the column before, if it was encountered previously
@@ -184,14 +176,7 @@ async function fetchProjectInformation(authToken) {
             'Authorization': authToken
         }
     })
-    // console.log("response")
 
-    // console.log(response)
-    //const response = await axios.get(process.env.REACT_APP_API_URL + "api/meta-data")
-    // console.log("response")
-
-    // console.log(response.data)
-    //return (undefined)
     return (response.data)
 }
 
