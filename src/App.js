@@ -19,6 +19,7 @@ import {
 // Import the various components
 import { LoginComponent } from "./components/login-component/login-component"
 import { DataQueryComponent } from "./components/data-query-component/data-query-component"
+import HomePageComponent from './components/homepage-component/homepage-component';
 import ProjectManagementComponent from "./components/project-management-component/project-management-component"
 import MainNavbar from './components/navigation-bar/navigation-bar-component'
 
@@ -40,6 +41,9 @@ function App() {
             <Route path="/login">
               <LoginComponent />
             </Route>
+            {authToken ? <Route exact path="/">
+              <HomePageComponent />
+            </Route> : <Redirect to="/login" />}
 
             {/* Checking if logged in, otherwise redirect */}
             {authToken ? <Route path="/data-querying">
@@ -47,7 +51,7 @@ function App() {
             </Route> : <Redirect to="/login" />}
 
             {/* Checking if logged in, otherwise redirect */}
-            {authToken ? <Route exact path="/">
+            {authToken ? <Route exact path="/project-management">
               <ProjectManagementComponent />
             </Route> : <Redirect to="/login" />}
           </AuthContext.Provider>

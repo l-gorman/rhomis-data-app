@@ -12,12 +12,13 @@ export default function MainNavbar() {
     return (
         <>
             <Navbar bg="dark" variant="dark" expand="xl">
-                <Navbar.Brand href="/">RHoMIS</Navbar.Brand>
+                <Navbar.Brand as={Link} to="/">RHoMIS</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
+                        <Nav.Link as={Link} to="/">Home</Nav.Link>
 
-                        <Nav.Link as={Link} to="/">Project Management</Nav.Link>
+                        <Nav.Link as={Link} to="/project-management">Project Management</Nav.Link>
                         <Nav.Link as={Link} to="/data-querying">Data Query</Nav.Link>
                     </Nav>
                     <Nav className="ml-auto">
