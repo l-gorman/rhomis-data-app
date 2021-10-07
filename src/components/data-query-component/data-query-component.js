@@ -54,7 +54,7 @@ function renderTable(data) {
             }
         }
         return (
-            <div className="sub-page-container">
+            <>
                 <Table striped bordered hover size="sm" variant="dark" responsive>
                     {/* Table header */}
                     <thead>
@@ -76,7 +76,7 @@ function renderTable(data) {
 
                     </tbody>
                 </Table>
-            </div >)
+            </ >)
     }
 }
 

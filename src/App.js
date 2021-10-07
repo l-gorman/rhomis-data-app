@@ -21,22 +21,32 @@ import { LoginComponent } from "./components/login-component/login-component"
 import { DataQueryComponent } from "./components/data-query-component/data-query-component"
 import HomePageComponent from './components/homepage-component/homepage-component';
 import ProjectManagementComponent from "./components/project-management-component/project-management-component"
+import AccountManagementComponent from './components/account-management-component/account-management-component';
 import MainNavbar from './components/navigation-bar/navigation-bar-component'
 
 // Import the context which stores the authentication tokens
 import AuthContext, { AuthContextProvider } from './components/authentication-component/AuthContext';
+
+function Logout() {
+  const [authToken, setAuthToken] = useState(AuthContext);
+  console.log("clicked")
+  // setAuthToken(null)
+
+
+}
+
 
 function App() {
   const [authToken, setAuthToken] = useState(null);
 
   return (
     < Router >
+      <Switch>
+        <AuthContext.Provider value={[authToken, setAuthToken]}>
+          {/* Rendering the router */}
+          {authToken ? <MainNavbar Logout={Logout} /> : null}
+          <div className="main-page">
 
-      {/* Rendering the router */}
-      {authToken ? <MainNavbar /> : null}
-      <div className="main-page">
-        <Switch>
-          <AuthContext.Provider value={[authToken, setAuthToken]}>
 
             <Route path="/login">
               <LoginComponent />
@@ -54,10 +64,17 @@ function App() {
             {authToken ? <Route exact path="/project-management">
               <ProjectManagementComponent />
             </Route> : <Redirect to="/login" />}
-          </AuthContext.Provider>
 
-        </Switch>
-      </div >
+
+            {authToken ? <Route exact path="/account">
+              <AccountManagementComponent />
+            </Route> : <Redirect to="/login" />}
+
+
+          </div >
+        </AuthContext.Provider>
+
+      </Switch>
     </Router >
 
 
