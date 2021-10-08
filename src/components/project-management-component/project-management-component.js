@@ -114,15 +114,15 @@ async function DeleteProject(authToken, projectName, formName, formFile) {
 }
 
 
-async function CreateForm(authToken, projectName, formName, formFile) {
+async function CreateForm(authToken, projectName, formName, formVersion, formFile) {
     console.log(projectName)
-    console.log(process.env.REACT_APP_AUTHENTICATOR_URL + 'api/forms/new?form_name=' + formName + '&project_name=' + projectName + '&publish=true')
+    console.log(process.env.REACT_APP_AUTHENTICATOR_URL + 'api/forms/new?form_name=' + formName + '&form_version=' + formVersion + '&project_name=' + projectName + '&publish=true')
 
 
     // Create form
     const formCreationResponse = await axios({
         method: "post",
-        url: process.env.REACT_APP_AUTHENTICATOR_URL + 'api/forms/new?form_name=' + formName + '&project_name=' + projectName + '&publish=true',
+        url: process.env.REACT_APP_AUTHENTICATOR_URL + 'api/forms/new?form_name=' + formName + '&form_version=' + formVersion + '&project_name=' + projectName + '&publish=true',
         data: formFile,
         headers: {
             'Authorization': authToken,
@@ -147,6 +147,8 @@ export default function ProjectManagementComponent(props) {
 
     const [projectName, setProjectName] = useState(null)
     const [formName, setFormName] = useState(null)
+    const [formVersion, setFormVersion] = useState(null)
+
     const [selectedFile, setSelectedFile] = useState(null);
 
 
@@ -234,6 +236,14 @@ export default function ProjectManagementComponent(props) {
                                 </Form.Text>
                             </Form.Group>
 
+                            <Form.Group className="mb-3" controlId="newFormEntry">
+                                <Form.Label>Form version</Form.Label>
+                                <Form.Control type="text" placeholder="Enter the version of your form" onChange={(e) => setFormVersion(e.target.value)} />
+                                <Form.Text className="text-muted">
+                                    This must match the "version" field in your xlsx settings tab
+                                </Form.Text>
+                            </Form.Group>
+
                             <Form.Group controlId="formFile" className="mb-3">
                                 <Form.Label>Select your xlsx file</Form.Label>
                                 <Form.Control type="file" onChange={(e) => setSelectedFile(e.target.files[0])} />
@@ -245,7 +255,7 @@ export default function ProjectManagementComponent(props) {
 
                     <div className="end-button-container">
                         <Button className="end-button" onClick={async () => {
-                            const formResponse = await CreateForm(authToken, projectName, formName, selectedFile)
+                            const formResponse = await CreateForm(authToken, projectName, formName, formVersion, selectedFile)
                             console.log(formResponse)
 
                         }

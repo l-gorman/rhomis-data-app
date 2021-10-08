@@ -171,7 +171,7 @@ async function fetchProjectInformation(authToken) {
     // Basic get request for metadata
     const response = await axios({
         method: "get",
-        url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/meta-data",
+        url: process.env.REACT_APP_API_URL + "api/meta-data/form-data",
         headers: {
             'Authorization': authToken
         }
@@ -256,24 +256,16 @@ function filterButtons(projectInformationAvailable, projectInformation, projectN
     if (projectInformationAvailable) {
 
         // console.log(projectInformation)
-        const projectNames = projectInformation.projects.map(project => project.name)
+        const projectNames = projectInformation.map(project => project.name)
 
         // Making sure only the forms belonging to this project are shown.
         const formIDs = []
 
         if (projectName !== null) {
-            const project = projectInformation.projects.filter(project => project.name === projectName)
-            // console.log(project)
-            const projectID = project[0].centralID
-            if (projectID !== null) {
+            const project = projectInformation.filter(project => project.name === projectName)
+
+            if (project !== null) {
                 formIDs.push(project[0].forms)
-
-
-                // projectInformation.forms.forEach((form) => {
-                //     if (form.project === projectID) {
-                //         formIDs.push(form.name)
-                //     }
-                // })
             }
         }
 
@@ -334,9 +326,7 @@ function projectInformationButton(projectInformation, setProjectInformation, pro
 
                     <Button data-testid="fetchProjectButton" className="end-button" onClick={async () => {
                         const newProjectInfo = await fetchProjectInformation(authToken)
-                        // console.log("newProjectInfo")
 
-                        // console.log(newProjectInfo)
                         if (newProjectInfo !== undefined) {
                             setProjectInformation(newProjectInfo)
                             setProjectInformationAvailable(true)
