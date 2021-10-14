@@ -19,7 +19,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "CI=true react-scripts test --verbose",
+    "test": "CI=true REACT_APP_API_URL=http://localhost:3001/ REACT_APP_AUTHENTICATOR_URL=http://localhost:3002/ REACT_APP_ENV=test react-scripts test --verbose",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
