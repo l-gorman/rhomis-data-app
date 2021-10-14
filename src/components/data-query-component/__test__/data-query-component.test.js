@@ -58,9 +58,9 @@ describe("DATA QUERY COMPONENT", function () {
         // const response = { data: mockMetaDataResponse }
         // console.log(process.env.REACT_APP_AUTHENTICATOR_URL)
 
-        let scope = nock(process.env.REACT_APP_AUTHENTICATOR_URL)
+        let scope = nock(process.env.REACT_APP_API_URL)
             // Obtaining central authentication token
-            .get('/api/meta-data')
+            .get('/api/meta-data/form-data')
             .matchHeader('Authorization', 'testAuthToken')
             .reply(200, mockMetaDataResponse)
 
