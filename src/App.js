@@ -16,13 +16,19 @@ import {
   Redirect,
 } from "react-router-dom";
 
+
+
 // Import the various components
 import { LoginComponent } from "./components/login-component/login-component"
 import { DataQueryComponent } from "./components/data-query-component/data-query-component"
 import HomePageComponent from './components/homepage-component/homepage-component';
 import ProjectManagementComponent from "./components/project-management-component/project-management-component"
-import AccountManagementComponent from './components/account-management-component/account-management-component';
+// import AccountManagementComponent from './components/account-management-component/account-management-component';
+import PublicDataComponent from './components/public-data-component/public-data-component';
+import CollectDataComponent from './components/collect-data-component/collect-data-component';
 import MainNavbar from './components/navigation-bar/navigation-bar-component'
+
+import { Fade } from 'react-bootstrap';
 
 // Import the context which stores the authentication tokens
 import AuthContext, { AuthContextProvider } from './components/authentication-component/AuthContext';
@@ -30,9 +36,6 @@ import AuthContext, { AuthContextProvider } from './components/authentication-co
 function Logout() {
   const [authToken, setAuthToken] = useState(AuthContext);
   console.log("clicked")
-  // setAuthToken(null)
-
-
 }
 
 
@@ -41,40 +44,42 @@ function App() {
 
   return (
     < Router >
-      <Switch>
-        <AuthContext.Provider value={[authToken, setAuthToken]}>
-          {/* Rendering the router */}
-          {authToken ? <MainNavbar Logout={Logout} /> : null}
-          <div className="main-page">
+      <Fade>
+        <Switch>
+          <AuthContext.Provider value={[authToken, setAuthToken]}>
 
 
-            <Route path="/login">
-              <LoginComponent />
-            </Route>
-            {authToken ? <Route exact path="/">
-              <HomePageComponent />
-            </Route> : <Redirect to="/login" />}
+            {/* If auth token does not exist, do not render the main navigation bar */}
 
-            {/* Checking if logged in, otherwise redirect */}
-            {authToken ? <Route path="/data-querying">
-              <DataQueryComponent />
-            </Route> : <Redirect to="/login" />}
+            <div className="background">
 
-            {/* Checking if logged in, otherwise redirect */}
-            {authToken ? <Route exact path="/project-management">
-              <ProjectManagementComponent />
-            </Route> : <Redirect to="/login" />}
+              <div className="main-page">
+                {authToken ? <MainNavbar Logout={Logout} /> : null}
 
 
-            {authToken ? <Route exact path="/account">
-              <AccountManagementComponent />
-            </Route> : <Redirect to="/login" />}
+                {/* Render login route  */}
+                <Route path="/login">
+                  <LoginComponent />
+                </Route>
+                {/* If the auth token does not exist, can render each of these components */}
+                {authToken ?
+                  <>
+                    <Route exact path="/" component={HomePageComponent}></Route>
+                    <Route path="/project-management" component={ProjectManagementComponent}></Route>
+                    <Route path="/data-collection" component={CollectDataComponent}></Route>
+                    <Route path="/global-data" component={PublicDataComponent}></Route>
+                    <Route path="/data-querying" component={DataQueryComponent}></Route>
 
+                    {/* <Route path="/account" component={AccountManagementComponent}></Route> */}
+                  </>
+                  : <Redirect to="/login" />}
 
-          </div >
-        </AuthContext.Provider>
+              </div >
+            </div>
+          </AuthContext.Provider>
 
-      </Switch>
+        </Switch>
+      </Fade>
     </Router >
 
 

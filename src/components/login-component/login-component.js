@@ -1,13 +1,19 @@
 /**/
 
-import React, { useState, useContext } from 'react'
-import { Button, Card, Form } from 'react-bootstrap'
+import React, { useState, useContext, useEffect } from 'react'
+import { Button, Card, Form, Spinner } from 'react-bootstrap'
+import Fade from 'react-bootstrap/Fade'
+import { FaUserCircle } from 'react-icons/fa'
 import axios from 'axios'
 import { useHistory } from 'react-router'
 import "./login-component.css"
 
 import AuthContext from '../authentication-component/AuthContext';
-// import { set } from 'msw/lib/types/context';
+
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 
 function CheckCredentials(props) {
     if (props.email === null) {
@@ -25,52 +31,67 @@ function CheckCredentials(props) {
 function LoginCard(props) {
     const [authToken, setAuthToken] = useContext(AuthContext)
     return (
-        <Card className="card-style">
+        <Card className="card-style border-0">
             <Card.Header className="bg-dark text-white">
-                <h2>RHoMIS 2.0 Login</h2>
+                <h2>Login</h2>
             </Card.Header>
+
             <Card.Body>
+                <div className="icon-container">
+                    <FaUserCircle size={60} />
+                </div>
                 <Form>
-                    <Form.Group>
+                    <Form.Group className="form-group-spaced">
                         <Form.Label htmlFor="email">Email</Form.Label>
                         <Form.Control id="email" type="text" onChange={(event) => props.setEmail(event.target.value)} />
                     </Form.Group>
-                    <Form.Group>
+                    <Form.Group className="form-group-spaced">
                         <Form.Label htmlFor="password">Password</Form.Label>
                         <Form.Control type="password" onChange={(event) => props.setPassword(event.target.value)} />
                     </Form.Group>
                     {props.requestError ? <p className="warning">{props.requestError}</p> : null}
                     <div className="button-container">
-                        <Button className="login-buttons"
-                            variant="dark"
-                            onClick={async (event) => {
-                                const tokenResponse = await Login({
-                                    event: event,
-                                    email: props.email,
-                                    password: props.password,
-                                    requestError: props.requestError,
-                                    setRequestError: props.setRequestError,
+                        {props.loading ? <Button className="login-buttons" variant="dark">
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                            />
+                            Loading</Button> :
+                            <Button className="login-buttons"
+                                variant="dark"
+                                onClick={async (event) => {
+                                    props.setLoading(true)
+
+                                    const tokenResponse = await Login({
+                                        event: event,
+                                        email: props.email,
+                                        password: props.password,
+                                        requestError: props.requestError,
+                                        setRequestError: props.setRequestError,
 
 
-                                    // setAuthToken: props.setAuthToken
-                                })
-                                if (tokenResponse.status === 400) {
-                                    return
-                                }
+                                        // setAuthToken: props.setAuthToken
+                                    })
+                                    props.setLoading(false)
 
-                                if (tokenResponse.status === 200) {
-                                    setAuthToken(tokenResponse.data)
+                                    if (tokenResponse.status === 400) {
+                                        return
+                                    }
 
-                                    console.log("Setting token")
+                                    if (tokenResponse.status === 200) {
 
-                                    console.log(tokenResponse.data)
-                                    props.history.push("/")
+                                        setAuthToken(tokenResponse.data)
 
-                                }
+                                        props.history.push("/")
+
+                                    }
 
 
 
-                            }}>Login</Button>
+                                }}>Login</Button>}
                     </div>
                     <a href="#" onClick={(event) => { props.setCardType(!props.cardType) }}>Click here</a> for registration
 
@@ -84,34 +105,50 @@ function LoginCard(props) {
 function RegistrationCard(props) {
 
     return (
-        <Card className="card-style">
+        <Card className="card-style border-0">
             <Card.Header className="bg-dark text-white">
-                <h2>Registration</h2>
+                <h2>Signup</h2>
             </Card.Header>
             <Card.Body>
+                <div className="icon-container">
+                    <FaUserCircle size={60} />
+                </div>
                 <Form>
-                    <Form.Group>
+                    <Form.Group className="form-group-spaced">
                         <Form.Label htmlFor="email">Email</Form.Label>
                         <Form.Control id="email" type="text" onChange={(event) => props.setEmail(event.target.value)} />
                     </Form.Group>
-                    <Form.Group>
+                    <Form.Group className="form-group-spaced">
                         <Form.Label htmlFor="password">Password</Form.Label>
                         <Form.Control type="password" onChange={(event) => props.setPassword(event.target.value)} />
                     </Form.Group>
                     {props.requestError ? <p className="warning">{props.requestError}</p> : null}
 
                     <div className="button-container">
-                        <Button className="login-buttons" variant="dark" onClick={(event) => {
-                            RegisterUser({
-                                event: event,
-                                email: props.email,
-                                password: props.password,
-                                requestError: props.requestError,
-                                setRequestError: props.setRequestError,
-                                history: props.history,
-                                setCardType: props.setCardType
-                            })
-                        }}>Register</Button>
+                        {props.loading ? <Button className="login-buttons">
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                            />
+                            Loading...</Button> : <Button className="login-buttons" variant="dark" onClick={(event) => {
+                                props.setLoading(true)
+
+                                RegisterUser({
+                                    event: event,
+                                    email: props.email,
+                                    password: props.password,
+                                    requestError: props.requestError,
+                                    setRequestError: props.setRequestError,
+                                    history: props.history,
+                                    setCardType: props.setCardType
+                                })
+                                props.setLoading(false)
+
+                            }}>Register</Button>
+                        }
                     </div>
                     <a href="#" onClick={(event) => { props.setCardType(!props.cardType) }}>Click here</a> for login
 
@@ -142,6 +179,9 @@ function RenderCard(props) {
 
                 history={props.history}
 
+                loading={props.loading}
+                setLoading={props.setLoading}
+
             />
 
         )
@@ -163,6 +203,8 @@ function RenderCard(props) {
                 setRequestError={props.setRequestError}
 
                 history={props.history}
+                loading={props.loading}
+                setLoading={props.setLoading}
             />
 
         )
@@ -174,10 +216,12 @@ async function Login(props) {
     props.event.preventDefault()
     props.setRequestError(null)
 
+
     const credentialsGiven = CheckCredentials({ email: props.email, password: props.password, requestError: props.requestError, setRequestError: props.setRequestError })
 
-    console.log("logging in user")
     try {
+        // await timeout(2000)
+
         const response = await axios({
             method: "post",
             url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/login",
@@ -188,11 +232,8 @@ async function Login(props) {
         })
 
         return (response)
-
     } catch (err) {
-        console.log(err.response)
         props.setRequestError(err.response.data)
-
         return (err.response)
 
     }
@@ -204,10 +245,15 @@ async function RegisterUser(props) {
     props.setRequestError(null)
 
     // check all of the details given
-    const credentialsGiven = CheckCredentials({ email: props.email, password: props.password, requestError: props.requestError, setRequestError: props.setRequestError })
-    // const username = firstName + "_" + surname
-
+    const credentialsGiven = CheckCredentials({
+        email: props.email,
+        password: props.password,
+        requestError: props.requestError,
+        setRequestError: props.setRequestError
+    })
     try {
+        // await timeout(2000)
+
         const response = await axios({
             method: "post",
             url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/register",
@@ -226,60 +272,54 @@ async function RegisterUser(props) {
         return (err.response.data)
 
     }
-
-
-    //console.log("Credentials given: " + credentialsGiven)
-
 }
 
 function LoginComponent(props) {
-    // Note, cannot pass this into an event handler
-    // const { authToken, setAuthToken } = useContext(AuthContext)
-
-    // const [firstName, setFirstName] = useState(null);
-    // const [surname, setSurname] = useState(null);
-
     const history = useHistory()
 
     const [requestError, setRequestError] = useState(null)
-
-    const [cardType, setCardType] = useState(false)
-
+    const [cardType, setCardType] = useState(true)
     const [password, setPassword] = useState(null);
     const [email, setEmail] = useState(null);
+    const [open, setOpen] = useState(false)
 
+    const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        setOpen(true)
+    }, [])
 
     return (
-        <div className="child-login-container">
-
-            <RenderCard
-                // setFirstName={setFirstName}
-                // firstName={firstName}
-
-                // setSurname={setSurname}
-                // surname={surname}
-
-                setEmail={setEmail}
-                email={email}
-
-                setPassword={setPassword}
-                password={password}
-
-                setCardType={setCardType}
-                cardType={cardType}
-
-                requestError={requestError}
-                setRequestError={setRequestError}
-
-                history={history}
-
-            // setAuthToken={props.setAuthToken}
-            // setAuthToken={setAuthToken}
-            />
+        <Fade in={open}>
 
 
-        </div >
 
+            <div className="child-login-container">
+
+                <RenderCard
+
+                    setEmail={setEmail}
+                    email={email}
+
+                    setPassword={setPassword}
+                    password={password}
+
+                    setCardType={setCardType}
+                    cardType={cardType}
+
+                    requestError={requestError}
+                    setRequestError={setRequestError}
+
+                    history={history}
+
+                    loading={loading}
+                    setLoading={setLoading}
+
+                />
+
+
+            </div >
+        </Fade>
     )
 }
 

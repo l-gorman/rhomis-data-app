@@ -428,9 +428,6 @@ function DataQueryComponent(props) {
 
     const [authToken, setAuthToken] = useContext(AuthContext)
 
-
-
-
     // The data we are hoping to view and download
     const [data, setData] = useState(null)
     // The link generated to download the data

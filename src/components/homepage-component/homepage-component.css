@@ -1,4 +1,39 @@
+
+.portal-card{
+    display: grid;
+    vertical-align: top;
+    justify-items: center;
+    margin: 15px;
+    padding-left: 20px;
+    padding-right: 20px;
+    background-color: #111111;
+    width: 250px;
+    height:300px;
+    transition: 0.3s;
+}
+
+.portal-card:hover{
+    background-color:#001f3f;   
+    
+ 
+
+}
+
 .sub-page-container {
     padding-top: 20px;
-    width:50vw;
+    width:80vw;
+}
+
+.portal-card-header {
+    margin-top: 10px;
+    color: white;
+
+
+}
+
+.portal-card-body {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    /* margin: 3em; */
 }

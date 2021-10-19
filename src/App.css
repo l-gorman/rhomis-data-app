@@ -1,3 +1,10 @@
+.background {
+  background-color: #1B8697;
+  overflow-x:hidden; 
+  /* overflow-y:hidden;  */
+
+}
+
 .main-page {
   display: flex;
   flex-direction: column;
@@ -6,10 +13,19 @@
 }
 
 h1{
-  padding: 20px;
   text-align: center;
 }
 
+.main-card{
+  margin-top: 25px;
+  margin-bottom: 25px;
+
+}
+
+.card-content{
+  margin: 20px;
+
+}
 
 
 
