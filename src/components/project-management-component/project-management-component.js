@@ -6,6 +6,8 @@ import './project-management-component.css'
 import { actions } from 'react-table'
 import { response } from 'msw'
 
+import { MdOutlineRefresh } from 'react-icons/md'
+
 
 async function GetProjectInformation(props) {
     console.log("authToken: ", props.authToken)
@@ -23,7 +25,6 @@ async function GetProjectInformation(props) {
         console.log("Setting project information")
 
         props.setProjectInformation(result.data)
-        props.setProjectInformationAvailable(true)
     }
     if (result.status === 400) {
         alert(result.data)
@@ -32,14 +33,7 @@ async function GetProjectInformation(props) {
 
 
 function RenderProjectInformation(props) {
-    // Need:
-    //props.projects (array of objects)
-    //props.forms
 
-    // console.log("project info avail:" + props.projectInformationAvailable)
-    // console.log("project info:")
-    // console.log(props.projectInformation)
-    // console.log(props.projectInformation.forms.length === 0)
     if (props.projectInformationAvailable) {
 
         return (
@@ -57,13 +51,17 @@ function RenderProjectInformation(props) {
                         < tr >
                             <th>Project</th>
                             <th>Form</th>
+                            <th ></th>
                         </tr >
                     </thead>
                     <tbody>
                         {props.projectInformation.forms.map((form) => {
                             return <tr>
-                                <td>{form.project}</td>
-                                <td>{form.name}</td></tr>
+                                <td >{form.project}</td>
+                                <td>{form.name}</td>
+                                <td><Button className="float-right">Select</Button></td>
+                            </tr>
+
                         })}
 
                     </tbody>
@@ -74,231 +72,107 @@ function RenderProjectInformation(props) {
 
     return
 }
+function RenderProjectCards(props) {
+    console.log("Render cards props")
+    console.log(props)
 
-async function CreateProject(authToken, projectName, formName, formFile) {
-    console.log(projectName)
-    console.log(authToken)
-
-    // Create project
-    const projectCreationResponse = await axios({
-        method: "post",
-        url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/projects/create",
-        data: {
-            name: projectName
-        },
-        headers: {
-            'Authorization': authToken
-        }
+    return props.data.map((project) => {
+        return (<RenderProjectCard data={project} />)
     })
 
-    return (projectCreationResponse)
 }
+function RenderProjectCard(props) {
+    // console.log(props)
+    return (
+        <>
+            < Card className="sub-card project-card border-0">
+                <h4 className="portal-card-header">{props.data.name}</h4>
+                <p className="sub-card-text text-white">{props.data.description}</p>
 
-async function DeleteProject(authToken, projectName, formName, formFile) {
-    console.log(projectName)
-    console.log(authToken)
-
-    // Create project
-    const projectCreationResponse = await axios({
-        method: "delete",
-        url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/projects/delete",
-        data: {
-            name: projectName
-        },
-        headers: {
-            'Authorization': authToken
-        }
-    })
-
-    return (projectCreationResponse)
-}
-
-
-async function CreateForm(authToken, projectName, formName, formVersion, formFile) {
-    console.log(projectName)
-    console.log(process.env.REACT_APP_AUTHENTICATOR_URL + 'api/forms/new?form_name=' + formName + '&form_version=' + formVersion + '&project_name=' + projectName + '&publish=true')
-
-
-    // Create form
-    const formCreationResponse = await axios({
-        method: "post",
-        url: process.env.REACT_APP_AUTHENTICATOR_URL + 'api/forms/new?form_name=' + formName + '&form_version=' + formVersion + '&project_name=' + projectName + '&publish=true',
-        data: formFile,
-        headers: {
-            'Authorization': authToken,
-            'Content-Type': "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        }
-    })
-    return (formCreationResponse)
-
-
-
-
+            </Card >
+        </>
+    )
 }
 
 
 export default function ProjectManagementComponent(props) {
 
-    const [projectInformation, setProjectInformation] = useState(null)
-    const [projectInformationAvailable, setProjectInformationAvailable] = useState(false)
+    const [projectInformation, setProjectInformation] = useState([])
 
     const [authToken, setAuthToken] = useContext(AuthContext)
 
+    // const [filters, setFilters] = useState([])
 
-    const [projectName, setProjectName] = useState(null)
-    const [formName, setFormName] = useState(null)
-    const [formVersion, setFormVersion] = useState(null)
 
-    const [selectedFile, setSelectedFile] = useState(null);
+    // const [projectName, setProjectName] = useState(null)
+
+    const [projectSelected, setProjectSelected] = useState(null)
+    const [formSelected, setFormSelected] = useState(null)
+
+
+
+    const projects = [{
+        name: "xyz",
+        description: "short description to remember details about the project"
+    },
+    {
+        name: "abc",
+        description: "short description to remember details about the project"
+    }]
+
+    useEffect(async () => {
+        const projectResponse = await GetProjectInformation({
+            setProjectInformation: setProjectInformation,
+            authToken: authToken
+        })
+        // console.log(projectResponse)
+
+    }, [])
 
 
     useEffect(() => {
-        console.log(projectName)
+        console.log("Project Information")
 
-    }, [projectName])
+        console.log(projectInformation.projects)
+
+    }, [projectInformation])
 
     return (
         <div id="project-management-container" className="sub-page-container">
 
-            <Card >
-                <Card.Header className="bg-dark text-white">Get Project MetaData</Card.Header>
-                <Card.Body>
+            <Card className="main-card border-0">
+                <Card.Header className=" bg-dark text-white">
+                    <div className="main-card-header-container">
+                        <h3>Get Project MetaData</h3>
 
-                    <RenderProjectInformation projectInformation={projectInformation} projectInformationAvailable={projectInformationAvailable} />
+                        <div style={{ "display": "flex", "flex-direction": "row", "margin-left": "auto" }} >
+                            <div className="main-card-header-item">filter 1</div>
+                            <div className="main-card-header-item">filter 2</div>
+                            <div className="main-card-header-item">filter 3</div>
+                            <Button className="bg-dark border-0" onClick={async () => {
+                                const projectResponse = await GetProjectInformation({
+                                    setProjectInformation: setProjectInformation,
+                                    authToken: authToken
+                                })
+                                console.log(projectResponse)
 
-                </Card.Body>
-
-
-                <div className="end-button-container">
-                    <Button className="end-button" onClick={async () => {
-                        const projectResponse = await GetProjectInformation({
-                            setProjectInformationAvailable: setProjectInformationAvailable,
-                            setProjectInformation: setProjectInformation,
-                            authToken: authToken
-                        })
-                        console.log(projectResponse)
-
-                    }
-
-                    }>Get Project Information</Button>
-
-                </div>
-            </Card>
-
-
-
-            <Card >
-                <Card.Header className="bg-dark text-white">Add a project</Card.Header>
-                <Card.Body>
-
-                    Please use this form to create a new project and form to start collecting data
-
-                    <Form>
-                        <Form.Group className="mb-3" controlId="newProjectEntry">
-                            <Form.Label>Project Name</Form.Label>
-                            <Form.Control type="text" placeholder="Enter a project name" onChange={(e) => setProjectName(e.target.value)} />
-                            <Form.Text className="text-muted">
-                                This is a project which will be able to hold multiple forms
-                            </Form.Text>
-                        </Form.Group>
-                    </Form>
-                </Card.Body>
-
-                <div className="end-button-container">
-                    <Button className="end-button" onClick={async () => {
-                        const projectResponse = await CreateProject(authToken, projectName, formName, selectedFile)
-                        console.log(projectResponse)
-
-                    }
-
-                    }>Create Project</Button>
-
-                </div>
-
-
-                <Card>
-                    <Card.Header className="bg-dark text-white">Create a New form</Card.Header>
-
-                    <Card.Body>
-                        <Form>
-                            <Form.Group className="mb-3" controlId="newProjectEntry">
-                                <Form.Label>Project Name</Form.Label>
-                                <Form.Control type="text" placeholder="Enter a project name" onChange={(e) => setProjectName(e.target.value)} />
-                                <Form.Text className="text-muted">
-                                    This is a project which will be able to hold multiple forms
-                                </Form.Text>
-                            </Form.Group>
-                            <Form.Group className="mb-3" controlId="newFormEntry">
-                                <Form.Label>Form name</Form.Label>
-                                <Form.Control type="text" placeholder="Enter the name of your form" onChange={(e) => setFormName(e.target.value)} />
-                                <Form.Text className="text-muted">
-                                    This must match the "form_title" field in your xlsx form settings
-                                </Form.Text>
-                            </Form.Group>
-
-                            <Form.Group className="mb-3" controlId="newFormEntry">
-                                <Form.Label>Form version</Form.Label>
-                                <Form.Control type="text" placeholder="Enter the version of your form" onChange={(e) => setFormVersion(e.target.value)} />
-                                <Form.Text className="text-muted">
-                                    This must match the "version" field in your xlsx settings tab
-                                </Form.Text>
-                            </Form.Group>
-
-                            <Form.Group controlId="formFile" className="mb-3">
-                                <Form.Label>Select your xlsx file</Form.Label>
-                                <Form.Control type="file" onChange={(e) => setSelectedFile(e.target.files[0])} />
-                            </Form.Group>
-
-
-                        </Form>
-                    </Card.Body>
-
-                    <div className="end-button-container">
-                        <Button className="end-button" onClick={async () => {
-                            const formResponse = await CreateForm(authToken, projectName, formName, formVersion, selectedFile)
-                            console.log(formResponse)
-
-                        }
-
-                        }>Submit Form</Button>
+                            }
+                            }><MdOutlineRefresh size={25} /></Button>
+                        </div>
                     </div>
 
 
-                </Card>
-
-            </Card>
-
-            <Card>
-                <Card.Header className="bg-dark text-white">Delete a Project
                 </Card.Header>
 
-                <Card.Body>
-                    <Form>
-                        <Form.Group className="mb-3" controlId="newProjectEntry">
-                            <Form.Label>Project Name</Form.Label>
-                            <Form.Control type="text" placeholder="Enter a project name" onChange={(e) => setProjectName(e.target.value)} />
-                            <Form.Text className="text-muted">
-                                This is a project which will be able to hold multiple forms
-                            </Form.Text>
-                        </Form.Group>
-                    </Form>
+                <Card.Body className="main-card-body">
 
+                    {projectSelected ? <h1>No projects found</h1> : <RenderProjectCards data={projects} />}
 
                 </Card.Body>
 
-                <div className="end-button-container">
-                    <Button className="end-button" variant="danger" onClick={async () => {
-                        const projectResponse = await DeleteProject(authToken, projectName, formName, selectedFile)
-                        console.log(projectResponse)
-
-                    }
-
-                    }>Delete Project</Button>
-                </div>
 
 
-
-            </Card>
+            </Card >
 
         </div >
     )

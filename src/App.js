@@ -27,7 +27,7 @@ import ProjectManagementComponent from "./components/project-management-componen
 import PublicDataComponent from './components/public-data-component/public-data-component';
 import CollectDataComponent from './components/collect-data-component/collect-data-component';
 import MainNavbar from './components/navigation-bar/navigation-bar-component'
-
+import FormCreationComponent from './components/form-creation-component/form-creation-component';
 import { Fade } from 'react-bootstrap';
 
 // Import the context which stores the authentication tokens
@@ -51,7 +51,7 @@ function App() {
 
             {/* If auth token does not exist, do not render the main navigation bar */}
 
-            <div className="background">
+            <div className="main-app-background">
 
               <div className="main-page">
                 {authToken ? <MainNavbar Logout={Logout} /> : null}
@@ -69,6 +69,7 @@ function App() {
                     <Route path="/data-collection" component={CollectDataComponent}></Route>
                     <Route path="/global-data" component={PublicDataComponent}></Route>
                     <Route path="/data-querying" component={DataQueryComponent}></Route>
+                    <Route path="/form-creation" component={FormCreationComponent}></Route>
 
                     {/* <Route path="/account" component={AccountManagementComponent}></Route> */}
                   </>

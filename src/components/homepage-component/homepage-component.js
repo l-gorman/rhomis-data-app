@@ -11,7 +11,6 @@ import { PortalDataAll, PortalDataNewUser } from './portal-data'
 
 import './homepage-component.css'
 import '../../App.css'
-import { ContactSupportOutlined, ProductionQuantityLimitsSharp } from '@mui/icons-material';
 
 
 
@@ -48,10 +47,10 @@ function PortalCard(props) {
         return (
             <div onClick={() => { props.history.push(props.data.link) }}
             >
-                < Card className="portal-card border-0">
+                < Card className="sub-card portal-card border-0">
                     <h4 className="portal-card-header">{props.data.name}</h4>
                     <Icon classname="portal-icon" size={100} color="white" />
-                    <p className="text-white">{props.data.text}</p>
+                    <p className="sub-card-text text-white">{props.data.text}</p>
                 </Card >
             </div>
         )
@@ -61,11 +60,11 @@ function PortalCard(props) {
         return (
             <div>
                 <a href={props.data.link} style={{ 'text-decoration': 'none' }}>
-                    < Card className="portal-card border-0">
+                    < Card className="sub-card portal-card border-0">
 
                         <h4 className="portal-card-header">{props.data.name}</h4>
                         <Icon classname="portal-icon" size={100} color="white" />
-                        <p className="text-white" > {props.data.text}</p >
+                        <p className="sub-card-text text-white" > {props.data.text}</p >
                     </Card >
                 </a >
             </div >
@@ -87,7 +86,6 @@ function RenderPortalCards(props) {
 
 }
 
-
 export default function HomePageComponent() {
 
     const [userData, setUserData] = useState([])
@@ -107,20 +105,8 @@ export default function HomePageComponent() {
                 <Card.Header className="bg-dark text-white">
                     <h3 >Portal</h3>
                 </Card.Header>
-                <Card.Body className="portal-card-body">
-
-                    {/* <RenderPortalCards data={PortalDataAll} history={history} /> */}
+                <Card.Body className="main-card-body">
                     {userData.length > 0 ? <RenderPortalCards data={PortalDataAll} history={history} /> : <RenderPortalCards data={PortalDataNewUser} history={history} />}
-
-                    {/* {userData ?
-                        PortalDataAll.map((PortalItem) => <PortalCard data={PortalItem} history={history} />) :
-                        PortalDataNewUser.map((PortalItem) => <PortalCard data={PortalItem} />)
-                    } */}
-                    {/* {userData ?
-                        PortalDataAll.map((PortalItem) => <PortalCard data={PortalItem} history={history}/>) :
-                        PortalDataNewUser.map((PortalItem) => <PortalCard data={PortalItem} />)
-                    } */}
-
 
                 </Card.Body>
             </Card>

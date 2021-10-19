@@ -1,4 +1,4 @@
-.background {
+.main-app-background {
   background-color: #1B8697;
   overflow-x:hidden; 
   /* overflow-y:hidden;  */
@@ -12,9 +12,6 @@
   height: 100vh;
 }
 
-h1{
-  text-align: center;
-}
 
 .main-card{
   margin-top: 25px;
@@ -22,9 +19,87 @@ h1{
 
 }
 
+.main-card-header-container{
+  display: flex;
+  align-items: center; 
+}
+
+.main-card-header-item{
+margin: 5px;  
+border-color:white;
+border-style: solid;
+border-radius: 5px;
+border-width: 1px;
+padding-left:10px;
+padding-right:10px;
+padding-bottom:5px;
+padding-top:5px;
+
+}
 .card-content{
   margin: 20px;
+}
 
+.sub-card{
+  /* justify-items: center; */
+  display: grid;
+  vertical-align: top;
+  align-items: center;
+  
+  margin: 15px;
+  padding-left: 20px;
+  padding-right: 20px;
+  background-color:black!important;
+  transition: 0.3s;
+}
+
+.sub-card-text{
+  margin-top: 20px;
+  text-align: center;
+}
+
+.portal-icon{
+  padding-top: 20px;
+}
+
+.portal-card{
+  width: 250px;
+  height:300px;
+}
+
+.project-card{
+  width: 200px;
+  height:200px;
+}
+
+
+
+.portal-card:hover {
+  background-color:#001f3f!important;   
+}
+
+.project-card:hover{
+  background-color:#001f3f !important;   
+}
+
+.sub-page-container {
+  padding-top: 20px;
+  width:80vw;
+}
+
+.portal-card-header {
+  margin-top: 10px;
+  margin-bottom: 20px;
+
+  color: white;
+
+
+}
+.main-card-body {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  /* margin: 3em; */
 }
 
 

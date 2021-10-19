@@ -1,0 +1,27 @@
+.side-bar-container{ 
+    color: "white";
+    background-color: "blue";
+    width: "100%";
+    justify-items: "right" 
+}
+
+.side-bar-item{
+    color:white;
+    background-color:#212529;
+    font-size: 22px;
+    transition: .3s;
+}
+
+.side-bar-item:hover{
+    background-color:#1B8697;
+    font-size: 27px;
+}
+
+.side-bar-link{
+    margin-left: 1em;
+    color:white;
+}
+
+.side-bar-link:hover{
+    color:white;
+}

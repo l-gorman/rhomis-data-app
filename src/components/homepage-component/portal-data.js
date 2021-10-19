@@ -2,7 +2,7 @@ import { RiSurveyFill } from 'react-icons/ri'
 import { VscInspect } from 'react-icons/vsc'
 import { FcAcceptDatabase } from 'react-icons/fc'
 import { FiDatabase } from 'react-icons/fi'
-import { MdHelpOutline, MdOutlineDashboardCustomize, MdOutlineSendToMobile } from 'react-icons/md'
+import { MdHelpOutline, MdOutlineDashboardCustomize, MdOutlineSendToMobile, MdOutlineCreate } from 'react-icons/md'
 export const PortalDataAll = [
     {
         name: "Quickstart",
@@ -26,7 +26,7 @@ export const PortalDataAll = [
         name: "Collect Data",
         text: "Collect data for an existing project and access enumerator training materials",
         icon: MdOutlineSendToMobile,
-        link: "/project-management",
+        link: "/data-collection",
         external: false,
         roles: ["project-manager", "data-collector"]
 
@@ -36,7 +36,7 @@ export const PortalDataAll = [
         name: "Global Dataset",
         text: "Query publicly available survey data by time, location, and content.",
         icon: FiDatabase,
-        link: "/project-management",
+        link: "/global-data",
         external: false,
         roles: ["basic"]
 
@@ -48,6 +48,14 @@ export const PortalDataAll = [
         icon: MdHelpOutline,
         link: "https://rhomis-docs.readthedocs.io/en/latest/",
         external: true,
+        roles: ["basic"]
+    },
+    {
+        name: "Form Creation",
+        text: "Create projects and forms (only used for development)",
+        icon: MdOutlineCreate,
+        link: "/form-creation",
+        external: false,
         roles: ["basic"]
     }
 ]

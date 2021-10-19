@@ -8,10 +8,7 @@ const admin = {
         "/project-management",
         "/data-collection",
         "/data-querying",
-        "/documentation"
+        "/documentation",
         "/logout"
-
     ]
 }
-
-const data
