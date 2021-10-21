@@ -21,7 +21,7 @@ import {
 // Import the various components
 import { LoginComponent } from "./components/login-component/login-component"
 import { DataQueryComponent } from "./components/data-query-component/data-query-component"
-import HomePageComponent from './components/homepage-component/homepage-component';
+import PortalComponent from './components/portal-component/portal-component';
 import ProjectManagementComponent from "./components/project-management-component/project-management-component"
 // import AccountManagementComponent from './components/account-management-component/account-management-component';
 import PublicDataComponent from './components/public-data-component/public-data-component';
@@ -64,7 +64,7 @@ function App() {
                 {/* If the auth token does not exist, can render each of these components */}
                 {authToken ?
                   <>
-                    <Route exact path="/" component={HomePageComponent}></Route>
+                    <Route exact path="/" component={PortalComponent}></Route>
                     <Route path="/project-management" component={ProjectManagementComponent}></Route>
                     <Route path="/data-collection" component={CollectDataComponent}></Route>
                     <Route path="/global-data" component={PublicDataComponent}></Route>

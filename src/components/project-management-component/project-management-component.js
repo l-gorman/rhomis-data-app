@@ -7,6 +7,7 @@ import { actions } from 'react-table'
 import { response } from 'msw'
 
 import { MdOutlineRefresh } from 'react-icons/md'
+import { AiOutlineArrowLeft } from 'react-icons/ai'
 
 
 async function GetProjectInformation(props) {
@@ -34,108 +35,177 @@ async function GetProjectInformation(props) {
 
 function RenderProjectInformation(props) {
 
-    if (props.projectInformationAvailable) {
-
+    if (props.data.projects === undefined) {
         return (
-            <>
-                All Projects:
-                <ul>
-                    {props.projectInformation.projects.map((project) => {
-                        return <li>{project.name}</li>
-                    })}
-                </ul>
+            <div>
+                <Table striped bordered hover>
+                    <thead key="table-header">
+                        <tr key="table-row-1">
 
+                            <th key="table-head-item-2">Project Name</th>
+                            <th key="table-head-item-3">Description</th>
+                            <th key="table-head-item-3">Created at</th>
 
-                {props.projectInformation.forms.length > 0 ? <Table striped bordered hover variant="dark">
-                    <thead>
-                        < tr >
-                            <th>Project</th>
-                            <th>Form</th>
-                            <th ></th>
-                        </tr >
+                            <th key="table-head-item-1"></th>
+
+                        </tr>
                     </thead>
                     <tbody>
-                        {props.projectInformation.forms.map((form) => {
-                            return <tr>
-                                <td >{form.project}</td>
-                                <td>{form.name}</td>
-                                <td><Button className="float-right">Select</Button></td>
-                            </tr>
+                        <tr>
+                            <td colSpan={4}>No projects found</td>
+                        </tr>
+
+                    </tbody>
+
+                </Table>
+            </div>
+        )
+    }
+
+
+    if (props.data.projects !== undefined) {
+        return (
+            <div>
+                <Table striped bordered hover>
+                    <thead key="table-header">
+                        <tr key="table-row-1">
+
+                            <th key="table-head-item-1">Project Name</th>
+                            <th key="table-head-item-2">Description</th>
+                            <th key="table-head-item-3">Created at</th>
+                            <th key="table-head-item-4"></th>
+
+                        </tr>
+                    </thead>
+                    <tbody key="table-body">
+                        {props.data.projects.map((project, index) => {
+                            let date = new Date(project.createdAt)
+                            let dateString = date.toDateString()
+                            return (
+                                <tr key={"table-row-" + index}>
+
+                                    <td key={"table-row-" + index + "-item-1"}>{project.name}</td>
+                                    <td key={"table-row-" + index + "-item-2"}>{project.description}</td>
+                                    <td key={"table-row-" + index + "-item-3"}>{dateString}</td>
+                                    <td key={"table-row-" + index + "-item-4"}>
+                                        <Button className="bg-dark text-white border-0" onClick={() => {
+                                            props.setProjectSelected(project.name)
+                                            const currentFilters = props.filters
+                                            currentFilters.push("Project: " + project.name)
+                                            props.setFilters(currentFilters)
+                                            props.setTitle("Project Administration")
+                                        }}>
+                                            Select
+                                        </Button></td>
+                                </tr>
+                            )
 
                         })}
 
                     </tbody>
-                </Table > : <h2>No forms loaded yet</h2>}
-            </>)
+                </Table>
+            </div>
+
+
+        )
     }
-    if (!props.projectInformationAvailable) return (<>No Projects</>)
-
-    return
-}
-function RenderProjectCards(props) {
-    console.log("Render cards props")
-    console.log(props)
-
-    return props.data.map((project) => {
-        return (<RenderProjectCard data={project} />)
-    })
 
 }
-function RenderProjectCard(props) {
-    // console.log(props)
+
+function SelectProject(props) {
+
+}
+
+function FormTables() {
     return (
-        <>
-            < Card className="sub-card project-card border-0">
-                <h4 className="portal-card-header">{props.data.name}</h4>
-                <p className="sub-card-text text-white">{props.data.description}</p>
+        <Table striped bordered hover>
+            <thead>
+                <tr>
+                    <th>x</th>
+                    <th>y</th>
+                    <th>z</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>5</td>
+                    <td>6</td>
+                </tr>
+            </tbody>
 
-            </Card >
-        </>
+        </Table>
     )
+}
+
+function RenderProjectAdmin() {
+
+    return (<>
+        <Card className="project-management-card">
+            <Card.Header as="h5">Select a Form</Card.Header>
+            <Card.Body>
+                {/* <Card.Title>Special title treatment</Card.Title> */}
+                <FormTables />
+                <Button variant="primary">Go somewhere</Button>
+            </Card.Body>
+        </Card>
+
+        <Card className="project-management-card">
+            <Card.Header as="h5">Manage Users</Card.Header>
+            <Card.Body>
+                {/* <Card.Title>Special title treatment</Card.Title> */}
+                <Card.Text>
+
+                </Card.Text>
+                <Button variant="primary">Go somewhere</Button>
+            </Card.Body>
+        </Card>
+    </>
+
+    )
+
+}
+
+
+function BackButton(props) {
+
+    if (props.filters.length === 1) {
+        props.setProjectSelected(false)
+        props.setFilters([])
+        props.setTitle("Select a Project")
+
+    }
+
 }
 
 
 export default function ProjectManagementComponent(props) {
 
-    const [projectInformation, setProjectInformation] = useState([])
 
     const [authToken, setAuthToken] = useContext(AuthContext)
 
-    // const [filters, setFilters] = useState([])
+    const [projectInformation, setProjectInformation] = useState([])
+    const [filters, setFilters] = useState([])
 
+    const [title, setTitle] = useState("Select a Project")
 
     // const [projectName, setProjectName] = useState(null)
 
-    const [projectSelected, setProjectSelected] = useState(null)
-    const [formSelected, setFormSelected] = useState(null)
-
-
-
-    const projects = [{
-        name: "xyz",
-        description: "short description to remember details about the project"
-    },
-    {
-        name: "abc",
-        description: "short description to remember details about the project"
-    }]
+    const [projectSelected, setProjectSelected] = useState(false)
+    const [formSelected, setFormSelected] = useState(false)
 
     useEffect(async () => {
         const projectResponse = await GetProjectInformation({
             setProjectInformation: setProjectInformation,
             authToken: authToken
         })
-        // console.log(projectResponse)
 
     }, [])
-
-
-    useEffect(() => {
-        console.log("Project Information")
-
-        console.log(projectInformation.projects)
-
-    }, [projectInformation])
 
     return (
         <div id="project-management-container" className="sub-page-container">
@@ -143,21 +213,35 @@ export default function ProjectManagementComponent(props) {
             <Card className="main-card border-0">
                 <Card.Header className=" bg-dark text-white">
                     <div className="main-card-header-container">
-                        <h3>Get Project MetaData</h3>
-
+                        <h3>{title}</h3>
                         <div style={{ "display": "flex", "flex-direction": "row", "margin-left": "auto" }} >
-                            <div className="main-card-header-item">filter 1</div>
-                            <div className="main-card-header-item">filter 2</div>
-                            <div className="main-card-header-item">filter 3</div>
-                            <Button className="bg-dark border-0" onClick={async () => {
-                                const projectResponse = await GetProjectInformation({
-                                    setProjectInformation: setProjectInformation,
-                                    authToken: authToken
-                                })
-                                console.log(projectResponse)
+                            {/* Render the filters in the top of the card */}
+                            {filters ? filters.map((filter) => {
+                                return <div className="main-card-header-item">{filter}</div>
+                            }) : ''}
+                            {/* Render the refresh button if no  */}
+                            {filters.length > 0 ?
+                                <Button className="bg-dark border-0" onClick={() => {
+                                    BackButton({
+                                        setProjectSelected: setProjectSelected,
+                                        setFilters: setFilters,
+                                        filters: filters,
+                                        setFormSelected: setFormSelected,
+                                        setTitle: setTitle,
 
-                            }
-                            }><MdOutlineRefresh size={25} /></Button>
+                                    })
+                                }}>
+                                    <AiOutlineArrowLeft size={25} />
+                                </Button> :
+                                <Button className="bg-dark border-0" onClick={async () => {
+                                    const projectResponse = await GetProjectInformation({
+                                        setProjectInformation: setProjectInformation,
+                                        authToken: authToken
+                                    })
+                                    console.log(projectResponse)
+
+                                }
+                                }><MdOutlineRefresh size={25} /></Button>}
                         </div>
                     </div>
 
@@ -166,7 +250,7 @@ export default function ProjectManagementComponent(props) {
 
                 <Card.Body className="main-card-body">
 
-                    {projectSelected ? <h1>No projects found</h1> : <RenderProjectCards data={projects} />}
+                    {(filters.length === 1 & projectSelected !== false) ? <RenderProjectAdmin /> : <RenderProjectInformation data={projectInformation} setProjectSelected={setProjectSelected} filters={filters} setFilters={setFilters} setTitle={setTitle} />}
 
                 </Card.Body>
 

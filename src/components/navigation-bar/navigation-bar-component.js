@@ -16,6 +16,7 @@ this with the Nav.Link component
 
 
 export default function MainNavbar(props) {
+    console.log("Survey builder url: " + process.env.SURVEY_BUILDER_URL)
     // props.Logout()
     const [authToken, setAuthToken] = useContext(AuthContext)
     const [show, setShow] = useState(false)
@@ -28,15 +29,15 @@ export default function MainNavbar(props) {
             <Navbar fixed="top" bg="dark" variant="dark" expand="false">
                 {/* <Container fluid> */}
 
-                <Button bg="dark" variant="dark" onClick={handleShow}><MdOutlineMenu size={25} color="white" /></Button>
-                <h2 style={{ "color": "white" }}>RHoMIS 2.0</h2>
-                <Nav.Link className="side-bar-link" as={Link} to="/login" onClick={() => setAuthToken(null)} >Logout</Nav.Link>
+                <div className="menu-button" onClick={handleShow}><MdOutlineMenu className="menu-button-icon" size={30} /></div>
+                <h2 style={{ "color": "white" }}>RHoMIS</h2>
+                <Nav.Link className="logout-button" as={Link} to="/login" onClick={() => setAuthToken(null)} >Logout</Nav.Link>
 
 
 
                 <Offcanvas
                     backdrop="true"
-                    style={{ "background-color": "#212529" }}
+                    style={{ "background-color": "#212529", "width": "25%" }}
                     id="offcanvasNavbar"
                     aria-labelledby="offcanvasNavbarLabel"
                     placement="start"
@@ -44,8 +45,9 @@ export default function MainNavbar(props) {
                     onHide={handleClose}
 
                 >
-                    <Offcanvas.Header closeVariant="white" closeButton style={{ "color": "white" }}>
-                        <Offcanvas.Title id="offcanvasNavbarLabel">RHoMIS 2.0</Offcanvas.Title>
+
+                    <Offcanvas.Header closeVariant="white" closeButton style={{ "color": "white", "background-color": "#212529" }}>
+                        <Offcanvas.Title id="offcanvasNavbarLabel"><h2 style={{ "padding-left": "20px" }}>Dashboard</h2></Offcanvas.Title>
                     </Offcanvas.Header>
                     <div className="side-bar-container">
 
@@ -56,7 +58,7 @@ export default function MainNavbar(props) {
                             <Nav.Link className="side-bar-link" as={Link} onClick={() => { handleClose() }} to="/project-management">My Projects</Nav.Link>
                         </div>
                         <div className="side-bar-item">
-                            <Nav.Link className="side-bar-link" as={Link} onClick={() => { handleClose() }} to="/project-management">Design a Survey</Nav.Link>
+                            <Nav.Link className="side-bar-link" onClick={() => { handleClose() }} href="https://rhomis-survey.stats4sdtest.online/login">Design a Survey</Nav.Link>
                         </div>
                         <div className="side-bar-item">
                             <Nav.Link className="side-bar-link" as={Link} onClick={() => { handleClose() }} to="/data-collection">Collect Data</Nav.Link>
@@ -79,6 +81,9 @@ export default function MainNavbar(props) {
                 {/* </Navbar.Collapse> */}
                 {/* </Container> */}
             </Navbar >
+
+
+
 
         </>
 

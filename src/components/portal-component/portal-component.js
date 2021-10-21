@@ -9,7 +9,7 @@ import { Redirect, useHistory } from 'react-router';
 
 import { PortalDataAll, PortalDataNewUser } from './portal-data'
 
-import './homepage-component.css'
+import './portal-component.css'
 import '../../App.css'
 
 
@@ -48,9 +48,12 @@ function PortalCard(props) {
             <div onClick={() => { props.history.push(props.data.link) }}
             >
                 < Card className="sub-card portal-card border-0">
-                    <h4 className="portal-card-header">{props.data.name}</h4>
-                    <Icon classname="portal-icon" size={100} color="white" />
-                    <p className="sub-card-text text-white">{props.data.text}</p>
+                    <div className="portal-card-header-container">
+                        <h4 className="portal-card-header">{props.data.name}</h4>
+                    </div>
+                    <div className="portal-icon-container">
+                        <Icon classname="portal-icon" size={100} color="white" />
+                    </div>
                 </Card >
             </div>
         )
@@ -61,10 +64,13 @@ function PortalCard(props) {
             <div>
                 <a href={props.data.link} style={{ 'text-decoration': 'none' }}>
                     < Card className="sub-card portal-card border-0">
+                        <div className="portal-card-header-container">
+                            <h4 className="portal-card-header">{props.data.name}</h4>
+                        </div>
+                        <div className="portal-icon-container">
 
-                        <h4 className="portal-card-header">{props.data.name}</h4>
-                        <Icon classname="portal-icon" size={100} color="white" />
-                        <p className="sub-card-text text-white" > {props.data.text}</p >
+                            <Icon classname="portal-icon" size={100} color="white" />
+                        </div>
                     </Card >
                 </a >
             </div >
@@ -86,7 +92,7 @@ function RenderPortalCards(props) {
 
 }
 
-export default function HomePageComponent() {
+export default function PortalComponent() {
 
     const [userData, setUserData] = useState([])
     const [authToken, setAuthToken] = useContext(AuthContext)

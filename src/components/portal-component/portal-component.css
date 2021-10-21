@@ -1,0 +1,17 @@
+
+
+
+ .portal-card-header {
+     justify-self: center;
+    margin-top: 10px;
+    color: white;
+} 
+
+.portal-icon-container{
+    display: grid;
+    justify-items: center;
+    align-items: end;
+    margin-bottom: 60px;
+    height:100%;
+    width:100%;
+}

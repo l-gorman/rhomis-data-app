@@ -5,7 +5,7 @@ import { FiDatabase } from 'react-icons/fi'
 import { MdHelpOutline, MdOutlineDashboardCustomize, MdOutlineSendToMobile, MdOutlineCreate } from 'react-icons/md'
 export const PortalDataAll = [
     {
-        name: "Quickstart",
+        name: "Build a Survey",
         text: "Get started straight away. Build a survey, collect test-data, and view your data.",
         icon: RiSurveyFill,
         link: "https://rhomis-survey.stats4sdtest.online/login",
@@ -13,7 +13,7 @@ export const PortalDataAll = [
         roles: ["basic"]
     },
     {
-        name: "Manage Projects",
+        name: "Manage My Projects",
         text: "Check up on your projects, download your data, and control user access.",
         icon: MdOutlineDashboardCustomize,
         link: "/project-management",
@@ -43,7 +43,7 @@ export const PortalDataAll = [
 
     },
     {
-        name: "Documentation",
+        name: "Help",
         text: "See guidance for more advanced use case and how to contribute to our system",
         icon: MdHelpOutline,
         link: "https://rhomis-docs.readthedocs.io/en/latest/",
@@ -62,7 +62,7 @@ export const PortalDataAll = [
 
 export const PortalDataNewUser = [
     {
-        name: "Quickstart",
+        name: "Build a Survey",
         text: "Get started straight away. Build a survey, collect test-data, and view your data",
         icon: RiSurveyFill,
         link: process.env.SURVEY_BUILDER_URL,

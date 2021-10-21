@@ -13,15 +13,60 @@
 }
 
 .side-bar-item:hover{
-    background-color:#1B8697;
+    background-color:white;
     font-size: 27px;
 }
 
-.side-bar-link{
+.side-bar-link,
+.logout-button{
     margin-left: 1em;
     color:white;
 }
 
-.side-bar-link:hover{
-    color:white;
+
+.logout-button{
+    border: solid;
+    border-radius: 10px;
+    border-width: 1px;
+    transition: .3s;
+}
+
+.side-bar-link:hover,
+.logout-button:hover{
+    color:black;
+}
+
+.logout-button:hover{
+    background-color: white;
+}
+
+.menu-button{
+    display: grid;
+    place-content: center;
+    margin-left: 10px;
+    height:40px;
+    width:40px;
+
+    padding:10px;
+    border: solid;
+    border-radius: 10px;
+    border-width: 1px;
+    transition: .3s;
+    border-color: whitesmoke;
+background-color: #212529 !important;
+}
+
+.menu-button-icon{
+    color:white
+
+}
+
+.menu-button-icon:hover{
+    color:black
+}
+
+.menu-button:hover{
+    
+    border-color: #212529;
+background-color: white !important;
 }

@@ -16,7 +16,9 @@
 }
 
 
-
+.table > tbody > tr > td {
+    vertical-align: center;
+}
 
 .sub-page-container {
     padding-top: 20px;
@@ -29,6 +31,11 @@
     flex-wrap: wrap;
     flex-direction: row;
 
+}
+
+.project-management-card{
+    width:80%;
+    margin: 20px;
 }
 
 

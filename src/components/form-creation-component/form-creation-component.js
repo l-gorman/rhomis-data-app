@@ -120,10 +120,101 @@ function CreateProjectForm(props) {
     )
 }
 
+function NewFormEntry(props) {
+    console.log(props.data)
+    let projectList = ["No Projects"]
+    let disabled = true
+
+    if (props.data !== undefined & props.data !== null) {
+        if (props.data.projects !== undefined) {
+            projectList = props.data.projects.map((project) => {
+                return project.name
+            })
+            disabled = false
+        }
+
+        if (props.data.projects.length === 0) {
+            projectList = ["No Projects"]
+            disabled = true
+
+        }
+
+    }
+    console.log(projectList)
+
+    return (
+        <>
+            <Form>
+                <Form.Group>
+                    <Form.Label>
+                        Select a Project
+                    </Form.Label>
+                    <Form.Select onChange={(event) => { props.setSelectedProject(event.target.value) }} disabled={disabled} aria-label="Default select example">
+                        {projectList.map((option) => {
+                            return <option>{option}</option>
+                        })}
+                    </Form.Select>
+                </Form.Group>
+                <Form.Group>
+                    <Form.Label>
+                        Enter the name of the form
+                    </Form.Label>
+                    <Form.Control onChange={(event) => { props.setNewFormName(event.target.value) }} />
+                    <Form.Text>This must match the "form_title" field in your xlsx form settings</Form.Text>
+                </Form.Group>
+
+                <Form.Group>
+                    <Form.Label>
+                        Enter the form version
+                    </Form.Label>
+                    <Form.Control onChange={(event) => { props.setNewFormVersion(event.target.value) }} />
+
+
+                    <Form.Text>This must match the "version" field in your xlsx settings tab</Form.Text>
+                </Form.Group>
+
+                <Form.Group>
+                    <Form.Label>
+                        Select your file
+                    </Form.Label>
+                    <Form.Control type="file" size="lg" onChange={(e) => props.setSelectedFile(e.target.files[0])} />
+
+                </Form.Group>
+                <Button onClick={() => { CreateForm(props.authToken, props.selectedProject, props.newFormName, props.newFormVersion, props.selectedFile) }}>Submit</Button>
+            </Form>
+        </>
+    )
+}
+
 
 function RenderProjectInformation(props) {
 
     console.log(props)
+    if (!props.data) {
+        return (
+            <div>
+                <Table>
+                    <thead key="table-header">
+                        <tr key="table-row-1">
+                            <th key="table-head-item-1">#</th>
+
+                            <th key="table-head-item-2">Project Name</th>
+                            <th key="table-head-item-3">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colSpan={3}>No projects found</td>
+                        </tr>
+
+                    </tbody>
+
+                </Table>
+            </div>
+        )
+    }
+
+
     if (props.data.projects !== undefined) {
         return (
             <div>
@@ -159,7 +250,6 @@ function RenderProjectInformation(props) {
 
         )
     }
-    return (<></>)
 
 }
 
@@ -170,21 +260,35 @@ export default function FormCreationComponent() {
 
     const [authToken, setAuthToken] = useContext(AuthContext)
 
-    const [projectInformation, setProjectInformation] = useState([])
+    const [projectInformation, setProjectInformation] = useState(null)
 
     const [newProjectName, setNewProjectName] = useState(null)
     const [newProjectDescription, setNewProjectDescription] = useState(null)
 
+    const [selectedProject, setSelectedProject] = useState(null)
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [newFormName, setNewFormName] = useState(null);
+    const [newFormVersion, setNewFormVersion] = useState(null);
+
+
+
+
     useEffect(async () => {
         await GetProjectInformation({ authToken: authToken, setProjectInformation: setProjectInformation })
-
     }, [])
+
+    useEffect(() => {
+        console.log("project info")
+
+        console.log(projectInformation)
+
+    }, [projectInformation])
 
     return (
         <div id="project-management-container" className="sub-page-container">
 
             <Card className="main-card border-0">
-                <Card.Header className=" bg-dark text-white">Creating Forms/Projects</Card.Header>
+                <Card.Header className=" bg-dark text-white"><h3>Creating Forms/Projects</h3></Card.Header>
                 <Card.Body>
                     <Accordion defaultActiveKey="0">
                         <Accordion.Item eventKey="0">
@@ -197,7 +301,19 @@ export default function FormCreationComponent() {
                         </Accordion.Item>
                         <Accordion.Item eventKey="2">
                             <Accordion.Header>Create a Form</Accordion.Header>
-                            <Accordion.Body><CreateProjectForm /></Accordion.Body>
+                            <Accordion.Body>
+                                <NewFormEntry
+                                    authToken={authToken}
+                                    data={projectInformation}
+                                    selectedFile={selectedFile}
+                                    setSelectedFile={setSelectedFile}
+                                    setNewFormName={setNewFormName}
+                                    newFormName={newFormName}
+                                    setNewFormVersion={setNewFormVersion}
+                                    newFormVersion={newFormVersion}
+                                    setSelectedProject={setSelectedProject}
+                                    selectedProject={selectedProject} />
+                            </Accordion.Body>
                         </Accordion.Item>
 
 
