@@ -6,6 +6,8 @@ import './project-management-component.css'
 import { actions } from 'react-table'
 import { response } from 'msw'
 
+import { useHistory } from 'react-router'
+
 import { MdOutlineRefresh } from 'react-icons/md'
 import { AiOutlineArrowLeft } from 'react-icons/ai'
 
@@ -25,12 +27,13 @@ async function GetProjectInformation(props) {
     if (result.status === 200) {
         console.log("Setting project information")
 
-        props.setProjectInformation(result.data)
+        props.setAdminData(result.data)
     }
     if (result.status === 400) {
         alert(result.data)
     }
 }
+
 
 
 function RenderProjectInformation(props) {
@@ -42,17 +45,47 @@ function RenderProjectInformation(props) {
                     <thead key="table-header">
                         <tr key="table-row-1">
 
-                            <th key="table-head-item-2">Project Name</th>
-                            <th key="table-head-item-3">Description</th>
+                            <th key="table-head-item-1">Project Name</th>
+                            <th key="table-head-item-2">Description</th>
                             <th key="table-head-item-3">Created at</th>
+                            <th key="table-head-item-4"></th>
 
-                            <th key="table-head-item-1"></th>
 
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td colSpan={4}>No projects found</td>
+                        </tr>
+
+                    </tbody>
+
+                </Table>
+            </div>
+        )
+    }
+
+    if (props.data.projects.length === 0) {
+        return (
+            <div>
+                <Table striped bordered hover>
+                    <thead key="table-header">
+                        <tr key="table-row-1">
+
+                            <th key="table-head-item-1">Project Name</th>
+                            <th key="table-head-item-2">Description</th>
+                            <th key="table-head-item-3">Created at</th>
+                            <th key="table-head-item-4"></th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr >
+                            <td colSpan={4} style={{ "text-align": "center" }}>No projects found</td>
+                        </tr>
+                        <tr >
+                            <td colSpan={4} style={{ "text-align": "center" }}><a href="https://rhomis-survey.stats4sdtest.online"><Button >Start Creating a Survey</Button></a></td>
                         </tr>
 
                     </tbody>
@@ -69,12 +102,10 @@ function RenderProjectInformation(props) {
                 <Table striped bordered hover>
                     <thead key="table-header">
                         <tr key="table-row-1">
-
                             <th key="table-head-item-1">Project Name</th>
                             <th key="table-head-item-2">Description</th>
                             <th key="table-head-item-3">Created at</th>
                             <th key="table-head-item-4"></th>
-
                         </tr>
                     </thead>
                     <tbody key="table-body">
@@ -93,7 +124,7 @@ function RenderProjectInformation(props) {
                                             const currentFilters = props.filters
                                             currentFilters.push("Project: " + project.name)
                                             props.setFilters(currentFilters)
-                                            props.setTitle("Project Administration")
+                                            props.setTitle("Select a Form")
                                         }}>
                                             Select
                                         </Button></td>
@@ -117,33 +148,98 @@ function SelectProject(props) {
 }
 
 function FormTables() {
+    const forms = [
+        {
+            name: "form 1",
+            createdAt: "dd/mm/yyyy"
+        },
+        {
+            name: "form 2",
+            createdAt: "dd/mm/yyyy"
+        }
+    ]
+
+
     return (
         <Table striped bordered hover>
             <thead>
                 <tr>
-                    <th>x</th>
-                    <th>y</th>
-                    <th>z</th>
+                    <th>Form Name</th>
+                    <th>Created At</th>
+                    <th style={{ "width": "40px" }}></th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>2</td>
-                    <td>3</td>
-                </tr>
-                <tr>
-                    <td>4</td>
-                    <td>5</td>
-                    <td>6</td>
-                </tr>
+                {forms.map((form) => {
+                    return (
+                        <tr>
+                            <td>{form.name}</td>
+                            <td >{form.createdAt}</td>
+                            <td style={{ "width": "40px" }}><Button className="bg-dark text-white border-0">Select</Button></td>
+                        </tr>
+                    )
+                })}
             </tbody>
 
-        </Table>
+        </Table >
     )
 }
 
-function RenderProjectAdmin() {
+
+function UserTables() {
+
+    const users = []
+
+    return (
+        <>
+            <Table>
+                <thead>
+                    <th>Email</th>
+                    <th>Project</th>
+                    <th>Form</th>
+                    <th>Role</th>
+                </thead>
+
+                <tbody>
+                    {users.length === 0 ?
+                        <tr>
+                            <td colSpan={4}>No other users found</td>
+                        </tr> :
+                        <tr>
+                            <td colSpan={4}>Users found</td>
+                        </tr>
+                    }
+                </tbody>
+
+            </Table>
+        </>
+    )
+
+}
+
+function UserForm() {
+
+    return (
+        <>
+            <Form>
+                <Form.Group>
+                    <Form.Label>User email</Form.Label>
+                    <Form.Control />
+                </Form.Group>
+                <Form.Group>
+                    <Form.Label>User email</Form.Label>
+                    <Form.Control />
+                </Form.Group>
+
+                <Button className="bg-dark text-white border-0">Add User</Button>
+
+            </Form>
+        </>
+    )
+
+}
+
+function RenderProjectAdmin(props) {
 
     return (<>
         <Card className="project-management-card">
@@ -151,18 +247,14 @@ function RenderProjectAdmin() {
             <Card.Body>
                 {/* <Card.Title>Special title treatment</Card.Title> */}
                 <FormTables />
-                <Button variant="primary">Go somewhere</Button>
             </Card.Body>
         </Card>
 
         <Card className="project-management-card">
             <Card.Header as="h5">Manage Users</Card.Header>
             <Card.Body>
-                {/* <Card.Title>Special title treatment</Card.Title> */}
-                <Card.Text>
-
-                </Card.Text>
-                <Button variant="primary">Go somewhere</Button>
+                <UserTables />
+                <UserForm />
             </Card.Body>
         </Card>
     </>
@@ -186,10 +278,13 @@ function BackButton(props) {
 
 export default function ProjectManagementComponent(props) {
 
+    const history = useHistory()
 
     const [authToken, setAuthToken] = useContext(AuthContext)
 
-    const [projectInformation, setProjectInformation] = useState([])
+    const [adminData, setAdminData] = useState([])
+
+
     const [filters, setFilters] = useState([])
 
     const [title, setTitle] = useState("Select a Project")
@@ -200,10 +295,12 @@ export default function ProjectManagementComponent(props) {
     const [formSelected, setFormSelected] = useState(false)
 
     useEffect(async () => {
-        const projectResponse = await GetProjectInformation({
-            setProjectInformation: setProjectInformation,
+        const metaData = await GetProjectInformation({
+            setAdminData: setAdminData,
             authToken: authToken
         })
+
+
 
     }, [])
 
@@ -233,15 +330,11 @@ export default function ProjectManagementComponent(props) {
                                 }}>
                                     <AiOutlineArrowLeft size={25} />
                                 </Button> :
-                                <Button className="bg-dark border-0" onClick={async () => {
-                                    const projectResponse = await GetProjectInformation({
-                                        setProjectInformation: setProjectInformation,
-                                        authToken: authToken
-                                    })
-                                    console.log(projectResponse)
+                                <Button className="bg-dark border-0" onClick={() => {
+                                    history.push("/")
 
                                 }
-                                }><MdOutlineRefresh size={25} /></Button>}
+                                }><AiOutlineArrowLeft size={25} /></Button>}
                         </div>
                     </div>
 
@@ -250,7 +343,7 @@ export default function ProjectManagementComponent(props) {
 
                 <Card.Body className="main-card-body">
 
-                    {(filters.length === 1 & projectSelected !== false) ? <RenderProjectAdmin /> : <RenderProjectInformation data={projectInformation} setProjectSelected={setProjectSelected} filters={filters} setFilters={setFilters} setTitle={setTitle} />}
+                    {(filters.length === 1 & projectSelected !== false) ? <RenderProjectAdmin /> : <RenderProjectInformation data={adminData} setProjectSelected={setProjectSelected} filters={filters} setFilters={setFilters} setTitle={setTitle} />}
 
                 </Card.Body>
 

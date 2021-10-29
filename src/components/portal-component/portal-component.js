@@ -7,7 +7,7 @@ import axios from 'axios';
 
 import { Redirect, useHistory } from 'react-router';
 
-import { PortalDataAll, PortalDataNewUser } from './portal-data'
+import { PortalDataAll } from './portal-data'
 
 import './portal-component.css'
 import '../../App.css'
@@ -18,11 +18,10 @@ import '../../App.css'
 
 async function FetchProjectInformation(authToken) {
 
-    console.log("Auth Token: " + authToken)
     // Basic get request for metadata
     const response = await axios({
         method: "get",
-        url: process.env.REACT_APP_API_URL + "api/meta-data/form-data",
+        url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/",
         headers: {
             'Authorization': authToken
         }
@@ -39,7 +38,6 @@ async function FetchProjectInformation(authToken) {
 
 
 function PortalCard(props) {
-    console.log(props.data)
     const Icon = props.data.icon
 
 
@@ -47,12 +45,12 @@ function PortalCard(props) {
         return (
             <div onClick={() => { props.history.push(props.data.link) }}
             >
-                < Card className="sub-card portal-card border-0">
-                    <div className="portal-card-header-container">
-                        <h4 className="portal-card-header">{props.data.name}</h4>
+                < Card key={"card-" + props.data.name} className="sub-card portal-card border-0">
+                    <div key={"header-container-" + props.data.name} className="portal-card-header-container">
+                        <h4 key={"card-header-" + props.data.name} className="portal-card-header">{props.data.name}</h4>
                     </div>
-                    <div className="portal-icon-container">
-                        <Icon classname="portal-icon" size={100} color="white" />
+                    <div key={"icon-container-" + props.data.name} className="portal-icon-container">
+                        <Icon size={100} color="white" />
                     </div>
                 </Card >
             </div>
@@ -62,7 +60,7 @@ function PortalCard(props) {
     if (props.data.external) {
         return (
             <div>
-                <a href={props.data.link} style={{ 'text-decoration': 'none' }}>
+                <a href={props.data.link} style={{ 'textDecoration': 'none' }}>
                     < Card className="sub-card portal-card border-0">
                         <div className="portal-card-header-container">
                             <h4 className="portal-card-header">{props.data.name}</h4>
@@ -81,9 +79,52 @@ function PortalCard(props) {
 
 function RenderPortalCards(props) {
 
+    const portalCardData = []
+    console.log(props.data[0])
+    console.log(props.userData)
+
+    if (props.userData) {
+        if (props.userData.basic === true) {
+            const cardToAdd = props.data.filter(item => item.label === "surveyBuilder")
+            portalCardData.push(...cardToAdd)
+        }
+        if (props.userData.dataCollector.length > 0) {
+            const cardToAdd = props.data.filter(item => item.label === "dataCollector")
+            portalCardData.push(...cardToAdd)
+        }
+
+        if (props.userData.projectManager.length > 0 | props.userData.projectAnalyst.length > 0) {
+            const cardToAdd = props.data.filter(item => item.label === "projectManager")
+            portalCardData.push(...cardToAdd)
+        }
+
+        if (props.userData.researcher.length > 0) {
+            const cardToAdd = props.data.filter(item => item.label === "globalData")
+            portalCardData.push(...cardToAdd)
+        }
+
+        if (props.userData.administrator === true) {
+            const cardToAdd = props.data.filter(item => item.label === "administrator")
+            portalCardData.push(...cardToAdd)
+        }
+
+
+        if (props.userData.basic === true) {
+            const cardToAdd = props.data.filter(item => item.label === "help")
+            portalCardData.push(...cardToAdd)
+        }
+
+    }
+
+    if (!props.userData) {
+        portalCardData.push(props.data[0])
+    }
+
+
+
     return (
         <>
-            {props.data.map((PortalItem) => {
+            {portalCardData.map((PortalItem) => {
                 return <PortalCard data={PortalItem} history={props.history} />
             })
             }
@@ -94,15 +135,16 @@ function RenderPortalCards(props) {
 
 export default function PortalComponent() {
 
-    const [userData, setUserData] = useState([])
+    const [userData, setUserData] = useState(null)
+    const [useInfoAvail, setUserInfoAvail] = useState(false)
     const [authToken, setAuthToken] = useContext(AuthContext)
     const history = useHistory()
 
     useEffect(async () => {
         const newUserData = await FetchProjectInformation(authToken
         )
-        console.log(newUserData)
         setUserData(newUserData)
+        setUserInfoAvail(true)
     }, [])
 
     return (
@@ -112,7 +154,7 @@ export default function PortalComponent() {
                     <h3 >Portal</h3>
                 </Card.Header>
                 <Card.Body className="main-card-body">
-                    {userData.length > 0 ? <RenderPortalCards data={PortalDataAll} history={history} /> : <RenderPortalCards data={PortalDataNewUser} history={history} />}
+                    <RenderPortalCards data={PortalDataAll} userData={userData} history={history} />
 
                 </Card.Body>
             </Card>

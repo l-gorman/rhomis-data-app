@@ -230,7 +230,7 @@ async function Login(props) {
                 password: props.password
             }
         })
-
+        console.log(response)
         return (response)
     } catch (err) {
         props.setRequestError(err.response.data)

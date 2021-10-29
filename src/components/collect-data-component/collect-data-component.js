@@ -14,11 +14,11 @@ import './collect-data-component.css'
 // LM9WEZ!zKy7TB1J2iMd1Q7xxWV11b6sv7fkKQFfZV0VV8odsjHYNzOWxXRtvWYqg
 const odk_settings = {
     "general": {
-        "server_url": "https://central.rhomis.cgiar.org/v1/key/4uUx4Z2MFhnA2me1qtzP4R2OvppJVNfMZdX8Ai9fQQr4utVRuy!YAvI1C6r9$NjO/projects/109",
+        "server_url": "https://central.rhomis.cgiar.org/v1/key/2GM1jhPPgwzp4Gn1aWy9IalZVAJplmekY9jCIZdEON1p0vi2cs52Ra$8ubAUA2nO/projects/143",
         "form_update_mode": "match_exactly",
         "autosend": "wifi_and_cellular"
     },
-    "project": { "name": "friday_test" },
+    "project": { "name": "xyz" },
     "admin": {}
 }
 

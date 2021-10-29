@@ -74,13 +74,13 @@ async function DeleteProject(authToken, projectName) {
 
 async function CreateForm(authToken, projectName, formName, formVersion, formFile) {
     console.log(projectName)
-    console.log(process.env.REACT_APP_AUTHENTICATOR_URL + 'api/forms/new?form_name=' + formName + '&form_version=' + formVersion + '&project_name=' + projectName + '&publish=true')
+    console.log(process.env.REACT_APP_AUTHENTICATOR_URL + 'api/forms/new?form_name=' + formName + '&form_version=' + formVersion + '&project_name=' + projectName + '&publish=false')
 
 
     // Create form
     const formCreationResponse = await axios({
         method: "post",
-        url: process.env.REACT_APP_AUTHENTICATOR_URL + 'api/forms/new?form_name=' + formName + '&form_version=' + formVersion + '&project_name=' + projectName + '&publish=true',
+        url: process.env.REACT_APP_AUTHENTICATOR_URL + 'api/forms/new?form_name=' + formName + '&form_version=' + formVersion + '&project_name=' + projectName + '&publish=false',
         data: formFile,
         headers: {
             'Authorization': authToken,
@@ -138,7 +138,6 @@ function NewFormEntry(props) {
             disabled = true
 
         }
-
     }
     console.log(projectList)
 
@@ -149,7 +148,8 @@ function NewFormEntry(props) {
                     <Form.Label>
                         Select a Project
                     </Form.Label>
-                    <Form.Select onChange={(event) => { props.setSelectedProject(event.target.value) }} disabled={disabled} aria-label="Default select example">
+                    <Form.Select defaultValue="Select a Project" onChange={(event) => { props.setSelectedProject(event.target.value) }} disabled={disabled} aria-label="Default select example">
+                        <option disabled={true}>Select a Project</option>
                         {projectList.map((option) => {
                             return <option>{option}</option>
                         })}

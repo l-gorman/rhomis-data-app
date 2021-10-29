@@ -6,68 +6,57 @@ import { MdHelpOutline, MdOutlineDashboardCustomize, MdOutlineSendToMobile, MdOu
 export const PortalDataAll = [
     {
         name: "Build a Survey",
+        label: "surveyBuilder",
         text: "Get started straight away. Build a survey, collect test-data, and view your data.",
         icon: RiSurveyFill,
         link: "https://rhomis-survey.stats4sdtest.online/login",
         external: true,
-        roles: ["basic"]
     },
     {
         name: "Manage My Projects",
+        label: "projectManager",
         text: "Check up on your projects, download your data, and control user access.",
         icon: MdOutlineDashboardCustomize,
         link: "/project-management",
         external: false,
-        roles: ["project-manager", "project-analyst"]
 
     },
 
     {
         name: "Collect Data",
+        label: "dataCollector",
         text: "Collect data for an existing project and access enumerator training materials",
         icon: MdOutlineSendToMobile,
-        link: "/data-collection",
+        link: "/project-management",
         external: false,
-        roles: ["project-manager", "data-collector"]
 
 
     },
     {
         name: "Global Dataset",
+        label: "globalData",
         text: "Query publicly available survey data by time, location, and content.",
         icon: FiDatabase,
         link: "/global-data",
         external: false,
-        roles: ["basic"]
 
 
     },
     {
         name: "Help",
+        label: "help",
         text: "See guidance for more advanced use case and how to contribute to our system",
         icon: MdHelpOutline,
         link: "https://rhomis-docs.readthedocs.io/en/latest/",
         external: true,
-        roles: ["basic"]
     },
     {
         name: "Form Creation",
+        label: "administrator",
         text: "Create projects and forms (only used for development)",
         icon: MdOutlineCreate,
         link: "/form-creation",
         external: false,
-        roles: ["basic"]
     }
 ]
 
-export const PortalDataNewUser = [
-    {
-        name: "Build a Survey",
-        text: "Get started straight away. Build a survey, collect test-data, and view your data",
-        icon: RiSurveyFill,
-        link: process.env.SURVEY_BUILDER_URL,
-        external: true,
-        roles: ["basic"]
-
-    },
-]
