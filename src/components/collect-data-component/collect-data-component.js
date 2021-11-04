@@ -7,7 +7,7 @@ import React from 'react'
 import { Card } from 'react-bootstrap'
 import { MdBatteryCharging20 } from 'react-icons/md'
 import QRCode from 'react-qr-code'
-import { createGzip, Gzip, Deflate, deflateSync } from 'zlib'
+import { deflateSync } from 'zlib'
 import './collect-data-component.css'
 
 // 
