@@ -7,7 +7,6 @@ import '../../App.css'
 import axios from 'axios'
 
 import AuthContext from '../authentication-component/AuthContext'
-import { Description } from '@mui/icons-material'
 
 async function GetProjectInformation(props) {
     console.log("authToken: ", props.authToken)
@@ -94,6 +93,24 @@ async function CreateForm(authToken, projectName, formName, formVersion, formFil
 
 }
 
+async function UpdateForm(authToken, projectName, formName, formVersion, formFile) {
+
+
+    // Create form
+    const formCreationResponse = await axios({
+        method: "post",
+        url: process.env.REACT_APP_AUTHENTICATOR_URL + 'api/forms/new-draft?form_name=' + formName + '&form_version=' + formVersion + '&project_name=' + projectName + '&publish=false',
+        data: formFile,
+        headers: {
+            'Authorization': authToken,
+            'Content-Type': "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        }
+    })
+    return (formCreationResponse)
+}
+
+
+
 function CreateProjectForm(props) {
     return (
         <>
@@ -114,6 +131,8 @@ function CreateProjectForm(props) {
             </Form>
             <Button style={{ "text-align": "right" }} onClick={async () => {
                 await CreateProject(props.authToken, props.newProjectName, props.newProjectDescription)
+                await props.GetProjectInformation({ authToken: props.authToken, setProjectInformation: props.setProjectInformation })
+
 
             }}>Add project</Button>
         </>
@@ -121,6 +140,7 @@ function CreateProjectForm(props) {
 }
 
 function NewFormEntry(props) {
+
     console.log(props.data)
     let projectList = ["No Projects"]
     let disabled = true
@@ -180,7 +200,117 @@ function NewFormEntry(props) {
                     <Form.Control type="file" size="lg" onChange={(e) => props.setSelectedFile(e.target.files[0])} />
 
                 </Form.Group>
-                <Button onClick={() => { CreateForm(props.authToken, props.selectedProject, props.newFormName, props.newFormVersion, props.selectedFile) }}>Submit</Button>
+                <Button onClick={async () => {
+                    await CreateForm(props.authToken, props.selectedProject, props.newFormName, props.newFormVersion, props.selectedFile)
+                    await props.GetProjectInformation({ authToken: props.authToken, setProjectInformation: props.setProjectInformation })
+
+                }}>Submit</Button>
+            </Form>
+        </>
+    )
+}
+
+
+function NewDraftFormEntry(props) {
+    console.log("Draft form data")
+
+    const [formList, setFormList] = useState([])
+
+    console.log(props.data)
+    let projectList = ["No Projects"]
+    let projectDisabled = true
+
+    if (props.data !== undefined & props.data !== null) {
+        if (props.data.projects !== undefined) {
+            projectList = props.data.projects.map((project) => {
+                return project.name
+            })
+            projectDisabled = false
+        }
+
+        if (props.data.projects.length === 0) {
+            projectList = ["No Projects"]
+            projectDisabled = true
+
+        }
+    }
+    console.log(projectList)
+
+    console.log(props.data)
+
+
+    return (
+        <>
+            <Form>
+                <Form.Group>
+                    <Form.Label>
+                        Select the form you would like to update
+                    </Form.Label>
+                    <Form.Select defaultValue="Select a Project" onChange={(event) => {
+
+                        props.setSelectedDraftProject(event.target.value)
+
+                        const newFormList = []
+                        if (props.data !== undefined & props.data !== null) {
+                            if (props.data.forms !== undefined) {
+                                props.data.forms.map((form) => {
+                                    if (form.project === event.target.value) {
+                                        newFormList.push(form.name)
+                                    }
+                                })
+                                setFormList(newFormList)
+                            }
+
+                            if (props.data.projects.length === 0) {
+                                setFormList([])
+                            }
+                        }
+                    }
+                    } disabled={projectDisabled} aria-label="Default select example">
+                        <option disabled={true}>Select a Project</option>
+                        {projectList.map((option) => {
+                            return <option>{option}</option>
+                        })}
+                    </Form.Select>
+                </Form.Group>
+
+                <Form.Group>
+                    <Form.Label>
+                        Select the form you would like to update
+                    </Form.Label>
+                    <Form.Select defaultValue="Select a form" onChange={(event) => {
+                        props.setNewDraftFormName(event.target.value)
+                    }
+                    } aria-label="Default select example">
+                        <option disabled={true}>Select a form</option>
+                        {formList.map((option) => {
+                            return <option>{option}</option>
+                        })}
+                    </Form.Select>
+                </Form.Group>
+
+
+                <Form.Group>
+                    <Form.Label>
+                        Enter the new form version
+                    </Form.Label>
+                    <Form.Control onChange={(event) => { props.setNewDraftFormVersion(event.target.value) }} />
+
+
+                    <Form.Text>This must match the "version" field in your xlsx settings tab, please ensure it is different to the previous version</Form.Text>
+                </Form.Group>
+
+                <Form.Group>
+                    <Form.Label>
+                        Select your file
+                    </Form.Label>
+                    <Form.Control type="file" size="lg" onChange={(e) => props.setSelectedDraftFile(e.target.files[0])} />
+
+                </Form.Group>
+                <Button onClick={async () => {
+                    await UpdateForm(props.authToken, props.selectedDraftProject, props.newDraftFormName, props.newDraftFormVersion, props.selectedDraftFile)
+                    await props.GetProjectInformation({ authToken: props.authToken, setProjectInformation: props.setProjectInformation })
+                }}>Submit</Button>
             </Form>
         </>
     )
@@ -271,18 +401,15 @@ export default function FormCreationComponent() {
     const [newFormVersion, setNewFormVersion] = useState(null);
 
 
-
+    const [selectedDraftProject, setSelectedDraftProject] = useState(null)
+    const [selectedDraftFile, setSelectedDraftFile] = useState(null);
+    const [newDraftFormName, setNewDraftFormName] = useState(null);
+    const [newDraftFormVersion, setNewDraftFormVersion] = useState(null);
 
     useEffect(async () => {
         await GetProjectInformation({ authToken: authToken, setProjectInformation: setProjectInformation })
     }, [])
 
-    useEffect(() => {
-        console.log("project info")
-
-        console.log(projectInformation)
-
-    }, [projectInformation])
 
     return (
         <div id="project-management-container" className="sub-page-container">
@@ -293,16 +420,32 @@ export default function FormCreationComponent() {
                     <Accordion defaultActiveKey="0">
                         <Accordion.Item eventKey="0">
                             <Accordion.Header>Projects</Accordion.Header>
-                            <Accordion.Body><RenderProjectInformation data={projectInformation} authToken={authToken} /></Accordion.Body>
+                            <Accordion.Body>
+                                <RenderProjectInformation
+                                    GetProjectInformation={GetProjectInformation}
+                                    setProjectInformation={setProjectInformation}
+                                    data={projectInformation}
+                                    authToken={authToken} /></Accordion.Body>
                         </Accordion.Item>
                         <Accordion.Item eventKey="1">
                             <Accordion.Header>Create a Project</Accordion.Header>
-                            <Accordion.Body><CreateProjectForm newProjectName={newProjectName} setNewProjectName={setNewProjectName} newProjectDescription={newProjectDescription} setNewProjectDescription={setNewProjectDescription} authToken={authToken} /></Accordion.Body>
+                            <Accordion.Body>
+                                <CreateProjectForm
+
+                                    GetProjectInformation={GetProjectInformation}
+                                    setProjectInformation={setProjectInformation}
+                                    newProjectName={newProjectName}
+                                    setNewProjectName={setNewProjectName}
+                                    newProjectDescription={newProjectDescription}
+                                    setNewProjectDescription={setNewProjectDescription}
+                                    authToken={authToken} /></Accordion.Body>
                         </Accordion.Item>
                         <Accordion.Item eventKey="2">
                             <Accordion.Header>Create a Form</Accordion.Header>
                             <Accordion.Body>
                                 <NewFormEntry
+                                    GetProjectInformation={GetProjectInformation}
+                                    setProjectInformation={setProjectInformation}
                                     authToken={authToken}
                                     data={projectInformation}
                                     selectedFile={selectedFile}
@@ -313,6 +456,24 @@ export default function FormCreationComponent() {
                                     newFormVersion={newFormVersion}
                                     setSelectedProject={setSelectedProject}
                                     selectedProject={selectedProject} />
+                            </Accordion.Body>
+                        </Accordion.Item>
+                        <Accordion.Item eventKey="3">
+                            <Accordion.Header>Update Draft Form</Accordion.Header>
+                            <Accordion.Body>
+                                <NewDraftFormEntry
+                                    GetProjectInformation={GetProjectInformation}
+                                    setProjectInformation={setProjectInformation}
+                                    authToken={authToken}
+                                    data={projectInformation}
+                                    selectedDraftFile={selectedDraftFile}
+                                    setSelectedDraftFile={setSelectedDraftFile}
+                                    setNewDraftFormName={setNewDraftFormName}
+                                    newDraftFormName={newDraftFormName}
+                                    setNewDraftFormVersion={setNewDraftFormVersion}
+                                    newDraftFormVersion={newDraftFormVersion}
+                                    setSelectedDraftProject={setSelectedDraftProject}
+                                    selectedDraftProject={selectedDraftProject} />
                             </Accordion.Body>
                         </Accordion.Item>
 

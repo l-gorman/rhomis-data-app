@@ -143,6 +143,26 @@ function RenderProjectInformation(props) {
 
 }
 
+async function FinalizeForm(props) {
+
+    console.log("Finalizing form")
+
+    const result = await axios({
+        method: 'post',
+        url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/forms/publish",
+        headers: {
+            'Authorization': props.authToken
+        },
+        params: {
+            form_name: props.form,
+            project_name: props.project
+        }
+    })
+
+    console.log("Finalization response")
+    console.log(result)
+
+}
 
 function FormTables(props) {
 
@@ -152,7 +172,15 @@ function FormTables(props) {
     let formsExist = false
 
     if (props.data.forms !== undefined) {
-        formsExist = props.data.forms.length > 0
+
+        if (props.data.forms.length > 0) {
+            let formsForProject = props.data.forms.filter((form) => form.project === props.projectSelected)
+            formsExist = formsForProject.length > 0
+
+            console.log("formsForProject")
+
+            console.log(formsForProject)
+        }
     }
 
 
@@ -165,34 +193,53 @@ function FormTables(props) {
 
                     <th>Created At</th>
                     <th style={{ "width": "40px" }}></th>
+                    <th style={{ "width": "40px" }}></th>
                 </tr>
             </thead>
             <tbody>
                 {formsExist ? props.data.forms.map((form) => {
-                    let date = new Date(form.date)
+                    let date = new Date(form.createdAt)
                     let dateString = date.toDateString()
-                    return (
-                        <tr>
-                            <td>{form.name}</td>
-                            <td>{form.draft ? "Draft" : "Finalized"}</td>
-                            <td >{dateString}</td>
-                            <td style={{ "width": "40px" }}><Button className="bg-dark text-white border-0"
-                                onClick={() => {
-                                    props.setFormSelected(form.name)
-                                    const newFilters = props.filters
-                                    newFilters.push("Form: " + form.name)
-                                    props.setFilters(newFilters)
-                                }}>Select</Button></td>
-                        </tr>
-                    )
+                    if (form.project === props.projectSelected) {
+                        return (
+                            <tr>
+                                <td>{form.name}</td>
+                                <td>{form.draft ? "Draft" : "Finalized"}</td>
+                                <td >{dateString}</td>
+                                <td style={{ "width": "40px" }}>
+                                    <Button disabled={!form.draft} className="bg-dark text-white border-0"
+                                        onClick={async () => {
 
-                }) : <tr><td colSpan={4}>No forms created yet</td></tr>}
+                                            const finalizedForm = await FinalizeForm({
+                                                form: form.name,
+                                                project: props.projectSelected,
+                                                authToken: props.authToken
+                                            })
+
+                                            const metaData = await GetProjectInformation({
+                                                setAdminData: props.setAdminData,
+                                                authToken: props.authToken
+                                            })
+
+                                        }}>Finalize</Button></td>
+                                <td style={{ "width": "40px" }}><Button className="bg-dark text-white border-0"
+                                    onClick={() => {
+                                        props.setFormSelected(form.name)
+                                        const newFilters = props.filters
+                                        newFilters.push("Form: " + form.name)
+                                        props.setFilters(newFilters)
+                                    }}>Select</Button></td>
+                            </tr>
+                        )
+                    }
+
+                }) : <><tr><td style={{ "text-align": "center" }} colSpan={5}>No forms created yet</td></tr>
+                    <tr><td style={{ "text-align": "center" }} colSpan={5}><a href="https://rhomis-survey.stats4sdtest.online"><Button >Start Creating a Survey</Button></a></td></tr></>}
             </tbody>
 
         </Table >
     )
 }
-
 
 function UserTables() {
 
@@ -264,7 +311,7 @@ function RenderProjectAdmin(props) {
             <Card.Header as="h5">Select a Form</Card.Header>
             <Card.Body>
                 {/* <Card.Title>Special title treatment</Card.Title> */}
-                <FormTables data={props.data} filters={props.filters} setFilters={props.setFilters} setFormSelected={props.setFormSelected} />
+                <FormTables projectSelected={props.projectSelected} authToken={props.authToken} setAdminData={props.setAdminData} data={props.data} filters={props.filters} setFilters={props.setFilters} setFormSelected={props.setFormSelected} />
             </Card.Body>
         </Card>
 
@@ -311,7 +358,7 @@ function BackButton(props) {
 function RenderFormAdmin(props) {
 
     const [renderInstallCode, setRenderInstallCode] = useState(false)
-    const [renderODKFormCode, setRenderODKFormCode] = useState(false)
+    const [renderODKFormCode, setRenderODKFormCode] = useState(true)
     console.log(props)
 
     let renderUserForm = false
@@ -320,24 +367,28 @@ function RenderFormAdmin(props) {
         renderUserForm = props.data.user.roles.projectManager.length > 0
     }
 
-    if (props.data.user.roles.projectManager !== undefined) {
+    let odkConf = {}
+    let draft = null
+
+    if (props.data.forms !== undefined) {
+        let form = props.data.forms.filter((item) => item.name === props.formSelected)
+
+        if (form.length === 1) {
+            if (form[0].draft === true) {
+                odkConf = form[0].draftCollectionDetails
+                draft = true
+            }
+            if (form[0].draft === false) {
+                odkConf = form[0].collectionDetails
+                draft = false
+            }
+        }
+        console.log(form)
 
     }
 
-
-    const odk_settings = {
-        "general": {
-            "server_url": "https://central.rhomis.cgiar.org/v1/key/2GM1jhPPgwzp4Gn1aWy9IalZVAJplmekY9jCIZdEON1p0vi2cs52Ra$8ubAUA2nO/projects/143",
-            "form_update_mode": "match_exactly",
-            "autosend": "wifi_and_cellular"
-        },
-        "project": { "name": "xyz" },
-        "admin": {}
-    }
-
-    const encoded_settings = deflateSync(JSON.stringify(odk_settings)).toString('base64');
-
-
+    console.log(odkConf)
+    const encoded_settings = deflateSync(JSON.stringify(odkConf)).toString('base64');
 
     return (
         <>
@@ -392,6 +443,8 @@ function RenderFormAdmin(props) {
                             </div>
                         </>
                         : <></>}
+                    {draft ? <h4>***Your form is currently saved as a draft. Any submissions you make
+                        will be removed once the form is finalised*** </h4> : <></>}
 
                 </Card.Body>
             </Card>
@@ -441,10 +494,6 @@ export default function ProjectManagementComponent(props) {
             setAdminData: setAdminData,
             authToken: authToken
         })
-
-
-
-
     }, [])
 
     return (
@@ -487,15 +536,25 @@ export default function ProjectManagementComponent(props) {
                 <Card.Body className="main-card-body">
                     {(filters.length === 0 & projectSelected === false) ? <RenderProjectInformation data={adminData} setProjectSelected={setProjectSelected} filters={filters} setFilters={setFilters} setTitle={setTitle} /> : <></>}
 
-                    {(filters.length === 1 & projectSelected !== false) ? <RenderProjectAdmin data={adminData} setFormSelected={setFormSelected} filters={filters} setFilters={setFilters} /> : <></>}
-                    {(filters.length === 2 & projectSelected !== false & formSelected !== false) ? <RenderFormAdmin data={adminData} formSelected={formSelected} projectSelected={projectSelected} /> : <></>}
-
+                    {(filters.length === 1 & projectSelected !== false) ?
+                        <RenderProjectAdmin
+                            authToken={authToken}
+                            projectSelected={projectSelected}
+                            formSelected={formSelected}
+                            setAdminData={setAdminData}
+                            data={adminData}
+                            setFormSelected={setFormSelected}
+                            filters={filters}
+                            setFilters={setFilters} /> : <></>}
+                    {(filters.length === 2 & projectSelected !== false & formSelected !== false) ?
+                        <RenderFormAdmin
+                            authToken={authToken}
+                            setAdminData={setAdminData}
+                            data={adminData}
+                            formSelected={formSelected}
+                            projectSelected={projectSelected} /> : <></>}
                 </Card.Body>
-
-
-
             </Card >
-
         </div >
     )
 }

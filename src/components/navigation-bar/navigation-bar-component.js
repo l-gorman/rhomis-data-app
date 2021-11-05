@@ -60,12 +60,12 @@ export default function MainNavbar(props) {
                         <div className="side-bar-item">
                             <Nav.Link className="side-bar-link" onClick={() => { handleClose() }} href="https://rhomis-survey.stats4sdtest.online/login">Design a Survey</Nav.Link>
                         </div>
-                        <div className="side-bar-item">
+                        {/* <div className="side-bar-item">
                             <Nav.Link className="side-bar-link" as={Link} onClick={() => { handleClose() }} to="/data-collection">Collect Data</Nav.Link>
-                        </div>
-                        <div className="side-bar-item">
+                        </div> */}
+                        {/* <div className="side-bar-item">
                             <Nav.Link className="side-bar-link" as={Link} onClick={() => { handleClose() }} to="/global-data">Global Data</Nav.Link>
-                        </div>
+                        </div> */}
                         <div className="side-bar-item">
                             <Nav.Link className="side-bar-link" as={Link} onClick={() => { handleClose() }} to="/data-querying">Data Query</Nav.Link>
                         </div>

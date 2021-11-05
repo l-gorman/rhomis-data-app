@@ -33,14 +33,19 @@ import { Fade } from 'react-bootstrap';
 // Import the context which stores the authentication tokens
 import AuthContext, { AuthContextProvider } from './components/authentication-component/AuthContext';
 
-function Logout() {
-  const [authToken, setAuthToken] = useState(AuthContext);
-  console.log("clicked")
-}
 
 
 function App() {
   const [authToken, setAuthToken] = useState(null);
+
+  // Automatically log out 
+  // after 1 hour of use
+  setTimeout(() => {
+
+    setAuthToken(null);
+
+
+  }, 60 * 60 * 1000);
 
   return (
     < Router >
@@ -54,7 +59,7 @@ function App() {
             <div className="main-app-background">
 
               <div className="main-page">
-                {authToken ? <MainNavbar Logout={Logout} /> : null}
+                {authToken ? <MainNavbar /> : null}
 
 
                 {/* Render login route  */}
@@ -66,8 +71,8 @@ function App() {
                   <>
                     <Route exact path="/" component={PortalComponent}></Route>
                     <Route path="/project-management" component={ProjectManagementComponent}></Route>
-                    <Route path="/data-collection" component={CollectDataComponent}></Route>
-                    <Route path="/global-data" component={PublicDataComponent}></Route>
+                    {/* <Route path="/data-collection" component={CollectDataComponent}></Route> */}
+                    {/* <Route path="/global-data" component={PublicDataComponent}></Route> */}
                     <Route path="/data-querying" component={DataQueryComponent}></Route>
                     <Route path="/form-creation" component={FormCreationComponent}></Route>
 
