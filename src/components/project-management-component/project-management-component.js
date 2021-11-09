@@ -13,6 +13,7 @@ import { AiOutlineArrowLeft } from 'react-icons/ai'
 
 import QRCode from 'react-qr-code'
 import { deflateSync } from 'zlib'
+import { ProductionQuantityLimitsSharp } from '@mui/icons-material'
 
 async function GetProjectInformation(props) {
     console.log("authToken: ", props.authToken)
@@ -34,6 +35,35 @@ async function GetProjectInformation(props) {
     if (result.status === 400) {
         alert(result.data)
     }
+}
+
+async function ProcessData(props) {
+    console.log("Process data form")
+
+
+    const form = props.data.forms.filter((item) => item.name === props.formSelected)[0]
+    console.log(form)
+
+
+    const result = await axios({
+        method: 'post',
+        url: process.env.REACT_APP_API_URL + "api/process-data",
+        headers: {
+            'Authorization': props.authToken
+        },
+        data: {
+            commandType: props.commandType,
+            projectName: props.projectSelected,
+            formName: props.formSelected,
+            formVersion: form.formVersion,
+            draft: props.draft,
+        }
+    })
+
+    console.log(result)
+    return (result)
+
+
 }
 
 function RenderProjectInformation(props) {
@@ -359,6 +389,8 @@ function RenderFormAdmin(props) {
 
     const [renderInstallCode, setRenderInstallCode] = useState(false)
     const [renderODKFormCode, setRenderODKFormCode] = useState(true)
+    console.log("Form Props")
+
     console.log(props)
 
     let renderUserForm = false
@@ -451,7 +483,55 @@ function RenderFormAdmin(props) {
 
             <Card className="project-management-card">
                 <Card.Header>Process Data</Card.Header>
-                <Card.Body>Test Body</Card.Body>
+                <Card.Body>
+                    {draft ? <Button style={{ "margin": "10px" }}
+                        onClick={async () => {
+                            await ProcessData({
+                                commandType: "generate",
+                                draft: draft,
+                                authToken: props.authToken,
+                                data: props.data,
+                                formSelected: props.formSelected,
+                                projectSelected: props.projectSelected
+                            })
+                            console.log("gen data")
+                        }}
+
+                    >Generate Data</Button> : <></>}
+
+
+                    <Button style={{ "margin": "10px" }}
+                        onClick={async () => {
+                            await ProcessData({
+                                commandType: "units",
+                                draft: draft,
+                                authToken: props.authToken,
+                                data: props.data,
+                                formSelected: props.formSelected,
+                                projectSelected: props.projectSelected
+                            })
+                            console.log("gen data")
+                        }}
+                    >
+                        Extract Units
+                    </Button>
+                    <Button style={{ "margin": "10px" }}
+                        onClick={async () => {
+                            await ProcessData({
+                                commandType: "process",
+                                draft: draft,
+                                authToken: props.authToken,
+                                data: props.data,
+                                formSelected: props.formSelected,
+                                projectSelected: props.projectSelected
+                            })
+                            console.log("gen data")
+                        }}
+                    >
+                        Process Data
+                    </Button>
+
+                </Card.Body>
             </Card>
 
             <Card className="project-management-card">
@@ -459,14 +539,16 @@ function RenderFormAdmin(props) {
                 <Card.Body>Test Body</Card.Body>
             </Card>
 
-            {renderUserForm ? <Card className="project-management-card">
-                <Card.Header as="h5">Manage Users</Card.Header>
-                <Card.Body>
-                    <UserTables />
-                    <UserForm />
-                </Card.Body>
-            </Card> :
-                <></>}
+            {
+                renderUserForm ? <Card className="project-management-card">
+                    <Card.Header as="h5">Manage Users</Card.Header>
+                    <Card.Body>
+                        <UserTables />
+                        <UserForm />
+                    </Card.Body>
+                </Card> :
+                    <></>
+            }
         </>
     )
 }
