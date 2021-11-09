@@ -3,6 +3,8 @@ import { Form, Button, Card, Table } from 'react-bootstrap'
 import axios from 'axios'
 import AuthContext from '../authentication-component/AuthContext'
 import './project-management-component.css'
+import '../../App.css'
+
 import { actions } from 'react-table'
 import { response } from 'msw'
 
