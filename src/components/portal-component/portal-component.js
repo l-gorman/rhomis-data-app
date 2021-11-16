@@ -67,7 +67,7 @@ function PortalCard(props) {
                         </div>
                         <div className="portal-icon-container">
 
-                            <Icon classname="portal-icon" size={100} color="white" />
+                            <Icon size={100} color="white" />
                         </div>
                     </Card >
                 </a >

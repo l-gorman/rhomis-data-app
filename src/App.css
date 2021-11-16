@@ -25,20 +25,19 @@
 }
 
 .main-card-header-item{
-margin: 5px;  
-border-color:white;
-border-style: solid;
-border-radius: 5px;
-border-width: 1px;
-padding-left:10px;
-padding-right:10px;
-padding-bottom:5px;
-padding-top:5px;
+  margin: 5px;  
+  border-color:white;
+  border-style: solid;
+  border-radius: 5px;
+  border-width: 1px;
+  padding-left:10px;
+  padding-right:10px;
+  padding-bottom:5px;
+  padding-top:5px;
+  
+  }
 
-}
-.card-content{
-  margin: 20px;
-}
+
 
 .sub-card{
   /* justify-items: center; */
@@ -91,7 +90,6 @@ padding-top:5px;
   display:grid;
   place-content: center;
   text-align: center;
-  height: 200px;
 
 }
 .portal-card-header {

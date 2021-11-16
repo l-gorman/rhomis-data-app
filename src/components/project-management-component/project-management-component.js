@@ -5,17 +5,13 @@ import AuthContext from '../authentication-component/AuthContext'
 import './project-management-component.css'
 import '../../App.css'
 
-import { actions } from 'react-table'
-import { response } from 'msw'
 
 import { useHistory } from 'react-router'
 
-import { MdOutlineRefresh } from 'react-icons/md'
 import { AiOutlineArrowLeft } from 'react-icons/ai'
 
 import QRCode from 'react-qr-code'
 import { deflateSync } from 'zlib'
-import { ProductionQuantityLimitsSharp } from '@mui/icons-material'
 
 async function GetProjectInformation(props) {
     console.log("authToken: ", props.authToken)
