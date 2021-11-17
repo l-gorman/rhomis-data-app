@@ -9,7 +9,7 @@ export const PortalDataAll = [
         label: "surveyBuilder",
         text: "Get started straight away. Build a survey, collect test-data, and view your data.",
         icon: RiSurveyFill,
-        link: "https://rhomis-survey.stats4sdtest.online/login",
+        link: "https://rhomis-survey.stats4sdtest.online/login/",
         external: true,
     },
     {

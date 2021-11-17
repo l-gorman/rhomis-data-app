@@ -1,12 +1,14 @@
 /**/
 
 import React, { useState, useContext, useEffect } from 'react'
-import { Button, Card, Form, Spinner } from 'react-bootstrap'
+import { Button, Card, Form, Spinner, Row, Col } from 'react-bootstrap'
 import Fade from 'react-bootstrap/Fade'
 import { FaUserCircle } from 'react-icons/fa'
 import axios from 'axios'
 import { useHistory } from 'react-router'
 import "./login-component.css"
+import ReCAPTCHA from "react-google-recaptcha";
+import PasswordStrengthBar from 'react-password-strength-bar';
 
 import AuthContext from '../authentication-component/AuthContext';
 
@@ -30,8 +32,16 @@ function CheckCredentials(props) {
 
 function LoginCard(props) {
     const [authToken, setAuthToken] = useContext(AuthContext)
+
+    const history = useHistory()
+
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+
+    const [requestError, setRequestError] = useState("")
+    const [loading, setLoading] = useState("")
     return (
-        <Card className="card-style border-0">
+        <Card className="card-style border-0 login-card">
             <Card.Header className="bg-dark text-white">
                 <h2>Login</h2>
             </Card.Header>
@@ -40,18 +50,18 @@ function LoginCard(props) {
                 <div className="icon-container">
                     <FaUserCircle size={60} />
                 </div>
-                <Form>
+                <Form style={{ "marginLeft": "2em", "marginRight": "2em" }}>
                     <Form.Group className="form-group-spaced">
                         <Form.Label htmlFor="email">Email</Form.Label>
-                        <Form.Control id="email" type="text" onChange={(event) => props.setEmail(event.target.value)} />
+                        <Form.Control id="email" type="text" onChange={(event) => setEmail(event.target.value)} />
                     </Form.Group>
                     <Form.Group className="form-group-spaced">
                         <Form.Label htmlFor="password">Password</Form.Label>
-                        <Form.Control type="password" onChange={(event) => props.setPassword(event.target.value)} />
+                        <Form.Control type="password" onChange={(event) => setPassword(event.target.value)} />
                     </Form.Group>
-                    {props.requestError ? <p className="warning">{props.requestError}</p> : null}
+                    {requestError ? <p className="warning">{requestError}</p> : null}
                     <div className="button-container">
-                        {props.loading ? <Button className="login-buttons" variant="dark">
+                        {loading ? <Button className="login-buttons" variant="dark">
                             <Spinner
                                 as="span"
                                 animation="border"
@@ -63,19 +73,19 @@ function LoginCard(props) {
                             <Button className="login-buttons"
                                 variant="dark"
                                 onClick={async (event) => {
-                                    props.setLoading(true)
+                                    setLoading(true)
 
                                     const tokenResponse = await Login({
                                         event: event,
-                                        email: props.email,
-                                        password: props.password,
-                                        requestError: props.requestError,
-                                        setRequestError: props.setRequestError,
+                                        email: email,
+                                        password: password,
+                                        requestError: requestError,
+                                        setRequestError: setRequestError,
 
 
                                         // setAuthToken: props.setAuthToken
                                     })
-                                    props.setLoading(false)
+                                    setLoading(false)
 
                                     if (tokenResponse.status === 400) {
                                         return
@@ -85,7 +95,7 @@ function LoginCard(props) {
 
                                         setAuthToken(tokenResponse.data)
 
-                                        props.history.push("/")
+                                        history.push("/")
 
                                     }
 
@@ -93,8 +103,10 @@ function LoginCard(props) {
 
                                 }}>Login</Button>}
                     </div>
-                    <a href="#" onClick={(event) => { props.setCardType(!props.cardType) }}>Click here</a> for registration
-
+                    <div style={{ textAlign: "center", width: "100%" }}>
+                        Don't have an account?&nbsp;
+                        <a href="#" onClick={(event) => { props.setCardType(!props.cardType) }}>Click here</a> for registration
+                    </div>
                 </Form>
             </Card.Body>
         </Card >
@@ -103,29 +115,159 @@ function LoginCard(props) {
 }
 
 function RegistrationCard(props) {
+    // console.log("site key")
+    // console.log(process.env)
+    const [title, setTitle] = useState("")
+
+    const [password, setPassword] = useState("")
+    const [confirmPassword, setConfirmPassword] = useState("")
+
+    const [email, setEmail] = useState("")
+    const [confirmEmail, setConfirmEmail] = useState("")
+
+    const [firstName, setfirstName] = useState("")
+    const [surname, setSurname] = useState("")
+    // const [institution, setInstitution] = useState("")
+    // const [description, setDescription] = useState("")
+
+    const [loading, setLoading] = useState(false)
+    const [requestError, setRequestError] = useState(null)
+
+    const [captchaToken, setCaptchaToken] = useState(null)
+
+
+    let passwordsMatch = password === confirmPassword
+    let bothPasswordsEntered = (password.length > 0 && confirmPassword.length > 0)
+
+    let emailsMatch = email === confirmEmail
+    let bothEmailsEntered = (email.length > 0 && confirmEmail.length > 0)
+
+    let registrationEnabled = true
+
+    console.log(passwordsMatch)
+    console.log(bothPasswordsEntered)
+    console.log(emailsMatch)
+    console.log(bothEmailsEntered)
+    console.log(title.length > 0)
+    console.log(firstName.length > 0)
+    console.log(surname.length > 0)
+    console.log(emailsMatch)
+    console.log(bothEmailsEntered)
+    console.log(title.length > 0)
+    console.log(firstName.length > 0)
+    console.log(surname.length > 0)
+    console.log(captchaToken)
+
+
+    if (passwordsMatch &&
+        bothPasswordsEntered &&
+        emailsMatch &&
+        bothEmailsEntered &&
+        title.length > 0 &&
+        firstName.length > 0 &&
+        surname.length > 0 &&
+        captchaToken) {
+        registrationEnabled = false
+    }
 
     return (
-        <Card className="card-style border-0">
+        <Card className="card-style border-0 registration-card">
             <Card.Header className="bg-dark text-white">
                 <h2>Signup</h2>
             </Card.Header>
             <Card.Body>
-                <div className="icon-container">
+                {/* <div className="icon-container">
                     <FaUserCircle size={60} />
-                </div>
-                <Form>
-                    <Form.Group className="form-group-spaced">
-                        <Form.Label htmlFor="email">Email</Form.Label>
-                        <Form.Control id="email" type="text" onChange={(event) => props.setEmail(event.target.value)} />
-                    </Form.Group>
-                    <Form.Group className="form-group-spaced">
-                        <Form.Label htmlFor="password">Password</Form.Label>
-                        <Form.Control type="password" onChange={(event) => props.setPassword(event.target.value)} />
-                    </Form.Group>
-                    {props.requestError ? <p className="warning">{props.requestError}</p> : null}
+                </div> */}
+                <Form style={{ "marginLeft": "3em", "marginRight": "3em" }}>
+                    <Row>
+                        <Col xs={3}>
+                            <Form.Group className="form-group-spaced">
+                                <Form.Label htmlFor="email">Title</Form.Label>
+                                <Form.Select id="title" defaultValue="Select" onChange={(event) => setTitle(event.target.value)} >
+                                    <option disabled="true">Select</option>
+                                    <option value="ms">Ms</option>
+                                    <option value="mrs">Mrs</option>
+                                    <option value="mr">Mr</option>
+                                    <option value="mx">Mx</option>
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+                        <Col xs={4}>
+                            <Form.Group className="form-group-spaced">
+                                <Form.Label htmlFor="name">First Name</Form.Label>
+                                <Form.Control id="name" type="text" onChange={(event) => setfirstName(event.target.value)} />
+                            </Form.Group>
+                        </Col>
+                        <Col xs={5}>
+                            <Form.Group className="form-group-spaced">
+                                <Form.Label htmlFor="surname">Surname</Form.Label>
+                                <Form.Control id="surname" type="text" onChange={(event) => setSurname(event.target.value)} />
+                            </Form.Group>
+                        </Col>
+
+                    </Row>
+                    <Row>
+                        <Col>
+                            <Form.Group className="form-group-spaced">
+                                <Form.Label htmlFor="email">Email</Form.Label>
+                                <Form.Control id="email" type="text" onChange={(event) => setEmail(event.target.value)} />
+                            </Form.Group>
+                        </Col>
+
+                        <Col>
+                            <Form.Group className="form-group-spaced">
+                                <Form.Label htmlFor="email">Confirm Email</Form.Label>
+                                <Form.Control id="confirmemail" type="text" onChange={(event) => setConfirmEmail(event.target.value)} />
+                            </Form.Group>
+                            {bothEmailsEntered ?
+                                <Form.Text style={{ "textAlign": "end" }}>{emailsMatch ? "Emails match" : "Emails don't match"}</Form.Text> :
+                                <></>}
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+
+                            <Form.Group className="form-group-spaced">
+                                <Form.Label htmlFor="password">Password</Form.Label>
+                                <Form.Control type="password" onChange={(event) => {
+                                    setPassword(event.target.value)
+                                }} />
+
+                            </Form.Group>
+
+                            <PasswordStrengthBar password={password} />
+                        </Col>
+                        <Col>
+                            <Form.Group className="form-group-spaced">
+                                <Form.Label htmlFor="password">Confirm Password</Form.Label>
+                                <Form.Control type="password" onChange={(event) => {
+                                    setConfirmPassword(event.target.value)
+                                }} />
+                                {bothPasswordsEntered ?
+                                    <Form.Text style={{ "textAlign": "end" }}>{passwordsMatch ? "Passwords match" : "Passwords don't match"}</Form.Text> :
+                                    <></>}
+
+                            </Form.Group>
+                        </Col>
+
+
+
+
+                    </Row>
+                    {requestError ? <p className="warning">{requestError}</p> : null}
+                    <div className="icon-container">
+
+                        <ReCAPTCHA
+                            sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+                            onChange={async (value) => {
+                                setCaptchaToken(value)
+                            }}
+                        />
+                    </div>
 
                     <div className="button-container">
-                        {props.loading ? <Button className="login-buttons">
+                        {loading ? <Button className="login-buttons">
                             <Spinner
                                 as="span"
                                 animation="border"
@@ -133,25 +275,30 @@ function RegistrationCard(props) {
                                 role="status"
                                 aria-hidden="true"
                             />
-                            Loading...</Button> : <Button className="login-buttons" variant="dark" onClick={(event) => {
-                                props.setLoading(true)
+                            Loading...</Button> : <Button disabled={registrationEnabled} className="login-buttons" variant="dark" onClick={(event) => {
+                                setLoading(true)
 
                                 RegisterUser({
                                     event: event,
-                                    email: props.email,
-                                    password: props.password,
-                                    requestError: props.requestError,
-                                    setRequestError: props.setRequestError,
-                                    history: props.history,
+                                    title: title,
+                                    firstName: firstName,
+                                    surname: surname,
+                                    email: email,
+                                    password: password,
+                                    captchaToken: captchaToken,
+                                    requestError: requestError,
+                                    setRequestError: setRequestError,
                                     setCardType: props.setCardType
                                 })
-                                props.setLoading(false)
+                                setLoading(false)
 
                             }}>Register</Button>
                         }
                     </div>
-                    <a href="#" onClick={(event) => { props.setCardType(!props.cardType) }}>Click here</a> for login
-
+                    <div style={{ textAlign: "center", width: "100%" }}>
+                        Already got an account?&nbsp;
+                        <a href="#" onClick={(event) => { props.setCardType(!props.cardType) }}>Click here</a> for login
+                    </div>
                 </Form>
             </Card.Body>
         </Card >
@@ -159,58 +306,35 @@ function RegistrationCard(props) {
 }
 
 function RenderCard(props) {
-    if (props.cardType === true) {
+
+    const [cardType, setCardType] = useState(false)
+
+    if (cardType === true) {
         return (
             <RegistrationCard
-
-
-                cardType={props.cardType}
-                setCardType={props.setCardType}
-
-
-                setEmail={props.setEmail}
-                email={props.email}
-
-                setPassword={props.setPassword}
-                password={props.password}
-
-                requestError={props.requestError}
-                setRequestError={props.setRequestError}
-
-                history={props.history}
-
-                loading={props.loading}
-                setLoading={props.setLoading}
+                cardType={cardType}
+                setCardType={setCardType}
 
             />
 
         )
     }
 
-    if (props.cardType === false) {
+    if (cardType === false) {
         return (
             <LoginCard
-                cardType={props.cardType}
-                setCardType={props.setCardType}
+                cardType={cardType}
+                setCardType={setCardType}
 
-                setEmail={props.setEmail}
-                email={props.email}
-
-                setPassword={props.setPassword}
-                password={props.password}
-
-                requestError={props.requestError}
-                setRequestError={props.setRequestError}
-
-                history={props.history}
-                loading={props.loading}
-                setLoading={props.setLoading}
             />
 
         )
     }
+
     return <h1>Error loading application</h1>
 }
+
+
 
 async function Login(props) {
     props.event.preventDefault()
@@ -244,12 +368,31 @@ async function RegisterUser(props) {
     props.event.preventDefault()
     props.setRequestError(null)
 
+
+    // RegisterUser({
+    //     event: event,
+    //     title: title,
+    //     firstName: firstName,
+    //     surname: surname,
+    //     email: email,
+    //     password: password,
+    //     captchaToken: captchaToken,
+    //     requestError: requestError,
+    //     setRequestError: setRequestError,
+    //     setCardType: props.setCardType
+    // })
+
     // check all of the details given
     const credentialsGiven = CheckCredentials({
+        title: props.title,
+        firstName: props.firstName,
+        surname: props.surname,
         email: props.email,
         password: props.password,
         requestError: props.requestError,
-        setRequestError: props.setRequestError
+        setRequestError: props.setRequestError,
+        captchaToken: props.captchaToken
+
     })
     try {
         // await timeout(2000)
@@ -259,8 +402,13 @@ async function RegisterUser(props) {
             url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/register",
             data: {
                 // username: username,
+                title: props.title,
+                firstName: props.firstName,
+                surname: props.surname,
                 email: props.email,
-                password: props.password
+                password: props.password,
+                captchaToken: props.captchaToken
+
             }
         })
         props.setCardType(!props.cardType)
@@ -275,15 +423,7 @@ async function RegisterUser(props) {
 }
 
 function LoginComponent(props) {
-    const history = useHistory()
-
-    const [requestError, setRequestError] = useState(null)
-    const [cardType, setCardType] = useState(true)
-    const [password, setPassword] = useState(null);
-    const [email, setEmail] = useState(null);
     const [open, setOpen] = useState(false)
-
-    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         setOpen(true)
@@ -292,30 +432,9 @@ function LoginComponent(props) {
     return (
         <Fade in={open}>
 
-
-
             <div className="child-login-container">
 
-                <RenderCard
-
-                    setEmail={setEmail}
-                    email={email}
-
-                    setPassword={setPassword}
-                    password={password}
-
-                    setCardType={setCardType}
-                    cardType={cardType}
-
-                    requestError={requestError}
-                    setRequestError={setRequestError}
-
-                    history={history}
-
-                    loading={loading}
-                    setLoading={setLoading}
-
-                />
+                <RenderCard />
 
 
             </div >

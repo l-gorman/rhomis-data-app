@@ -8,12 +8,20 @@
     margin-bottom: 1em;
 }
 
+.registration-card{
+    justify-self: center;
+    width: 100%
+}
+.login-card{
+    justify-self: center;
+    width: 50%;
+}
 
 .child-login-container{
     display: grid;
     align-items:center;    
     min-width: 200px;
-    width:400px;
+    width:50%;
     height: 100%;
 }
 
@@ -38,16 +46,16 @@
     margin-top: 2em;
     margin-bottom: 2em;
     width:100%;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
+    display: grid;
+    place-items: center;
+    
     
 
 }
 
 .login-buttons{
 margin-left: 10px;
-width: 100%;
+width: 10em;
     /* margin-right: 10px; */
 
 }
