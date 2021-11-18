@@ -280,8 +280,7 @@ function RegistrationCard(props) {
                                 role="status"
                                 aria-hidden="true"
                             />
-                            {/* disabled={registrationEnabled} */}
-                            Loading...</Button> : <Button className="login-buttons" variant="dark" onClick={async (event) => {
+                            Loading...</Button> : <Button disabled={registrationEnabled} className="login-buttons" variant="dark" onClick={async (event) => {
                                 setLoading(true)
 
                                 const registrationResult = await RegisterUser({

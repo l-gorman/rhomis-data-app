@@ -300,27 +300,82 @@ function UserTables() {
 
 }
 
-function UserForm() {
+
+async function AddFormUser(props) {
+    let url = ""
+    if (props.userType === "dataCollector") {
+        url = process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/data-collector"
+    }
+
+    if (props.userType === "analyst") {
+        url = process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/analyst"
+    }
+
+
+    try {
+        const result = await axios({
+            method: 'post',
+            url: url,
+            headers: {
+                'Authorization': props.authToken
+            },
+            data: {
+                formName: props.formName,
+                email: props.email
+            }
+        })
+        console.log(result)
+        return (result)
+
+    } catch (err) {
+        return (err)
+
+    }
+
+}
+
+function UserForm(props) {
+
+    const [userType, setUserType] = useState('')
+    const [email, setEmail] = useState('')
 
     return (
         <>
             <Form>
                 <Form.Group>
                     <Form.Label>User email</Form.Label>
-                    <Form.Control />
+                    <Form.Control onChange={(event) => {
+                        setEmail(event.target.value)
+                        console.log(event.target.value)
+                    }}></Form.Control>
                 </Form.Group>
                 <Form.Group>
                     <Form.Label>User Role</Form.Label>
-                    <Form.Select aria-label="Default select example" defaultValue="Open this select menu">
+                    <Form.Select aria-label="Default select example" defaultValue="Open this select menu"
+                        onChange={(event) => {
+                            setUserType(event.target.value)
+
+                            console.log(event.target.value)
+                        }}>
                         <option disabled={true}>Open this select menu</option>
                         <option value="dataCollector">Data Collector: Can access training materials and configure enumerator devices</option>
-                        <option value="dataAnalyst">Data Analyst: Can download processed data</option>
+                        <option value="analyst">Data Analyst: Can download processed data</option>
                     </Form.Select>
                 </Form.Group>
 
-                <Button className="bg-dark text-white border-0 float-right" style={{ "marginTop": "10px" }}>Add User</Button>
+                <Button className="bg-dark text-white border-0 float-right" style={{ "marginTop": "10px" }}
+                    onClick={async () => {
+                        console.log(email)
+                        const result = await AddFormUser({
+                            authToken: props.authToken,
+                            email: email,
+                            formName: props.formSelected,
+                            userType: userType
+                        })
+                        console.log(result)
+                    }}>Add User</Button>
 
-            </Form>
+            </Form >
         </>
     )
 
@@ -455,6 +510,10 @@ function RenderFormAdmin(props) {
     console.log(odkConf)
     const encoded_settings = deflateSync(JSON.stringify(odkConf)).toString('base64');
 
+    console.log("form props")
+
+    console.log(props)
+
     return (
         <>
             <Card className="project-management-card">
@@ -576,8 +635,10 @@ function RenderFormAdmin(props) {
                 renderUserForm ? <Card className="project-management-card">
                     <Card.Header as="h5">Manage Users</Card.Header>
                     <Card.Body>
-                        <UserTables />
-                        <UserForm />
+                        {/* <UserTables /> */}
+                        <UserForm authToken={props.authToken}
+                            formSelected={props.formSelected}
+                            projectSelected={props.projectSelected} />
                     </Card.Body>
                 </Card> :
                     <></>

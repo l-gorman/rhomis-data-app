@@ -124,7 +124,7 @@ function RenderPortalCards(props) {
             portalCardData.push(...cardToAdd)
         }
 
-        if (props.userData.projectManager.length > 0 | props.userData.projectAnalyst.length > 0) {
+        if (props.userData.projectManager.length > 0 | props.userData.analyst.length > 0) {
             const cardToAdd = props.data.filter(item => item.label === "projectManager")
             portalCardData.push(...cardToAdd)
         }
