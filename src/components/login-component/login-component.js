@@ -117,6 +117,9 @@ function LoginCard(props) {
 function RegistrationCard(props) {
     // console.log("site key")
     // console.log(process.env)
+
+    console.log(props)
+
     const [title, setTitle] = useState("")
 
     const [password, setPassword] = useState("")
@@ -187,7 +190,9 @@ function RegistrationCard(props) {
                                 <Form.Select id="title" defaultValue="Select" onChange={(event) => setTitle(event.target.value)} >
                                     <option disabled="true">Select</option>
                                     <option value="ms">Ms</option>
+                                    <option value="misss">Miss</option>
                                     <option value="mrs">Mrs</option>
+                                    <option value="dr">Dr</option>
                                     <option value="mr">Mr</option>
                                     <option value="mx">Mx</option>
                                 </Form.Select>
@@ -267,7 +272,7 @@ function RegistrationCard(props) {
                     </div>
 
                     <div className="button-container">
-                        {loading ? <Button className="login-buttons">
+                        {loading ? <Button className="login-buttons" variant="dark">
                             <Spinner
                                 as="span"
                                 animation="border"
@@ -275,10 +280,11 @@ function RegistrationCard(props) {
                                 role="status"
                                 aria-hidden="true"
                             />
-                            Loading...</Button> : <Button disabled={registrationEnabled} className="login-buttons" variant="dark" onClick={(event) => {
+                            {/* disabled={registrationEnabled} */}
+                            Loading...</Button> : <Button className="login-buttons" variant="dark" onClick={async (event) => {
                                 setLoading(true)
 
-                                RegisterUser({
+                                const registrationResult = await RegisterUser({
                                     event: event,
                                     title: title,
                                     firstName: firstName,
@@ -291,6 +297,13 @@ function RegistrationCard(props) {
                                     setCardType: props.setCardType
                                 })
                                 setLoading(false)
+
+                                if (registrationResult.status > 199 || registrationResult.status < 300) {
+                                    props.setCardType(!props.cardType)
+
+                                }
+                                console.log("registrationResult")
+                                console.log(registrationResult)
 
                             }}>Register</Button>
                         }
@@ -413,11 +426,12 @@ async function RegisterUser(props) {
         })
         props.setCardType(!props.cardType)
         console.log(response)
+        return (response)
 
     } catch (err) {
         console.log(err)
         props.setRequestError(err.response.data)
-        return (err.response.data)
+        return (err.response)
 
     }
 }

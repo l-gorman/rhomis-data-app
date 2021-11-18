@@ -326,13 +326,37 @@ function UserForm() {
 
 }
 
+async function AddProjectManager(props) {
+
+    try {
+        const result = await axios({
+            method: 'post',
+            url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/project-manager",
+            headers: {
+                'Authorization': props.authToken
+            },
+            data: {
+                projectName: props.projectName,
+                email: props.email
+            }
+        })
+        console.log(result)
+        return (result)
+    } catch (err) {
+        return (err)
+    }
+}
+
 function RenderProjectAdmin(props) {
     let renderUserForm = false
+
+    const [newUser, setNewUser] = useState('')
 
     if (props.data.user.roles.projectManager !== undefined) {
         renderUserForm = props.data.user.roles.projectManager.length > 0
     }
-
+    console.log("props")
+    console.log(props)
 
     return (<>
         <Card className="project-management-card">
@@ -349,9 +373,20 @@ function RenderProjectAdmin(props) {
                 <Form>
                     <Form.Group>
                         <Form.Label>User email</Form.Label>
-                        <Form.Control />
+                        <Form.Control onChange={(event) => {
+                            setNewUser(event.target.value)
+                        }} />
                     </Form.Group>
-                    <Button className="bg-dark text-white border-0 float-right" style={{ "marginTop": "10px" }}>Add Project Manager</Button>
+                    <Button className="bg-dark text-white border-0 float-right" style={{ "marginTop": "10px" }}
+                        onClick={async () => {
+                            console.log(props.projectSelected)
+                            const result = await AddProjectManager({
+                                email: newUser,
+                                projectName: props.projectSelected,
+                                authToken: props.authToken
+                            })
+                            console.log(result)
+                        }}>Add Project Manager</Button>
                 </Form>
             </Card.Body>
         </Card> : <></>}
