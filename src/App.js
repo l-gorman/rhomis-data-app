@@ -9,6 +9,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Import router information
 import React, { useState, useEffect, useContext } from 'react';
+import { useHistory } from 'react-router';
 import {
   BrowserRouter as Router,
   Switch,
@@ -35,14 +36,20 @@ import AuthContext, { AuthContextProvider } from './components/authentication-co
 
 
 
+
+
 function App() {
   const [authToken, setAuthToken] = useState(null);
+
+
+
 
   // Automatically log out 
   // after 1 hour of use
   setTimeout(() => {
 
     setAuthToken(null);
+    localStorage.clear()
 
 
   }, 60 * 60 * 1000);

@@ -40,6 +40,37 @@ function LoginCard(props) {
 
     const [requestError, setRequestError] = useState("")
     const [loading, setLoading] = useState("")
+
+
+    useEffect(() => {
+        const localToken = localStorage.getItem("userToken")
+        console.log("Local Token")
+        console.log(localToken)
+
+        const currentDate = new Date()
+        const localTokenCreationTime = new Date(localStorage.getItem("createdAt"))
+        console.log("Current date")
+        console.log(currentDate)
+        console.log("Token time")
+        console.log(localTokenCreationTime)
+
+        console.log("Difference")
+        console.log(currentDate.getTime() - localTokenCreationTime.getTime())
+
+        const timeDifference = currentDate.getTime() - localTokenCreationTime.getTime()
+        if (timeDifference < 60 * 60 * 1000) {
+            setAuthToken(localToken)
+
+            history.push("/")
+            return
+
+        }
+
+
+    }, [])
+
+
+
     return (
         <Card className="card-style border-0 login-card">
             <Card.Header className="bg-dark text-white">
@@ -94,7 +125,9 @@ function LoginCard(props) {
                                     if (tokenResponse.status === 200) {
 
                                         setAuthToken(tokenResponse.data)
-
+                                        localStorage.setItem('userToken', tokenResponse.data)
+                                        const tokenDate = new Date()
+                                        localStorage.setItem('createdAt', tokenDate)
                                         history.push("/")
 
                                     }

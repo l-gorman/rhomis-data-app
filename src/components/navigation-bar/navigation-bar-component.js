@@ -31,7 +31,10 @@ export default function MainNavbar(props) {
 
                 <div className="menu-button" onClick={handleShow}><MdOutlineMenu className="menu-button-icon" size={30} /></div>
                 <h2 style={{ "color": "white" }}>RHoMIS</h2>
-                <Nav.Link className="logout-button" as={Link} to="/login" onClick={() => setAuthToken(null)} >Logout</Nav.Link>
+                <Nav.Link className="logout-button" as={Link} to="/login" onClick={() => {
+                    setAuthToken(null)
+                    localStorage.clear()
+                }} >Logout</Nav.Link>
 
 
 
