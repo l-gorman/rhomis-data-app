@@ -112,9 +112,9 @@ function RenderProjectInformation(props) {
                         <tr >
                             <td colSpan={4} style={{ "text-align": "center" }}>No projects found</td>
                         </tr>
-                        <tr >
+                        {/* <tr >
                             <td colSpan={4} style={{ "text-align": "center" }}><a href="https://rhomis-survey.stats4sdtest.online"><Button >Start Creating a Survey</Button></a></td>
-                        </tr>
+                        </tr> */}
 
                     </tbody>
 
@@ -197,6 +197,12 @@ function FormTables(props) {
     console.log("Render project admin props")
     console.log(props)
 
+    let allowToFinalize = false
+    if (props.data.user.roles.projectManager !== undefined) {
+        if (props.data.user.roles.projectManager.includes(props.projectSelected))
+            allowToFinalize = true
+    }
+
     let formsExist = false
 
     if (props.data.forms !== undefined) {
@@ -206,7 +212,6 @@ function FormTables(props) {
             formsExist = formsForProject.length > 0
 
             console.log("formsForProject")
-
             console.log(formsForProject)
         }
     }
@@ -229,13 +234,24 @@ function FormTables(props) {
                     let date = new Date(form.createdAt)
                     let dateString = date.toDateString()
                     if (form.project === props.projectSelected) {
+
+                        let disableButton = true
+
+                        if (allowToFinalize === false) {
+                            disableButton = false
+                        }
+
+                        if (form.draft) {
+                            disableButton = false
+                        }
+
                         return (
                             <tr>
                                 <td>{form.name}</td>
                                 <td>{form.draft ? "Draft" : "Finalized"}</td>
                                 <td >{dateString}</td>
                                 <td style={{ "width": "40px" }}>
-                                    <Button disabled={!form.draft} className="bg-dark text-white border-0"
+                                    <Button disabled={disableButton} className="bg-dark text-white border-0"
                                         onClick={async () => {
 
                                             const finalizedForm = await FinalizeForm({
@@ -261,8 +277,8 @@ function FormTables(props) {
                         )
                     }
 
-                }) : <><tr><td style={{ "text-align": "center" }} colSpan={5}>No forms created yet</td></tr>
-                    <tr><td style={{ "text-align": "center" }} colSpan={5}><a href="https://rhomis-survey.stats4sdtest.online"><Button >Start Creating a Survey</Button></a></td></tr></>}
+                }) : <><tr><td style={{ "text-align": "center" }} colSpan={5}>No forms created yet</td></tr></>}
+                {/* <tr><td style={{ "text-align": "center" }} colSpan={5}><a href="https://rhomis-survey.stats4sdtest.online"><Button >Start Creating a Survey</Button></a></td></tr></>} */}
             </tbody>
 
         </Table >
@@ -408,7 +424,8 @@ function RenderProjectAdmin(props) {
     const [newUser, setNewUser] = useState('')
 
     if (props.data.user.roles.projectManager !== undefined) {
-        renderUserForm = props.data.user.roles.projectManager.length > 0
+        if (props.data.user.roles.projectManager.includes(props.projectSelected))
+            renderUserForm = true
     }
     console.log("props")
     console.log(props)
@@ -481,10 +498,27 @@ function RenderFormAdmin(props) {
 
     console.log(props)
 
-    let renderUserForm = false
+    let projectManageOfForm = false
 
     if (props.data.user.roles.projectManager !== undefined) {
-        renderUserForm = props.data.user.roles.projectManager.length > 0
+
+        if (props.data.user.roles.projectManager.includes(props.projectSelected)) {
+            projectManageOfForm = true
+        }
+    }
+
+    let dataAnalystOfForm = false
+
+    if (props.data.user.roles.projectManager !== undefined ||
+        props.data.user.roles.dataCollector !== undefined) {
+
+        if (props.data.user.roles.projectManager.includes(props.projectSelected)) {
+            dataAnalystOfForm = true
+        }
+
+        if (props.data.user.roles.analyst.includes(props.formSelected)) {
+            dataAnalystOfForm = true
+        }
     }
 
     let odkConf = {}
@@ -536,7 +570,7 @@ function RenderFormAdmin(props) {
 
                             </div>
                             <div className="qr-code-container">
-                                <Button onClick={() => {
+                                <Button className="bg-dark border-0" onClick={() => {
                                     setRenderInstallCode(false)
                                 }}>Hide Code</Button>
                             </div>
@@ -561,7 +595,7 @@ function RenderFormAdmin(props) {
 
                             </div>
                             <div className="qr-code-container">
-                                <Button onClick={() => {
+                                <Button className="bg-dark border-0" onClick={() => {
                                     setRenderODKFormCode(false)
                                 }}>Hide Code</Button>
                             </div>
@@ -570,69 +604,87 @@ function RenderFormAdmin(props) {
                     {draft ? <h4>***Your form is currently saved as a draft. Any submissions you make
                         will be removed once the form is finalised*** </h4> : <></>}
 
-                </Card.Body>
-            </Card>
+                    {draft ?
+                        <>
+                            As this is a draft form. You might like to quickly see what the data you collect might look like. Click the button below to generate some mock data. Please note,
+                            that values are randomly generated.
+                            < br />
+                            <Button className="bg-dark border-0" style={{ "margin": "10px" }}
+                                onClick={async () => {
+                                    await ProcessData({
+                                        commandType: "generate",
+                                        draft: draft,
+                                        authToken: props.authToken,
+                                        data: props.data,
+                                        formSelected: props.formSelected,
+                                        projectSelected: props.projectSelected
+                                    })
+                                    console.log("gen data")
+                                }}
 
-            <Card className="project-management-card">
-                <Card.Header>Process Data</Card.Header>
-                <Card.Body>
-                    {draft ? <Button style={{ "margin": "10px" }}
-                        onClick={async () => {
-                            await ProcessData({
-                                commandType: "generate",
-                                draft: draft,
-                                authToken: props.authToken,
-                                data: props.data,
-                                formSelected: props.formSelected,
-                                projectSelected: props.projectSelected
-                            })
-                            console.log("gen data")
-                        }}
-
-                    >Generate Data</Button> : <></>}
-
-
-                    <Button style={{ "margin": "10px" }}
-                        onClick={async () => {
-                            await ProcessData({
-                                commandType: "units",
-                                draft: draft,
-                                authToken: props.authToken,
-                                data: props.data,
-                                formSelected: props.formSelected,
-                                projectSelected: props.projectSelected
-                            })
-                            console.log("gen data")
-                        }}
-                    >
-                        Extract Units
-                    </Button>
-                    <Button style={{ "margin": "10px" }}
-                        onClick={async () => {
-                            await ProcessData({
-                                commandType: "process",
-                                draft: draft,
-                                authToken: props.authToken,
-                                data: props.data,
-                                formSelected: props.formSelected,
-                                projectSelected: props.projectSelected
-                            })
-                            console.log("gen data")
-                        }}
-                    >
-                        Process Data
-                    </Button>
+                            >Generate Data</Button> </> : <></>}
 
                 </Card.Body>
             </Card>
+
+            {dataAnalystOfForm ?
+                < Card className="project-management-card">
+                    <Card.Header>Processing Data</Card.Header>
+                    <Card.Body>
+
+                        During data-collection, enumerators have the opportunity
+                        to input new units. We need to know what these units are
+                        in order calculate key indicators (e.g. crop yield). <br />
+
+                        <Button className="bg-dark border-0" style={{ "margin": "10px" }}
+                            onClick={async () => {
+                                await ProcessData({
+                                    commandType: "units",
+                                    draft: draft,
+                                    authToken: props.authToken,
+                                    data: props.data,
+                                    formSelected: props.formSelected,
+                                    projectSelected: props.projectSelected
+                                })
+                                console.log("gen data")
+                            }}
+                        >
+                            Extract Units
+                        </Button>
+
+                        <br />
+                        <Button className="bg-dark border-0" style={{ "margin": "10px" }}
+                            onClick={async () => {
+                                await ProcessData({
+                                    commandType: "process",
+                                    draft: draft,
+                                    authToken: props.authToken,
+                                    data: props.data,
+                                    formSelected: props.formSelected,
+                                    projectSelected: props.projectSelected
+                                })
+                                console.log("gen data")
+                            }}
+                        >
+                            Process Data
+                        </Button>
+
+                    </Card.Body>
+                </Card> : <></>
+            }
 
             <Card className="project-management-card">
                 <Card.Header>Modify Units</Card.Header>
                 <Card.Body>Test Body</Card.Body>
             </Card>
 
+            <Card className="project-management-card">
+                <Card.Header>Download Data</Card.Header>
+                <Card.Body>Test Body</Card.Body>
+            </Card>
+
             {
-                renderUserForm ? <Card className="project-management-card">
+                projectManageOfForm ? <Card className="project-management-card">
                     <Card.Header as="h5">Manage Users</Card.Header>
                     <Card.Body>
                         {/* <UserTables /> */}
@@ -671,6 +723,8 @@ export default function ProjectManagementComponent(props) {
             authToken: authToken
         })
     }, [])
+    console.log("AdminData")
+    console.log(adminData)
 
     return (
         <div id="project-management-container" className="sub-page-container">
