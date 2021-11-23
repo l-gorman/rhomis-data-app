@@ -490,11 +490,71 @@ function BackButton(props) {
 
 }
 
+
+async function GetFormInformation(props) {
+
+    const result = await axios({
+        method: 'post',
+        url: process.env.REACT_APP_API_URL + "api/project-data",
+        headers: {
+            'Authorization': props.authToken
+        },
+        data: {
+            projectName: props.projectName,
+            formName: props.formName
+        }
+    })
+
+    console.log("Form Data Response: ")
+    console.log(result.data)
+    if (result.status === 200) {
+        console.log("Setting project information")
+
+        props.setFormData(result.data)
+    }
+    if (result.status === 400) {
+        alert(result.data)
+    }
+
+}
+
 function RenderFormAdmin(props) {
 
     const [renderInstallCode, setRenderInstallCode] = useState(false)
     const [renderODKFormCode, setRenderODKFormCode] = useState(true)
     console.log("Form Props")
+
+
+
+
+    const [formData, setFormData] = useState(null)
+
+    let renderUnitsForm = false
+    if (formData) {
+        if (formData.units.length > 0) {
+            renderUnitsForm = true
+        }
+    }
+
+    let renderDataForm = false
+    if (formData) {
+        if (formData.dataSets.length > 0) {
+            renderDataForm = true
+        }
+    }
+
+
+    useEffect(async () => {
+
+        GetFormInformation({
+            authToken: props.authToken,
+            projectName: props.projectSelected,
+            formName: props.formSelected,
+            setFormData: setFormData
+        })
+
+        console.log("Rendering form admin")
+    }, [])
 
     console.log(props)
 
@@ -633,8 +693,9 @@ function RenderFormAdmin(props) {
                     <Card.Body>
 
                         During data-collection, enumerators have the opportunity
-                        to input new units. We need to know what these units are
-                        in order calculate key indicators (e.g. crop yield). <br />
+                        to input new units. We need to know the numeric conversions
+                        for these units in order calculate key indicators (e.g. crop yield). <br />
+
 
                         <Button className="bg-dark border-0" style={{ "margin": "10px" }}
                             onClick={async () => {
@@ -653,6 +714,8 @@ function RenderFormAdmin(props) {
                         </Button>
 
                         <br />
+                        Once you have converted your units, the data-set can be processed
+                        to calculate key information <br />
                         <Button className="bg-dark border-0" style={{ "margin": "10px" }}
                             onClick={async () => {
                                 await ProcessData({
@@ -673,15 +736,16 @@ function RenderFormAdmin(props) {
                 </Card> : <></>
             }
 
-            <Card className="project-management-card">
+            {renderUnitsForm ? <Card className="project-management-card">
                 <Card.Header>Modify Units</Card.Header>
-                <Card.Body>Test Body</Card.Body>
-            </Card>
+                <Card.Body>{JSON.stringify(formData.units)}</Card.Body>
+            </Card> : <></>}
 
-            <Card className="project-management-card">
+            {renderDataForm ? <Card className="project-management-card">
                 <Card.Header>Download Data</Card.Header>
-                <Card.Body>Test Body</Card.Body>
-            </Card>
+                <Card.Body>{JSON.stringify(formData.dataSets)}</Card.Body>
+            </Card> :
+                <></>}
 
             {
                 projectManageOfForm ? <Card className="project-management-card">
