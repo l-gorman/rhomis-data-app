@@ -81,7 +81,7 @@ function App() {
                     {/* <Route path="/data-collection" component={CollectDataComponent}></Route> */}
                     {/* <Route path="/global-data" component={PublicDataComponent}></Route> */}
                     <Route path="/data-querying" component={DataQueryComponent}></Route>
-                    <Route path="/form-creation" component={FormCreationComponent}></Route>
+                    <Route path="/administration" component={FormCreationComponent}></Route>
 
                     {/* <Route path="/account" component={AccountManagementComponent}></Route> */}
                   </>

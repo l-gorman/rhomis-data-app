@@ -1,8 +1,10 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { Container, Navbar, Nav, Offcanvas, Button } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import AuthContext from '../authentication-component/AuthContext';
 import { MdOutlineMenu } from 'react-icons/md'
+
+import axios from 'axios';
 
 import './navigation-bar-component.css'
 /* 
@@ -11,6 +13,37 @@ note that if you want to maintain state or context between routes,
 you must use the 'react-router-dom' "link". I have integrated
 this with the Nav.Link component 
 */
+
+
+async function GetAdminData(props) {
+    console.log("authToken: ", props.authToken)
+    const result = await axios({
+        method: 'get',
+        url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/meta-data",
+        headers: {
+            'Authorization': props.authToken
+        }
+    })
+
+    console.log("response: ")
+    console.log(result)
+    if (result.status === 200) {
+        console.log("Setting project information")
+        if (result.data.projects.length > 0) {
+            props.setShowProjectManagement(true)
+        }
+        if (result.data.user.roles.administrator === true) {
+            props.setShowAdmin(true)
+        }
+        if (result.data.user.roles.dataCollector.length > 0) {
+            props.setShowCollectData(true)
+        }
+    }
+    if (result.status === 400) {
+        alert(result.data)
+    }
+}
+
 
 
 
@@ -22,7 +55,23 @@ export default function MainNavbar(props) {
     const [show, setShow] = useState(false)
 
     const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+    const handleShow = async () => setShow(true);
+    const [showAdmin, setShowAdmin] = useState(false)
+    const [showCollectData, setShowCollectData] = useState(false)
+    const [showProjectManagement, setShowProjectManagement] = useState(false)
+
+    useEffect(async () => {
+        await GetAdminData({
+            authToken: authToken,
+            setShowAdmin: setShowAdmin,
+            setShowCollectData: setShowCollectData,
+            setShowProjectManagement: setShowProjectManagement,
+        })
+
+    }, [])
+
+
+
 
     return (
         <>
@@ -58,31 +107,51 @@ export default function MainNavbar(props) {
                             <Nav.Link className="side-bar-link" as={Link} onClick={() => { handleClose() }} to="/">Portal</Nav.Link>
                         </div>
                         <div className="side-bar-item">
-                            <Nav.Link className="side-bar-link" as={Link} onClick={() => { handleClose() }} to="/project-management">My Projects</Nav.Link>
+                            <form style={{ "width": "100%" }} method="post" action={"https://rhomis-survey.stats4sdtest.online/login"} class="inline">
+                                <input type="hidden" name="token" value={authToken} />
+                                <input type="hidden" name="redirect_url" value="/admin/xlsform/create" />
+                                <input className="form-link" type="submit" value="Design a Survey"
+                                />
+                            </form>
                         </div>
-                        <div className="side-bar-item">
+
+                        {showProjectManagement ? <div className="side-bar-item">
+                            <Nav.Link className="side-bar-link" as={Link} onClick={() => { handleClose() }} to="/project-management">Manage Projects</Nav.Link>
+                        </div> : <></>}
+
+                        {showCollectData ? <div className="side-bar-item">
+                            <Nav.Link className="side-bar-link" as={Link} onClick={() => { handleClose() }} to="/project-management">Collect Data</Nav.Link>
+                        </div> : <></>}
+
+
+                        {/* <div className="side-bar-item">
                             <Nav.Link className="side-bar-link" onClick={() => { handleClose() }} href="https://rhomis-survey.stats4sdtest.online/login">Design a Survey</Nav.Link>
-                        </div>
+                        </div> */}
                         {/* <div className="side-bar-item">
                             <Nav.Link className="side-bar-link" as={Link} onClick={() => { handleClose() }} to="/data-collection">Collect Data</Nav.Link>
                         </div> */}
                         {/* <div className="side-bar-item">
                             <Nav.Link className="side-bar-link" as={Link} onClick={() => { handleClose() }} to="/global-data">Global Data</Nav.Link>
                         </div> */}
-                        <div className="side-bar-item">
+                        {/* <div className="side-bar-item">
                             <Nav.Link className="side-bar-link" as={Link} onClick={() => { handleClose() }} to="/data-querying">Data Query</Nav.Link>
-                        </div>
+                        </div> */}
+                        {showAdmin ? <div className="side-bar-item">
+                            <Nav.Link className="side-bar-link" as={Link} onClick={() => {
+                                handleClose()
+
+                            }} to="/administration">Administration</Nav.Link>
+                        </div> : <></>}
                         <div className="side-bar-item">
-                            <Nav.Link className="side-bar-link" as={Link} onClick={() => { handleClose() }} to="/form-creation">Form Creation</Nav.Link>
-                        </div>
-                        <div className="side-bar-item">
-                            <Nav.Link className="side-bar-link" as={Link} to="/login" onClick={() => setAuthToken(null)} >Logout</Nav.Link>
+                            <Nav.Link className="side-bar-link" as={Link} to="/login" onClick={() => {
+                                setAuthToken(null)
+                                localStorage.clear()
+                            }} >Logout</Nav.Link>
                         </div>
                     </div>
 
                 </Offcanvas>
-                {/* </Navbar.Collapse> */}
-                {/* </Container> */}
+
             </Navbar >
 
 

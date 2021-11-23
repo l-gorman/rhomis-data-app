@@ -63,10 +63,7 @@ function LoginCard(props) {
 
             history.push("/")
             return
-
         }
-
-
     }, [])
 
 

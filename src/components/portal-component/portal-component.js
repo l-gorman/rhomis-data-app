@@ -65,7 +65,7 @@ function PortalCard(props) {
         return (
             <div>
                 <form method="post" action={props.data.link} class="inline">
-                    <input type="hidden" name="token" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MThlOGU3NWNkMWU4NDE3ZGNkYmQ2MGUiLCJlbWFpbCI6InRlc3RfcmhvbWlzX3VzZXJAb3V0bG9vay5jb20iLCJleHBpcnkiOiIyMDIxLTExLTE2VDE3OjM2OjQyLjYwNVoiLCJpYXQiOjE2MzcwODA2MDJ9.Rp28pfgOk2QV6sG_KCvlDhpoIA0pDILSOLD7yMKYuFA" />
+                    <input type="hidden" name="token" value={props.authToken} />
                     <input type="hidden" name="redirect_url" value="/admin/xlsform/create" />
                     <button type="submit" style={{ margin: 0, padding: 0, border: 0, backgroundColor: "white" }}>
 
@@ -90,7 +90,7 @@ function PortalCard(props) {
     if (props.data.external === true & props.data.label !== "surveyBuilder") {
         return (
             <div>
-                <Link style={{ 'textDecoration': 'none' }} to={{ pathname: props.data.link }}>
+                <Link style={{ 'textDecoration': 'none' }} target="_blank" to={{ pathname: props.data.link }}>
                     < Card className="sub-card portal-card border-0">
                         <div className="portal-card-header-container">
                             <h4 className="portal-card-header">{props.data.name}</h4>

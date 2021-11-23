@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { Card, Form, Accordion, Button, Table } from 'react-bootstrap'
+import { Card, Form, Accordion, Button, Table, Row, Col } from 'react-bootstrap'
 
 import './form-creation-component.css'
 import '../../App.css'
@@ -384,6 +384,30 @@ function RenderProjectInformation(props) {
 }
 
 
+async function AddAdministrator(props) {
+
+    try {
+
+        const result = await axios({
+            url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/admin",
+            method: "post",
+            headers: {
+                Authorization: props.authToken
+            },
+            data: {
+                email: props.newAdmin
+            }
+        })
+
+        console.log(result)
+
+        return (result.data)
+    } catch (err) {
+
+    }
+
+}
+
 export default function FormCreationComponent() {
 
 
@@ -401,10 +425,13 @@ export default function FormCreationComponent() {
     const [newFormVersion, setNewFormVersion] = useState(null);
 
 
-    const [selectedDraftProject, setSelectedDraftProject] = useState(null)
+    const [selectedDraftProject, setSelectedDraftProject] = useState(null);
     const [selectedDraftFile, setSelectedDraftFile] = useState(null);
     const [newDraftFormName, setNewDraftFormName] = useState(null);
     const [newDraftFormVersion, setNewDraftFormVersion] = useState(null);
+
+
+    const [newAdmin, setNewAdmin] = useState(null)
 
     useEffect(async () => {
         await GetProjectInformation({ authToken: authToken, setProjectInformation: setProjectInformation })
@@ -474,6 +501,36 @@ export default function FormCreationComponent() {
                                     newDraftFormVersion={newDraftFormVersion}
                                     setSelectedDraftProject={setSelectedDraftProject}
                                     selectedDraftProject={selectedDraftProject} />
+                            </Accordion.Body>
+                        </Accordion.Item>
+
+                        <Accordion.Item eventKey="4">
+                            <Accordion.Header>Add Administrator</Accordion.Header>
+                            <Accordion.Body>
+                                <Form>
+                                    <Row >
+                                        <Col md="4">
+                                            <Form.Group >
+                                                <Form.Label>User Email</Form.Label>
+                                                <Form.Control type="email" onChange={(event) => {
+                                                    setNewAdmin(event.target.value)
+
+                                                }} />
+
+                                                <Button className="border-0 bg-dark" style={{ "marginTop": "10px" }}
+                                                    onClick={async () => {
+                                                        AddAdministrator({
+                                                            authToken: authToken,
+                                                            newAdmin: newAdmin
+                                                        })
+                                                    }}>Add User</Button>
+
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                </Form>
+
+
                             </Accordion.Body>
                         </Accordion.Item>
 

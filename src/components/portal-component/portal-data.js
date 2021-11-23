@@ -51,11 +51,11 @@ export const PortalDataAll = [
         external: true,
     },
     {
-        name: "Form Creation",
+        name: "Administration",
         label: "administrator",
         text: "Create projects and forms (only used for development)",
         icon: MdOutlineCreate,
-        link: "/form-creation",
+        link: "/administration",
         external: false,
     }
 ]
