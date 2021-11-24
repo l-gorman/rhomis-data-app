@@ -62,10 +62,14 @@ function PortalCard(props) {
     }
 
     if (props.data.external === true & props.data.label === "surveyBuilder") {
+        console.log("Auth token")
+
+        console.log(props.authToken)
         return (
             <div>
                 <form method="post" action={props.data.link} class="inline">
                     <input type="hidden" name="token" value={props.authToken} />
+                    {/* <input type="hidden" name="X-XSRF-TOKEN" value={"eyJpdiI6IndJR29DYUNDbjQ5eG1taWJUVjJ1NVE9PSIsInZhbHVlIjoiVisvTVNCc2puS1ZsZWlhYnZBbHpMd01odksyWm9laG9UdE45N3dHcWp5c3hNRWNuK3FCbVRPa0xTcEZoNXhPSWxtbUFZUFdxbTY3a0RrVU5UWUQwOG0wTGRQL1lINC9kT3NndkVGeWtPVTFtTlc5clBnYWN4NmF0MGxxTGhtcUciLCJtYWMiOiIxZTUyMjJhZDFhZjNiNzMwZTZlZTQxZTM4NTJhNzk2OTY5OGM3ODUwZDU1NzliNTUwYjRiNTVlYmM3ZjJkNzc4IiwidGFnIjoiIn0%3D"} /> */}
                     <input type="hidden" name="redirect_url" value="/admin/xlsform/create" />
                     <button type="submit" style={{ margin: 0, padding: 0, border: 0, backgroundColor: "white" }}>
 
@@ -156,7 +160,7 @@ function RenderPortalCards(props) {
     return (
         <>
             {portalCardData.map((PortalItem) => {
-                return <PortalCard data={PortalItem} history={props.history} />
+                return <PortalCard data={PortalItem} history={props.history} authToken={props.authToken} />
             })
             }
         </>

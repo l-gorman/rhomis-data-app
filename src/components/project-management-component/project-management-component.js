@@ -13,6 +13,229 @@ import { AiOutlineArrowLeft } from 'react-icons/ai'
 import QRCode from 'react-qr-code'
 import { deflateSync } from 'zlib'
 
+
+function renderTable(data) {
+    // console.log(data)
+    console.log("Rendering user table")
+
+
+    if (data !== null) {
+        var full_data_set = data.slice(0, 9)
+        var column_names = []
+
+        // Looping through households
+        for (let household_index = 0; household_index < full_data_set.length; household_index++) {
+            // All of the column names for this individual household
+            var household_column_names = Object.keys(full_data_set[household_index])
+            //Looping through individual column names for the individual household
+            for (let column_index = 0; column_index < household_column_names.length; column_index++) {
+                // The new column name for that household
+                var new_column = household_column_names[column_index]
+
+                if (!column_names.some(column => column === new_column)) {
+
+                    if (household_index === 0) {
+                        column_names.splice(column_index, 0, new_column)
+                    }
+
+                    if (household_index > 0) {
+
+                        // Check if the previous column was in the column index
+                        if (!household_column_names[column_index - 1] !== undefined) {
+                            var index_of_previous_column_name = column_names.indexOf(household_column_names[column_index - 1])
+                            column_names.splice(index_of_previous_column_name + 1, 0, new_column)
+
+                        } else {
+                            column_names.splice(column_index + 1, 0, new_column)
+                        }
+                    }
+                }
+
+            }
+        }
+        return (
+            <>
+                <Table striped hover size="sm" responsive>
+                    {/* Table header */}
+                    <thead>
+                        <tr key="row_1">
+                            {column_names.map((column, column_key) => {
+                                return (<th className="col-md-1" key={"row_1_column_" + column_key}>{column}</th>)
+                            })}
+                        </tr>
+                    </thead>
+                    {/* Table Body */}
+                    <tbody>
+                        {full_data_set.map((household, household_key) => {
+                            return (<tr key={"row_" + household_key}>
+                                {column_names.map((column, column_key) => {
+                                    return (<td height="10px" key={"row_" + household_key + "column_" + column_key + "_" + "household_" + household_key}>{household[column] ? household[column] : "NA"}</td>)
+                                })}
+                            </tr>)
+                        })}
+
+                    </tbody>
+                </Table>
+            </ >)
+    }
+}
+
+
+function generateCSV(data) {
+    //Return nothing if the data is null
+    if (data === null) {
+        return;
+    }
+
+    // console.log("length " + data.length)
+    if (data.length === undefined) {
+        return;
+    }
+
+    // Creating an empty list to include all of the lines of the csv
+    var csv_lines = []
+
+    // This is the full RHoMIS Data set
+    var full_data_set = data
+
+    // Identifying the column headers
+    // Some households have more columns than other. This merges column
+    // names in order based on the rows of each household
+    var column_names = []
+
+    // Looping through households
+    for (let household_index = 0; household_index < full_data_set.length; household_index++) {
+        // All of the column names for this individual household
+        var household_column_names = Object.keys(full_data_set[household_index])
+        //Looping through individual column names for the individual household
+        for (let column_index = 0; column_index < household_column_names.length; column_index++) {
+            // The new column name for that household
+            var new_column = household_column_names[column_index]
+            // Checking whether the new column has previously been encountered 
+            if (!column_names.some(column => column === new_column)) {
+                // If this is the first househould, adds the new element at the column index
+                // not deleting any items
+                if (household_index === 0) {
+                    column_names.splice(column_index, 0, new_column)
+                }
+                // Checks if this is a household after the first household
+                if (household_index > 0) {
+                    // Check if the previous column was in the column index
+                    if (!household_column_names[column_index - 1] !== undefined) {
+                        // Looks at the column before, if it was encountered previously
+                        // we make sure this new column is added in the correct place
+                        var index_of_previous_column_name = column_names.indexOf(household_column_names[column_index - 1])
+
+                        column_names.splice(index_of_previous_column_name + 1, 0, new_column)
+
+                    } else {
+                        // If the previous column did not exist previously, we make sure to add the new column
+                        // at the end.
+                        column_names.splice(column_index + 1, 0, new_column)
+                    }
+                }
+            }
+
+
+        }
+    }
+    // add all of the column names, seperated by a column and a space
+    csv_lines.push(column_names.join(", "))
+
+    // Now push each individual household to the csv
+    var household_data = full_data_set.map((household) => {
+        var household_array = column_names.map((column) => {
+            if (household[column] !== null) {
+                return household[column]
+            } else {
+                return ''
+            }
+
+        })
+        // Join the column values by comma
+        var household_row = household_array.join(", ")
+        return (household_row)
+
+    })
+    csv_lines = csv_lines.concat(household_data)
+
+    // Join each line and seperate by \n
+    var csv_string = csv_lines.join('\n')
+    return (csv_string)
+}
+
+
+
+async function FetchData(props) {
+    // Basic post request, fetching information by: 
+    //dataType: type of data we are looking for (e.g. indicator data),
+    console.log("Fetching unit data")
+    console.log(props)
+
+    const response = await axios({
+        method: "post",
+        url: process.env.REACT_APP_API_URL + "api/data",
+        data: {
+            dataType: props.dataType,
+            projectID: props.projectID,
+            formID: props.formID,
+            unit: props.unit,
+            data: props.data
+
+        },
+        headers: {
+            'Authorization': props.authToken
+        }
+    })
+    console.log(response)
+
+    // If the response is null return null
+    // Otherwise return the dataset.
+    var data = response.data
+    if (data === null) {
+        return null
+    } else {
+        return (data)
+    }
+}
+
+
+// Generating a link to download the csv data
+function generateDataDownloadLink(dataToDownload, dataDownloadLink) {
+    // Generating the csv string from the data we
+    // hope to download (comes in JSON format)
+    const dataCSV = generateCSV(dataToDownload)
+    // Creat e a file-like immutable objesct
+    const data = new Blob([dataCSV], { type: 'text/plain' })
+
+    // Clears the previous URL used to download the data
+    if (dataDownloadLink !== '') {
+        window.URL.revokeObjectURL(dataDownloadLink)
+    }
+    // update the download link state
+    return (window.URL.createObjectURL(data))
+}
+
+
+
+function dataDownloadButton(dataDownloadLink, csvsAvailable, dataType, projectName, formID) {
+    if (csvsAvailable) {
+        return (<div className="end-button-container">
+            <a
+                // Name of the file to download
+                download={projectName + '_' + formID + '_' + dataType + '_' + '.csv'}
+                // link to the download URL
+                href={dataDownloadLink}
+            >
+                <Button className="end-button">Download Data as CSV</ Button></a>
+        </div>
+
+        )
+    }
+}
+
+
+
 async function GetProjectInformation(props) {
     console.log("authToken: ", props.authToken)
     const result = await axios({
@@ -525,6 +748,14 @@ function RenderFormAdmin(props) {
     console.log("Form Props")
 
 
+    const [unitsSelect, setUnitsSelect] = useState(null)
+    const [rhomisDataSelect, setRHoMISSelect] = useState(null)
+
+    const [unitsData, setUnitsData] = useState(null)
+    const [rhomisData, setRHoMISData] = useState(null)
+
+    const [unitsDownloadLink, setUnitsDownloadLink] = useState('')
+    const [dataDownloadLink, setDataDownloadLink] = useState('')
 
 
     const [formData, setFormData] = useState(null)
@@ -737,15 +968,112 @@ function RenderFormAdmin(props) {
             }
 
             {renderUnitsForm ? <Card className="project-management-card">
-                <Card.Header>Modify Units</Card.Header>
-                <Card.Body>{JSON.stringify(formData.units)}</Card.Body>
-            </Card> : <></>}
+                <Card.Header>Download Units</Card.Header>
+                <Card.Body>
+                    <Form>
+                        <Form.Group>
+                            <Form.Label>Select the Type of Unit</Form.Label>
 
-            {renderDataForm ? <Card className="project-management-card">
-                <Card.Header>Download Data</Card.Header>
-                <Card.Body>{JSON.stringify(formData.dataSets)}</Card.Body>
-            </Card> :
-                <></>}
+                            <Form.Select defaultValue="Select"
+                                onChange={async (event) => {
+
+                                    setUnitsSelect(event.target.value)
+
+
+
+                                    const newUnitsData = await FetchData({
+                                        authToken: props.authToken,
+                                        dataType: event.target.value,
+                                        projectID: props.projectSelected,
+                                        formID: props.formSelected,
+                                        unit: true,
+                                        data: false
+
+
+                                    })
+
+                                    setUnitsData(newUnitsData)
+                                    console.log("units data")
+                                    console.log(newUnitsData)
+
+
+
+                                }}>
+                                <option key="default-select" disabled={true}>Select</option>
+                                {formData.units.map((unitType) => {
+                                    return <option key={"unit-option-" + unitType}>{unitType}</option>
+                                })}
+                            </Form.Select>
+                        </Form.Group>
+
+                    </Form>
+                    {unitsData ? <>
+                        <br />
+                        {renderTable(unitsData)}
+                    </>
+                        : <></>}
+
+
+                    {/* {JSON.stringify(formData.units)} */}
+                </Card.Body>
+            </Card > : <></>
+            }
+
+            {
+                renderDataForm ? <Card className="project-management-card">
+                    <Card.Header>Download Data</Card.Header>
+                    <Card.Body>
+                        <Form>
+                            <Form.Group>
+                                <Form.Label>Select the type of data</Form.Label>
+
+                                <Form.Select defaultValue="Select"
+                                    onChange={async (event) => {
+
+                                        setRHoMISSelect(event.target.value)
+
+
+
+                                        const newRHoMISData = await FetchData({
+                                            authToken: props.authToken,
+                                            dataType: event.target.value,
+                                            projectID: props.projectSelected,
+                                            formID: props.formSelected,
+                                            unit: false,
+                                            data: true
+
+
+                                        })
+
+                                        setRHoMISData(newRHoMISData)
+                                        console.log("rhomis data")
+                                        console.log(newRHoMISData)
+
+
+
+                                    }}>
+                                    <option key="default-select" disabled={true}>Select</option>
+                                    {formData.dataSets.map((dataSet) => {
+                                        return <option key={"data-option-" + dataSet}>{dataSet}</option>
+                                    })}
+                                </Form.Select>
+                            </Form.Group>
+
+                        </Form>
+
+                        {rhomisData ? <>
+                            <br />
+                            {renderTable(rhomisData)}
+
+                        </>
+                            : <></>}
+
+                        {/* {JSON.stringify(formData.dataSets)} */}
+
+                    </Card.Body>
+                </Card> :
+                    <></>
+            }
 
             {
                 projectManageOfForm ? <Card className="project-management-card">
