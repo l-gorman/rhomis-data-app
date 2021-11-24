@@ -991,8 +991,13 @@ function RenderFormAdmin(props) {
 
 
                                     })
+                                    const units_download_link = generateDataDownloadLink(newUnitsData, unitsDownloadLink)
+                                    setUnitsDownloadLink(units_download_link)
 
                                     setUnitsData(newUnitsData)
+
+
+
                                     console.log("units data")
                                     console.log(newUnitsData)
 
@@ -1010,9 +1015,14 @@ function RenderFormAdmin(props) {
                     {unitsData ? <>
                         <br />
                         {renderTable(unitsData)}
+                        <a
+                            // Name of the file to download
+                            download={props.projectSelected + '_' + props.formSelected + '_' + unitsSelect + '.csv'}
+                            // link to the download URL
+                            href={unitsDownloadLink}
+                        >
 
-
-                        <Button className="bg-dark border-0">Download Data</Button>
+                            <Button className="bg-dark border-0">Download Data</Button></a>
                     </>
                         : <></>}
 
@@ -1049,6 +1059,8 @@ function RenderFormAdmin(props) {
 
 
                                         })
+                                        const rhomis_download_link = generateDataDownloadLink(newRHoMISData, dataDownloadLink)
+                                        setDataDownloadLink(rhomis_download_link)
 
                                         setRHoMISData(newRHoMISData)
                                         console.log("rhomis data")
@@ -1069,7 +1081,14 @@ function RenderFormAdmin(props) {
                         {rhomisData ? <>
                             <br />
                             {renderTable(rhomisData)}
-                            <Button className="bg-dark border-0">Download Data</Button>
+                            <a
+                                // Name of the file to download
+                                download={props.projectSelected + '_' + props.formSelected + '_' + rhomisDataSelect + '.csv'}
+                                // link to the download URL
+                                href={dataDownloadLink}
+                            >
+
+                                <Button className="bg-dark border-0">Download Data</Button></a>
 
 
                         </>
