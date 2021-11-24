@@ -1010,8 +1010,13 @@ function RenderFormAdmin(props) {
                     {unitsData ? <>
                         <br />
                         {renderTable(unitsData)}
+
+
+                        <Button className="bg-dark border-0">Download Data</Button>
                     </>
                         : <></>}
+
+
 
 
                     {/* {JSON.stringify(formData.units)} */}
@@ -1064,8 +1069,11 @@ function RenderFormAdmin(props) {
                         {rhomisData ? <>
                             <br />
                             {renderTable(rhomisData)}
+                            <Button className="bg-dark border-0">Download Data</Button>
+
 
                         </>
+
                             : <></>}
 
                         {/* {JSON.stringify(formData.dataSets)} */}
