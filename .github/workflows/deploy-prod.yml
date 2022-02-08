@@ -31,6 +31,27 @@ jobs:
           file_contents=$(<./build/CNAME) &&
           echo "${file_contents//'TESTDOMAIN'/'rhomis.cgiar.org'}" > ./build/CNAME
 
+      - name: Init new repo in main folder commit generated files
+        run: |
+          git init
+          git add -A
+          git config --local user.email "lgorman@turing.ac.uk"
+          git config --local user.name "l-gorman"
+          git commit -m 'deploy'
+
+      - name: Force push main production repo
+        uses: ad-m/github-push-action@v0.5.0
+        with:
+          # Token for the repo
+          # Can be passed in using $\{{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.PUBLISHPAT }}
+          # Destination branch to push changes
+          branch: main
+          # Force the changes through
+          force: true
+          # Change to the build directory before pushing
+          repository: "ilri/rhomis-data-app"
+
       - name: Init new repo in build folder and commit generated files
         run: |
           cd build
@@ -52,17 +73,4 @@ jobs:
           force: true
           # Change to the build directory before pushing
           directory: ./build
-          repository: "ilri/rhomis-data-app"
-
-      - name: Force push main production repo
-        uses: ad-m/github-push-action@v0.5.0
-        with:
-          # Token for the repo
-          # Can be passed in using $\{{ secrets.GITHUB_TOKEN }}
-          github_token: ${{ secrets.PUBLISHPAT }}
-          # Destination branch to push changes
-          branch: main
-          # Force the changes through
-          force: true
-          # Change to the build directory before pushing
           repository: "ilri/rhomis-data-app"
