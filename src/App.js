@@ -59,12 +59,9 @@ function App() {
       <Fade>
         <Switch>
           <AuthContext.Provider value={[authToken, setAuthToken]}>
-
-
             {/* If auth token does not exist, do not render the main navigation bar */}
 
             <div className="main-app-background">
-
               <div className="main-page">
                 {authToken ? <MainNavbar /> : null}
 
