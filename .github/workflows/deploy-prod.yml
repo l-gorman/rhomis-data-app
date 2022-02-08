@@ -49,7 +49,7 @@ jobs:
           # Destination branch to push changes
           branch: gh-pages
           # Force the changes through
-          # force: true
+          force: true
           # Change to the build directory before pushing
           directory: ./build
           repository: "ilri/rhomis-data-app"
@@ -63,6 +63,6 @@ jobs:
           # Destination branch to push changes
           branch: main
           # Force the changes through
-          # force: true
+          force: true
           # Change to the build directory before pushing
           repository: "ilri/rhomis-data-app"
