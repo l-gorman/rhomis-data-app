@@ -32,11 +32,34 @@ jobs:
           file_contents=$(<./build/CNAME) &&
           echo "${file_contents//'TESTDOMAIN'/'app.l-gorman.com'}" > ./build/CNAME
 
-      - name: Publish to gh-pages
+      - name: Init new repo in dist folder and commit generated files
         run: |
-          npx gh-pages -d build -r https://github.com/l-gorman/rhomis-data-app
-        env:
-          GITHUB_TOKEN: ${{PUBLISHPAT}}
+          cd build
+          git init
+          git add -A
+          git config --local user.email "lgorman@turing.ac.uk"
+          git config --local user.name "l-gorman"
+          git commit -m 'deploy'
+
+      - name: Force push to destination branch
+        uses: ad-m/github-push-action@v0.5.0
+        with:
+          # Token for the repo
+          # Can be passed in using $\{{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.PUBLISHPAT }}
+          # Destination branch to push changes
+          branch: gh-pages
+          # Use force push to fully overwrite the destination branch
+          force: true
+          # We have to push from the folder where files were generated.
+          # Same were the new repo was initialized in the previous step
+          directory: ./build
+
+      # - name: Publish to gh-pages
+      #   run: |
+      #     npx gh-pages -d build -r https://github.com/l-gorman/rhomis-data-app
+      #   env:
+      #     GITHUB_TOKEN: ${{secrets. PUBLISHPAT}}
 
       # - name: Run script file
       #   run: |
