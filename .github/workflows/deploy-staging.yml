@@ -34,9 +34,9 @@ jobs:
 
       - name: Publish to gh-pages
         run: |
-          git config --global user.email "lgorman@turing.ac.uk"
-          git config --global user.name "l-gorman"
           npx gh-pages -d build -r https://github.com/l-gorman/rhomis-data-app
+        env:
+          GITHUB_TOKEN: ${{PUBLISHPAT}}
 
       # - name: Run script file
       #   run: |
