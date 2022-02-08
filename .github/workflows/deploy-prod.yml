@@ -1,8 +1,8 @@
-name: Deploy staging
+name: Deploy Production
 on:
   push:
     branches:
-      - main
+      - prod
 
 jobs:
   build:
@@ -30,7 +30,7 @@ jobs:
       - name: Modify CNAME file to contain correct directory
         run: |
           file_contents=$(<./build/CNAME) &&
-          echo "${file_contents//'TESTDOMAIN'/'app.l-gorman.com'}" > ./build/CNAME
+          echo "${file_contents//'TESTDOMAIN'/'rhomis.cgiar.org'}" > ./build/CNAME
 
       - name: Init new repo in build folder and commit generated files
         run: |
@@ -53,3 +53,4 @@ jobs:
           force: true
           # Change to the build directory before pushing
           directory: ./build
+          repository: "ilri/rhomis-data-app"
