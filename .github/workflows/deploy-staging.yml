@@ -1,0 +1,41 @@
+name: Deploy staging
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        node-version: [14]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build app
+        run: npm run build
+
+      - name: modify CNAME file
+        run: |
+          file_contents=$(<./build/CNAME) &&
+          echo "${file_contents//'TESTDOMAIN'/'app.l-gorman.com'}" > ./build/CNAME
+
+      - name: Publish to gh-pages
+        run: |
+          npx gh-pages -d build -r https://github.com/l-gorman/rhomis-data-app
+
+      # - name: Run script file
+      #   run: |
+      #     chmod +x ./publish.sh
+      #     ./publish.sh
+      #   shell: bash
