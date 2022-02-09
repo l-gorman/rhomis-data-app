@@ -40,18 +40,11 @@ import AuthContext, { AuthContextProvider } from './components/authentication-co
 
 function App() {
   const [authToken, setAuthToken] = useState(null);
-
-
-
-
   // Automatically log out 
   // after 1 hour of use
   setTimeout(() => {
-
     setAuthToken(null);
     localStorage.clear()
-
-
   }, 60 * 60 * 1000);
 
   return (

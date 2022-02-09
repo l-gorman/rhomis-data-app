@@ -25,6 +25,7 @@ jobs:
         run: npm run build
         env:
           CI: false
+          NODE_ENV: "production"
 
       - name: Modify CNAME file to contain correct directory
         run: |
