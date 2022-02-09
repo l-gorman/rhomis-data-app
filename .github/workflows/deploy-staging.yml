@@ -23,10 +23,9 @@ jobs:
         run: npm install
 
       - name: Build app
-        run: npm run build
+        run: npm run build:staging
         env:
           CI: false
-          NODE_ENV: "staging"
 
       - name: Modify CNAME file to contain correct directory
         run: |

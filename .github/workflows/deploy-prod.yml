@@ -22,10 +22,9 @@ jobs:
         run: npm install
 
       - name: Build app
-        run: npm run build
+        run: npm run build:production
         env:
           CI: false
-          NODE_ENV: "production"
 
       - name: Modify CNAME file to contain correct directory
         run: |

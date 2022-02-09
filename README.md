@@ -8,6 +8,6 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 * Testing tutorial available [here](https://www.youtube.com/watch?v=ZmVBCpefQe8). Example testing with API mocks found in [this tutorial](https://testing-library.com/docs/react-testing-library/example-intro/)
 
 * Server mocks made using [this framework](https://github.com/mswjs/examples/tree/master/examples/rest-react)
-
+* [Tutorial](https://tacomanator.medium.com/environments-with-create-react-app-7b645312c09d) on managing the different environments and how to integrate them into builds
 
 
