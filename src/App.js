@@ -9,9 +9,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Import router information
 import React, { useState, useEffect, useContext } from 'react';
-import { useHistory } from 'react-router';
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
+  //BrowserRouter as Router,
   Switch,
   Route,
   Redirect,
@@ -22,11 +22,10 @@ import {
 // Import the various components
 import { LoginComponent } from "./components/login-component/login-component"
 import { DataQueryComponent } from "./components/data-query-component/data-query-component"
+import { RegisterComponent } from './components/register-component/register-component';
 import PortalComponent from './components/portal-component/portal-component';
 import ProjectManagementComponent from "./components/project-management-component/project-management-component"
 // import AccountManagementComponent from './components/account-management-component/account-management-component';
-import PublicDataComponent from './components/public-data-component/public-data-component';
-import CollectDataComponent from './components/collect-data-component/collect-data-component';
 import MainNavbar from './components/navigation-bar/navigation-bar-component'
 import FormCreationComponent from './components/form-creation-component/form-creation-component';
 import { Fade } from 'react-bootstrap';
@@ -35,6 +34,28 @@ import { Fade } from 'react-bootstrap';
 import AuthContext, { AuthContextProvider } from './components/authentication-component/AuthContext';
 
 
+
+function ProtectedRoute(props) {
+  console.log("Protected route")
+  console.log(props)
+
+  if (props.path !== "/") {
+    return (
+      <Route path={props.path}>
+        {props.authToken ? <props.component /> : <Redirect to="/login" />}
+      </Route>
+    )
+  }
+
+  if (props.path === "/") {
+    return (
+      <Route exact path={props.path}>
+        {props.authToken ? <props.component /> : <Redirect to="/login" />}
+      </Route>
+    )
+
+  }
+}
 
 
 
@@ -60,18 +81,21 @@ function App() {
 
 
                 {/* Render login route  */}
-                <Route path="/login">
-                  <LoginComponent />
-                </Route>
+                <Route path="/login"> <LoginComponent /></Route>
+                <Route path="/register"><RegisterComponent /></Route>
+                <ProtectedRoute path="/project-management" component={ProjectManagementComponent} authToken={authToken} />
+                <ProtectedRoute path="/data-querying" component={DataQueryComponent} authToken={authToken} />
+                <ProtectedRoute path="/administration" component={FormCreationComponent} authToken={authToken} />
+
                 {/* If the auth token does not exist, can render each of these components */}
                 {authToken ?
                   <>
                     <Route exact path="/" component={PortalComponent}></Route>
-                    <Route path="/project-management" component={ProjectManagementComponent}></Route>
                     {/* <Route path="/data-collection" component={CollectDataComponent}></Route> */}
                     {/* <Route path="/global-data" component={PublicDataComponent}></Route> */}
                     <Route path="/data-querying" component={DataQueryComponent}></Route>
                     <Route path="/administration" component={FormCreationComponent}></Route>
+
 
                     {/* <Route path="/account" component={AccountManagementComponent}></Route> */}
                   </>
