@@ -1,3 +1,20 @@
+// Copyright (C) 2022 Léo Gorman
+// 
+// This file is part of rhomis-data-app.
+// 
+// rhomis-data-app is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// rhomis-data-app is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with rhomis-data-app.  If not, see <http://www.gnu.org/licenses/>.
+
 /* See this tutorial for authentication state management
 https://stackoverflow.com/questions/41030361/how-to-update-react-context-from-inside-a-child-component
 https://reactrouter.com/web/example/auth-workflow 
@@ -6,7 +23,6 @@ https://reactrouter.com/web/example/auth-workflow
 // Import styling
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
 // Import router information
 import React, { useState, useEffect, useContext } from 'react';
 import {
@@ -15,9 +31,8 @@ import {
   Switch,
   Route,
   Redirect,
+  useHistory
 } from "react-router-dom";
-
-
 
 // Import the various components
 import { LoginComponent } from "./components/login-component/login-component"
@@ -36,31 +51,54 @@ import AuthContext, { AuthContextProvider } from './components/authentication-co
 
 
 function ProtectedRoute(props) {
+  const history = useHistory()
   console.log("Protected route")
   console.log(props)
 
-  if (props.path !== "/") {
+
+  if (props.path !== "/" && props.path !== "*") {
     return (
+
+
       <Route path={props.path}>
         {props.authToken ? <props.component /> : <Redirect to="/login" />}
       </Route>
+
+
     )
   }
-
   if (props.path === "/") {
     return (
-      <Route exact path={props.path}>
+      < Route exact path={props.path} >
         {props.authToken ? <props.component /> : <Redirect to="/login" />}
-      </Route>
+      </Route >
     )
-
   }
+  if (props.path === "") {
+    console.log("Other route")
+    console.log(window.location.hash)
+    return (
+      <Route path="">
+        {/* {history.replace("/")} */}
+        {history.replace(window.location.hash ? "#/" : window.location.pathname)}
+
+        {/* {props.authToken ? <Redirect to="/" /> : <Redirect to="/login" />} */}
+
+
+      </Route>
+
+    )
+  }
+
+
 }
 
 
 
 function App() {
   const [authToken, setAuthToken] = useState(null);
+  console.log(window.location.hash)
+
   // Automatically log out 
   // after 1 hour of use
   setTimeout(() => {
@@ -80,26 +118,17 @@ function App() {
                 {authToken ? <MainNavbar /> : null}
 
 
+
                 {/* Render login route  */}
                 <Route path="/login"> <LoginComponent /></Route>
                 <Route path="/register"><RegisterComponent /></Route>
+                <ProtectedRoute path="/" component={PortalComponent} authToken={authToken} />
                 <ProtectedRoute path="/project-management" component={ProjectManagementComponent} authToken={authToken} />
                 <ProtectedRoute path="/data-querying" component={DataQueryComponent} authToken={authToken} />
                 <ProtectedRoute path="/administration" component={FormCreationComponent} authToken={authToken} />
-
-                {/* If the auth token does not exist, can render each of these components */}
-                {authToken ?
-                  <>
-                    <Route exact path="/" component={PortalComponent}></Route>
-                    {/* <Route path="/data-collection" component={CollectDataComponent}></Route> */}
-                    {/* <Route path="/global-data" component={PublicDataComponent}></Route> */}
-                    <Route path="/data-querying" component={DataQueryComponent}></Route>
-                    <Route path="/administration" component={FormCreationComponent}></Route>
+                <ProtectedRoute path="#" component={PortalComponent} authToken={authToken} />
 
 
-                    {/* <Route path="/account" component={AccountManagementComponent}></Route> */}
-                  </>
-                  : <Redirect to="/login" />}
 
               </div >
             </div>
