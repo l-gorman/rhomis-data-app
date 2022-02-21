@@ -48,23 +48,15 @@ async function FetchProjectInformation(authToken) {
     return (response.data)
 }
 
-// function RedirectUser(props) {
-//     history.push(props.link)
-
-// }
-
-
 function PortalCard(props) {
     const Icon = props.data.icon
-    console.log("props portal card")
-    console.log(props)
-    console.log(props.data.label)
+    const history = useHistory()
 
 
 
     if (props.data.external === false) {
         return (
-            <div onClick={() => { props.history.push(props.data.link) }}
+            <div onClick={() => { history.push(props.data.link) }}
             >
                 < Card key={"card-" + props.data.name} className="sub-card portal-card border-0">
                     <div key={"header-container-" + props.data.name} className="portal-card-header-container">
@@ -177,7 +169,7 @@ function RenderPortalCards(props) {
     return (
         <>
             {portalCardData.map((PortalItem) => {
-                return <PortalCard data={PortalItem} history={props.history} authToken={props.authToken} />
+                return <PortalCard data={PortalItem} authToken={props.authToken} />
             })
             }
         </>
@@ -190,7 +182,6 @@ export default function PortalComponent() {
     const [userData, setUserData] = useState(null)
     const [useInfoAvail, setUserInfoAvail] = useState(false)
     const [authToken, setAuthToken] = useContext(AuthContext)
-    const history = useHistory()
 
     useEffect(async () => {
         const newUserData = await FetchProjectInformation(authToken
@@ -206,7 +197,7 @@ export default function PortalComponent() {
                     <h3 >Portal</h3>
                 </Card.Header>
                 <Card.Body className="main-card-body">
-                    <RenderPortalCards data={PortalDataAll} userData={userData} history={history} authToken={authToken} />
+                    <RenderPortalCards data={PortalDataAll} userData={userData} authToken={authToken} />
 
                 </Card.Body>
             </Card>

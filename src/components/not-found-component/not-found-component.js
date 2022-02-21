@@ -15,3 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with rhomis-data-app.  If not, see <http://www.gnu.org/licenses/>.
 
+import React from "react";
+import './not-found-component.css'
+
+export default function NotFoundComponent() {
+    return (
+        <div className="child-404-container">
+            <div >
+                <h1>Nothing found</h1>
+            </div >
+        </div>
+    )
+}
+
+

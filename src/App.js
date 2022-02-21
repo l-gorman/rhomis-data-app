@@ -25,79 +25,68 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 // Import router information
 import React, { useState, useEffect, useContext } from 'react';
-import {
-  HashRouter as Router,
-  //BrowserRouter as Router,
-  Switch,
-  Route,
-  Redirect,
-  useHistory
-} from "react-router-dom";
+import axios from 'axios';
 
 // Import the various components
-import { LoginComponent } from "./components/login-component/login-component"
-import { DataQueryComponent } from "./components/data-query-component/data-query-component"
-import { RegisterComponent } from './components/register-component/register-component';
-import PortalComponent from './components/portal-component/portal-component';
-import ProjectManagementComponent from "./components/project-management-component/project-management-component"
-// import AccountManagementComponent from './components/account-management-component/account-management-component';
-import MainNavbar from './components/navigation-bar/navigation-bar-component'
-import FormCreationComponent from './components/form-creation-component/form-creation-component';
+import RoutingComponent from './components/routing-component/routing-component';
 import { Fade } from 'react-bootstrap';
 
 // Import the context which stores the authentication tokens
-import AuthContext, { AuthContextProvider } from './components/authentication-component/AuthContext';
+import AuthContext from './components/authentication-component/AuthContext';
+import UserContext from './components/user-info-component/UserContext';
 
 
 
-function ProtectedRoute(props) {
-  const history = useHistory()
-  console.log("Protected route")
-  console.log(props)
 
+function CheckForLocalToken(props) {
+  const localToken = localStorage.getItem("userToken")
 
-  if (props.path !== "/" && props.path !== "*") {
-    return (
+  const currentDate = new Date()
+  const localTokenCreationTime = new Date(localStorage.getItem("createdAt"))
 
+  console.log("Difference")
+  console.log(currentDate.getTime() - localTokenCreationTime.getTime())
 
-      <Route path={props.path}>
-        {props.authToken ? <props.component /> : <Redirect to="/login" />}
-      </Route>
-
-
-    )
+  const timeDifference = currentDate.getTime() - localTokenCreationTime.getTime()
+  if (timeDifference < 60 * 60 * 1000) {
+    props.setAuthToken(localToken)
+    return
   }
-  if (props.path === "/") {
-    return (
-      < Route exact path={props.path} >
-        {props.authToken ? <props.component /> : <Redirect to="/login" />}
-      </Route >
-    )
-  }
-  if (props.path === "") {
-    console.log("Other route")
-    console.log(window.location.hash)
-    return (
-      <Route path="">
-        {/* {history.replace("/")} */}
-        {history.replace(window.location.hash ? "#/" : window.location.pathname)}
+}
 
-        {/* {props.authToken ? <Redirect to="/" /> : <Redirect to="/login" />} */}
+async function FetchUserInformation(props) {
+  const response = await axios({
+    method: "get",
+    url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/",
+    headers: {
+      'Authorization': props.authToken
+    }
+  })
+  console.log("user info")
+  console.log(response.data)
 
-
-      </Route>
-
-    )
-  }
-
+  return (response.data)
 
 }
 
-
-
 function App() {
   const [authToken, setAuthToken] = useState(null);
-  console.log(window.location.hash)
+  const [userInfo, setUserInfo] = useState(null)
+
+
+
+  useEffect(() => {
+    CheckForLocalToken({
+      setAuthToken: setAuthToken
+    })
+  }, [])
+
+  useEffect(() => {
+    FetchUserInformation({
+      authToken: authToken,
+      setUserInfo: setUserInfo
+    })
+  }, [authToken])
 
   // Automatically log out 
   // after 1 hour of use
@@ -107,36 +96,16 @@ function App() {
   }, 60 * 60 * 1000);
 
   return (
-    < Router >
-      <Fade>
-        <Switch>
-          <AuthContext.Provider value={[authToken, setAuthToken]}>
-            {/* If auth token does not exist, do not render the main navigation bar */}
+    <AuthContext.Provider value={[authToken, setAuthToken]}>
+      <UserContext.Provider value={[userInfo, setUserInfo]}>
+        <div className="main-app-background">
+          <div className="main-page">
+            <RoutingComponent />
+          </div >
+        </div>
+      </UserContext.Provider>
+    </AuthContext.Provider>
 
-            <div className="main-app-background">
-              <div className="main-page">
-                {authToken ? <MainNavbar /> : null}
-
-
-
-                {/* Render login route  */}
-                <Route path="/login"> <LoginComponent /></Route>
-                <Route path="/register"><RegisterComponent /></Route>
-                <ProtectedRoute path="/" component={PortalComponent} authToken={authToken} />
-                <ProtectedRoute path="/project-management" component={ProjectManagementComponent} authToken={authToken} />
-                <ProtectedRoute path="/data-querying" component={DataQueryComponent} authToken={authToken} />
-                <ProtectedRoute path="/administration" component={FormCreationComponent} authToken={authToken} />
-                <ProtectedRoute path="#" component={PortalComponent} authToken={authToken} />
-
-
-
-              </div >
-            </div>
-          </AuthContext.Provider>
-
-        </Switch>
-      </Fade>
-    </Router >
 
 
   );

@@ -15,3 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with rhomis-data-app.  If not, see <http://www.gnu.org/licenses/>.
 
+import React, { createContext } from 'react';
+
+const UserContext = createContext()
+
+export default UserContext;

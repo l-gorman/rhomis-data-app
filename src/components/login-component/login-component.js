@@ -1,20 +1,16 @@
 /**/
 
 import React, { useState, useContext, useEffect } from 'react'
-import { Button, Card, Form, Spinner, Row, Col } from 'react-bootstrap'
+import { Button, Card, Form, Spinner } from 'react-bootstrap'
 import Fade from 'react-bootstrap/Fade'
 import { FaUserCircle } from 'react-icons/fa'
 import axios from 'axios'
 import { useHistory } from 'react-router'
 import "./login-component.css"
-import ReCAPTCHA from "react-google-recaptcha";
-import PasswordStrengthBar from 'react-password-strength-bar';
 
 import AuthContext from '../authentication-component/AuthContext';
 
-function timeout(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+
 
 
 function CheckCredentials(props) {
