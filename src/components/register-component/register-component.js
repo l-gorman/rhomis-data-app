@@ -53,6 +53,7 @@ function RegistrationCard(props) {
 
     const [captchaToken, setCaptchaToken] = useState(null)
 
+    const history = useHistory()
 
     let passwordsMatch = password === confirmPassword
     let bothPasswordsEntered = (password.length > 0 && confirmPassword.length > 0)
@@ -171,9 +172,6 @@ function RegistrationCard(props) {
                             </Form.Group>
                         </Col>
 
-
-
-
                     </Row>
                     {requestError ? <p className="warning">{requestError}</p> : null}
                     <div className="icon-container">
@@ -208,12 +206,12 @@ function RegistrationCard(props) {
                                     captchaToken: captchaToken,
                                     requestError: requestError,
                                     setRequestError: setRequestError,
-                                    setCardType: props.setCardType
                                 })
                                 setLoading(false)
 
                                 if (registrationResult.status > 199 || registrationResult.status < 300) {
-                                    props.setCardType(!props.cardType)
+                                    history.push("/#/login")
+                                    // props.setCardType(!props.cardType)
 
                                 }
                                 console.log("registrationResult")
