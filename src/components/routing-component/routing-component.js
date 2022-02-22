@@ -104,11 +104,16 @@ export default function RoutingComponent() {
                 <MainNavbar />
                 {/* <Fade> */}
                 <Switch>
-                    <Route exact path="/" component={PortalComponent} />
+                    <Route exact path="/">
+                        <Redirect from="/" to="/home" />
+                    </Route>
+                    <Route path="/home" component={PortalComponent} />
                     <Route path="/project-management" ><ProjectManagementComponent /></Route>
                     <Route path="/data-querying" component={DataQueryComponent} />
                     <Route path="/administration" component={FormCreationComponent} />
-                    <Route path="*" component={NotFoundComponent} />
+                    {/* <Route path="*" component={NotFoundComponent} /> */}
+                    <Redirect from="*" to="/home" />
+
 
                     {/* <Route exact path="/" component={NotFoundComponent} /> */}
 
@@ -127,9 +132,12 @@ export default function RoutingComponent() {
             < Router >
                 {/* <Fade> */}
                 <Switch>
-                    <Route exact path="/register"><RegisterComponent /></Route>
-                    <Route exact path="/login"><LoginComponent /></Route>
-                    <Route path="*" component={NotFoundComponent} />
+                    <Route exact path="/">
+                        <Redirect from="/" to="/login" />
+                    </Route>
+                    <Route path="/register"><RegisterComponent /></Route>
+                    <Route path="/login"><LoginComponent /></Route>
+                    <Redirect from="*" to="/login" />
                 </Switch >
                 {/* </Fade> */}
 
