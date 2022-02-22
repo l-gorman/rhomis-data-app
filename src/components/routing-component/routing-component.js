@@ -23,6 +23,7 @@ import { RegisterComponent } from '../register-component/register-component';
 import PortalComponent from '../portal-component/portal-component';
 import NotFoundComponent from '../not-found-component/not-found-component';
 import ProjectManagementComponent from "../project-management-component/project-management-component"
+import FormManagementComponent from '../form-management-component/form-management-component';
 // import AccountManagementComponent from './components/account-management-component/account-management-component';
 import MainNavbar from '../navigation-bar/navigation-bar-component'
 import FormCreationComponent from '../form-creation-component/form-creation-component';
@@ -109,16 +110,11 @@ export default function RoutingComponent() {
                     </Route>
                     <Route path="/home" component={PortalComponent} />
                     <Route path="/project-management" ><ProjectManagementComponent /></Route>
+                    <Route path="/project/:projectname"><FormManagementComponent /></Route>
                     <Route path="/data-querying" component={DataQueryComponent} />
                     <Route path="/administration" component={FormCreationComponent} />
                     {/* <Route path="*" component={NotFoundComponent} /> */}
                     <Redirect from="*" to="/home" />
-
-
-                    {/* <Route exact path="/" component={NotFoundComponent} /> */}
-
-                    {/* <Route path="*" component={NotFoundComponent} /> */}
-
 
                 </Switch >
                 {/* </Fade> */}
