@@ -111,6 +111,7 @@ function LoginCard(props) {
                                     setLoading(false)
 
                                     if (tokenResponse.status === 400) {
+                                        history.push("/login")
                                         return
                                     }
 

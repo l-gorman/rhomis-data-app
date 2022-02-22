@@ -34,7 +34,7 @@ export const PortalDataAll = [
         label: "projectManager",
         text: "Check up on your projects, download your data, and control user access.",
         icon: MdOutlineDashboardCustomize,
-        link: "/project-management",
+        link: "/projects",
         external: false,
 
     },
@@ -44,7 +44,7 @@ export const PortalDataAll = [
         label: "dataCollector",
         text: "Collect data for an existing project and access enumerator training materials",
         icon: MdOutlineSendToMobile,
-        link: "/project-management",
+        link: "/projects",
         external: false,
 
 

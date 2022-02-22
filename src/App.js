@@ -24,13 +24,11 @@ https://reactrouter.com/web/example/auth-workflow
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 // Import router information
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 
 // Import the various components
 import RoutingComponent from './components/routing-component/routing-component';
-import { Fade } from 'react-bootstrap';
-
 // Import the context which stores the authentication tokens
 import AuthContext from './components/authentication-component/AuthContext';
 import UserContext from './components/user-info-component/UserContext';
@@ -38,62 +36,10 @@ import UserContext from './components/user-info-component/UserContext';
 
 
 
-function CheckForLocalToken(props) {
-  const localToken = localStorage.getItem("userToken")
-
-  const currentDate = new Date()
-  const localTokenCreationTime = new Date(localStorage.getItem("createdAt"))
-
-  console.log("Difference")
-  console.log(currentDate.getTime() - localTokenCreationTime.getTime())
-
-  const timeDifference = currentDate.getTime() - localTokenCreationTime.getTime()
-  if (timeDifference < 60 * 60 * 1000) {
-    props.setAuthToken(localToken)
-    return
-  }
-}
-
-async function FetchUserInformation(props) {
-  const response = await axios({
-    method: "get",
-    url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/",
-    headers: {
-      'Authorization': props.authToken
-    }
-  })
-  console.log("user info")
-  console.log(response.data)
-
-  return (response.data)
-
-}
 
 function App() {
   const [authToken, setAuthToken] = useState(null);
   const [userInfo, setUserInfo] = useState(null)
-
-
-
-  useEffect(() => {
-    CheckForLocalToken({
-      setAuthToken: setAuthToken
-    })
-  }, [])
-
-  useEffect(() => {
-    FetchUserInformation({
-      authToken: authToken,
-      setUserInfo: setUserInfo
-    })
-  }, [authToken])
-
-  // Automatically log out 
-  // after 1 hour of use
-  setTimeout(() => {
-    setAuthToken(null);
-    localStorage.clear()
-  }, 60 * 60 * 1000);
 
   return (
     <AuthContext.Provider value={[authToken, setAuthToken]}>
@@ -105,9 +51,6 @@ function App() {
         </div>
       </UserContext.Provider>
     </AuthContext.Provider>
-
-
-
   );
 }
 

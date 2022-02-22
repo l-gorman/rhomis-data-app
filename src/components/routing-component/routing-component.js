@@ -24,6 +24,7 @@ import PortalComponent from '../portal-component/portal-component';
 import NotFoundComponent from '../not-found-component/not-found-component';
 import ProjectManagementComponent from "../project-management-component/project-management-component"
 import FormManagementComponent from '../form-management-component/form-management-component';
+import FormAdminComponent from '../form-admin-component/form-admin-component';
 // import AccountManagementComponent from './components/account-management-component/account-management-component';
 import MainNavbar from '../navigation-bar/navigation-bar-component'
 import FormCreationComponent from '../form-creation-component/form-creation-component';
@@ -32,7 +33,9 @@ import UserContext from '../user-info-component/UserContext';
 import axios from 'axios';
 import {
     HashRouter as Router,
-
+    RouteProps,
+    useHistory,
+    useLocation,
     // BrowserRouter as Router,
     Switch,
     Route,
@@ -40,40 +43,15 @@ import {
 } from "react-router-dom";
 
 
-function CheckForLocalToken(props) {
-    const localToken = localStorage.getItem("userToken")
+import { FetchUserInformation, CheckForLocalToken } from '../fetching-context-info/fetching-context-info';
 
-    const currentDate = new Date()
-    const localTokenCreationTime = new Date(localStorage.getItem("createdAt"))
-
-    console.log("Difference")
-    console.log(currentDate.getTime() - localTokenCreationTime.getTime())
-
-    const timeDifference = currentDate.getTime() - localTokenCreationTime.getTime()
-    if (timeDifference < 60 * 60 * 1000) {
-        props.setAuthToken(localToken)
-    }
-}
-
-async function FetchUserInformation(props) {
-    const response = await axios({
-        method: "get",
-        url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/",
-        headers: {
-            'Authorization': props.authToken
-        }
-    })
-    console.log("user info")
-    console.log(response.data)
-
-    return (response.data)
-
-}
 
 export default function RoutingComponent() {
 
     const [authToken, setAuthToken] = useContext(AuthContext)
     const [userInfo, setUserInfo] = useContext(UserContext)
+    const history = useHistory()
+    // const location = useLocation()
 
     useEffect(() => {
         CheckForLocalToken({
@@ -87,13 +65,6 @@ export default function RoutingComponent() {
             setUserInfo: setUserInfo
         })
     }, [authToken])
-
-    // Automatically log out 
-    // after 1 hour of use
-    setTimeout(() => {
-        setAuthToken(null);
-        localStorage.clear()
-    }, 60 * 60 * 1000);
 
     console.log("Auth token context")
     console.log(authToken)
@@ -109,12 +80,20 @@ export default function RoutingComponent() {
                         <Redirect from="/" to="/home" />
                     </Route>
                     <Route path="/home" component={PortalComponent} />
-                    <Route path="/project-management" ><ProjectManagementComponent /></Route>
-                    <Route path="/project/:projectname"><FormManagementComponent /></Route>
+
+                    <Route path="/projects/:projectName/forms/:formName" component={FormAdminComponent} />
+                    <Route path="/projects/:projectName" component={FormManagementComponent} />
+
+                    <Route path="/projects" ><ProjectManagementComponent /></Route>
+
+
+                    {/* <Route path="/project/:projectName/form/:formName"><FormManagementComponent /></Route> */}
+
                     <Route path="/data-querying" component={DataQueryComponent} />
                     <Route path="/administration" component={FormCreationComponent} />
+
                     {/* <Route path="*" component={NotFoundComponent} /> */}
-                    <Redirect from="*" to="/home" />
+                    {/* <Redirect from="*" to="/home" /> */}
 
                 </Switch >
                 {/* </Fade> */}
@@ -133,7 +112,7 @@ export default function RoutingComponent() {
                     </Route>
                     <Route path="/register"><RegisterComponent /></Route>
                     <Route path="/login"><LoginComponent /></Route>
-                    <Redirect from="*" to="/login" />
+                    {/* <Redirect from="*" to="/login" /> */}
                 </Switch >
                 {/* </Fade> */}
 

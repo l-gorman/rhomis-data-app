@@ -116,11 +116,11 @@ export default function MainNavbar(props) {
                         </div>
 
                         {showProjectManagement ? <div className="side-bar-item">
-                            <Nav.Link className="side-bar-link" as={Link} onClick={() => { handleClose() }} to="/project-management">Manage Projects</Nav.Link>
+                            <Nav.Link className="side-bar-link" as={Link} onClick={() => { handleClose() }} to="/projects">Manage Projects</Nav.Link>
                         </div> : <></>}
 
                         {showCollectData ? <div className="side-bar-item">
-                            <Nav.Link className="side-bar-link" as={Link} onClick={() => { handleClose() }} to="/project-management">Collect Data</Nav.Link>
+                            <Nav.Link className="side-bar-link" as={Link} onClick={() => { handleClose() }} to="/projects">Collect Data</Nav.Link>
                         </div> : <></>}
 
 
