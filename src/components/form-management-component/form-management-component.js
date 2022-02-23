@@ -55,8 +55,13 @@ async function FinalizeForm(props) {
         }
     })
 
-    console.log("Finalization response")
-    console.log(result)
+    FetchUserInformation({
+        authToken: props.authToken,
+        setUserInfo: props.setAdminData
+    })
+
+    // console.log("Finalization response")
+    // console.log(result)
 
 }
 
@@ -160,7 +165,8 @@ function FormTables(props) {
                                             const finalizedForm = await FinalizeForm({
                                                 form: form.name,
                                                 project: props.projectSelected,
-                                                authToken: props.authToken
+                                                authToken: props.authToken,
+                                                setAdminData: props.setAdminData
                                             })
 
                                             // const metaData = await GetProjectInformation({
