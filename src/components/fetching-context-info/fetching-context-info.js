@@ -33,7 +33,37 @@ function CheckForLocalToken(props) {
     }
 }
 
+
+async function GetFormInformation(props) {
+
+    const result = await axios({
+        method: 'post',
+        url: process.env.REACT_APP_API_URL + "api/project-data",
+        headers: {
+            'Authorization': props.authToken
+        },
+        data: {
+            projectName: props.projectName,
+            formName: props.formName
+        }
+    })
+
+    console.log("Form Data Response: ")
+    console.log(result.data)
+    if (result.status === 200) {
+        console.log("Setting project information")
+
+        props.setFormData(result.data)
+    }
+    if (result.status === 400) {
+        alert(result.data)
+    }
+
+}
+
+
 export {
     CheckForLocalToken,
     FetchUserInformation,
+    GetFormInformation
 }

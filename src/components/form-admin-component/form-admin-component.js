@@ -26,7 +26,7 @@ import '../../App.css'
 import { useHistory } from 'react-router'
 import { useParams } from 'react-router-dom'
 
-import { FetchUserInformation } from '../fetching-context-info/fetching-context-info'
+import { FetchUserInformation, GetFormInformation } from '../fetching-context-info/fetching-context-info'
 
 
 import { AiOutlineArrowLeft } from 'react-icons/ai'
@@ -202,7 +202,6 @@ async function FetchData(props) {
             formID: props.formID,
             unit: props.unit,
             data: props.data
-
         },
         headers: {
             'Authorization': props.authToken
@@ -235,57 +234,9 @@ function generateDataDownloadLink(dataToDownload, dataDownloadLink) {
     return (window.URL.createObjectURL(data))
 }
 
-function dataDownloadButton(dataDownloadLink, csvsAvailable, dataType, projectName, formID) {
-    if (csvsAvailable) {
-        return (<div className="end-button-container">
-            <a
-                // Name of the file to download
-                download={projectName + '_' + formID + '_' + dataType + '_' + '.csv'}
-                // link to the download URL
-                href={dataDownloadLink}
-            >
-                <Button className="end-button">Download Data as CSV</ Button></a>
-        </div>
-
-        )
-    }
-}
-
-async function GetFormInformation(props) {
-
-    const result = await axios({
-        method: 'post',
-        url: process.env.REACT_APP_API_URL + "api/project-data",
-        headers: {
-            'Authorization': props.authToken
-        },
-        data: {
-            projectName: props.projectName,
-            formName: props.formName
-        }
-    })
-
-    console.log("Form Data Response: ")
-    console.log(result.data)
-    if (result.status === 200) {
-        console.log("Setting project information")
-
-        props.setFormData(result.data)
-    }
-    if (result.status === 400) {
-        alert(result.data)
-    }
-
-}
-
 async function ProcessData(props) {
-    console.log("Process data form")
-
-
     const form = props.data.forms.filter((item) => item.name === props.formSelected)[0]
     console.log(form)
-
-
     const result = await axios({
         method: 'post',
         url: process.env.REACT_APP_API_URL + "api/process-data",
@@ -300,11 +251,7 @@ async function ProcessData(props) {
             draft: props.draft,
         }
     })
-
-    console.log(result)
     return (result)
-
-
 }
 
 async function AddFormUser(props) {
@@ -390,8 +337,6 @@ function RenderFormAdmin(props) {
 
     const [renderInstallCode, setRenderInstallCode] = useState(false)
     const [renderODKFormCode, setRenderODKFormCode] = useState(true)
-    console.log("Form Props")
-
 
     const [unitsSelect, setUnitsSelect] = useState(null)
     const [rhomisDataSelect, setRHoMISSelect] = useState(null)
@@ -402,85 +347,92 @@ function RenderFormAdmin(props) {
     const [unitsDownloadLink, setUnitsDownloadLink] = useState('')
     const [dataDownloadLink, setDataDownloadLink] = useState('')
 
+    const [renderUnitsForm, setRenderUnitsForm] = useState(false)
+    const [renderDataForm, setRenderDataForm] = useState(false)
+    const [projectManagerOfForm, setProjectManagerOfForm] = useState(false)
+    const [dataAnalystOfForm, setDataAnalystOfForm] = useState(false)
 
-    const [formData, setFormData] = useState(null)
+    const [odkConf, setODKConf] = useState(false)
+    const [draft, setDraft] = useState(false)
 
-    let renderUnitsForm = false
-    if (formData) {
-        if (formData.units.length > 0) {
-            renderUnitsForm = true
+    useEffect(() => {
+
+        // Checking whether units exist
+        // If they do then render the units form
+        if (props.formData) {
+            if (props.formData.units.length > 0) {
+                setRenderUnitsForm(true)
+            }
+
+            // Checking if their is data for this form
+            // If so the render the data form
+            if (props.formData) {
+                if (props.formData.dataSets.length > 0) {
+                    setRenderDataForm(true)
+                }
+            }
         }
-    }
 
-    let renderDataForm = false
-    if (formData) {
-        if (formData.dataSets.length > 0) {
-            renderDataForm = true
+        console.log("Props for form admin")
+        console.log(props)
+        if (props.data) {
+            if (props.data.user) {
+                if (props.data.user.roles) {
+                    if (props.data.user.roles.projectManager !== undefined) {
+                        if (props.data.user.roles.projectManager.includes(props.projectSelected)) {
+                            setProjectManagerOfForm(true)
+                            setDataAnalystOfForm(true)
+
+                        }
+                    }
+
+                    if (props.data.user.roles.dataCollector !== undefined) {
+                        if (props.data.user.roles.analyst.includes(props.formSelected)) {
+                            setDataAnalystOfForm(true)
+                        }
+
+                    }
+
+
+                }
+            }
         }
-    }
 
+        if (props.data) {
+            if (props.data.forms !== undefined) {
+                let form = props.data.forms.filter((item) => item.name === props.formSelected)
+                if (form.length === 1) {
+                    if (form[0].draft === true) {
+                        setODKConf(form[0].draftCollectionDetails)
+                        setDraft(true)
+                    }
+                    if (form[0].draft === false) {
+                        setODKConf(form[0].collectionDetails)
+                        setDraft(false)
+                    }
+                }
+            }
 
-    useEffect(async () => {
-        GetFormInformation({
-            authToken: props.authToken,
-            projectName: props.projectSelected,
-            formName: props.formSelected,
-            setFormData: setFormData
-        })
+        }
 
-        console.log("Rendering form admin")
     }, [])
 
-    console.log(props)
-
-    let projectManageOfForm = false
-
+    // Return nothing if there is no administrative data
     if (!props.data) {
         return (<></>)
     }
 
-    if (props.data.user.roles.projectManager !== undefined) {
-
-        if (props.data.user.roles.projectManager.includes(props.projectSelected)) {
-            projectManageOfForm = true
-        }
-    }
-
-    let dataAnalystOfForm = false
 
 
-    if (!props.data)
-        if (props.data.user.roles.projectManager !== undefined ||
-            props.data.user.roles.dataCollector !== undefined) {
 
-            if (props.data.user.roles.projectManager.includes(props.projectSelected)) {
-                dataAnalystOfForm = true
-            }
 
-            if (props.data.user.roles.analyst.includes(props.formSelected)) {
-                dataAnalystOfForm = true
-            }
-        }
 
-    let odkConf = {}
-    let draft = null
 
-    if (props.data.forms !== undefined) {
-        let form = props.data.forms.filter((item) => item.name === props.formSelected)
 
-        if (form.length === 1) {
-            if (form[0].draft === true) {
-                odkConf = form[0].draftCollectionDetails
-                draft = true
-            }
-            if (form[0].draft === false) {
-                odkConf = form[0].collectionDetails
-                draft = false
-            }
-        }
-        console.log(form)
 
-    }
+
+
+
 
     console.log(odkConf)
     const encoded_settings = deflateSync(JSON.stringify(odkConf)).toString('base64');
@@ -568,7 +520,7 @@ function RenderFormAdmin(props) {
                 </Card.Body>
             </Card>
 
-            {dataAnalystOfForm ?
+            {dataAnalystOfForm | projectManagerOfForm ?
                 < Card className="project-management-card">
                     <Card.Header>Processing Data</Card.Header>
                     <Card.Body>
@@ -655,7 +607,7 @@ function RenderFormAdmin(props) {
 
                                 }}>
                                 <option key="default-select" disabled={true}>Select</option>
-                                {formData.units.map((unitType) => {
+                                {props.formData.units.map((unitType) => {
                                     return <option key={"unit-option-" + unitType}>{unitType}</option>
                                 })}
                             </Form.Select>
@@ -691,14 +643,9 @@ function RenderFormAdmin(props) {
                         <Form>
                             <Form.Group>
                                 <Form.Label>Select the type of data</Form.Label>
-
                                 <Form.Select defaultValue="Select"
                                     onChange={async (event) => {
-
                                         setRHoMISSelect(event.target.value)
-
-
-
                                         const newRHoMISData = await FetchData({
                                             authToken: props.authToken,
                                             dataType: event.target.value,
@@ -706,21 +653,15 @@ function RenderFormAdmin(props) {
                                             formID: props.formSelected,
                                             unit: false,
                                             data: true
-
-
                                         })
                                         const rhomis_download_link = generateDataDownloadLink(newRHoMISData, dataDownloadLink)
                                         setDataDownloadLink(rhomis_download_link)
-
                                         setRHoMISData(newRHoMISData)
                                         console.log("rhomis data")
                                         console.log(newRHoMISData)
-
-
-
                                     }}>
                                     <option key="default-select" disabled={true}>Select</option>
-                                    {formData.dataSets.map((dataSet) => {
+                                    {props.formData.dataSets.map((dataSet) => {
                                         return <option key={"data-option-" + dataSet}>{dataSet}</option>
                                     })}
                                 </Form.Select>
@@ -737,19 +678,15 @@ function RenderFormAdmin(props) {
                                 // link to the download URL
                                 href={dataDownloadLink}
                             >
-
                                 <Button className="bg-dark border-0">Download Data</Button></a>
-
-
                         </>
                             : <></>}
                     </Card.Body>
                 </Card> :
                     <></>
             }
-
             {
-                projectManageOfForm ? <Card className="project-management-card">
+                projectManagerOfForm ? <Card className="project-management-card">
                     <Card.Header as="h5">Manage Users</Card.Header>
                     <Card.Body>
                         {/* <UserTables /> */}
@@ -774,14 +711,25 @@ export default function FormAdminComponent() {
     const [authToken, setAuthToken] = useContext(AuthContext)
     const [adminData, setAdminData] = useContext(UserContext)
 
+    const [formData, setFormData] = useState(null)
+
+
     useEffect(() => {
         console.log(authToken)
         FetchUserInformation({
             authToken: authToken,
             setUserInfo: setAdminData
         })
-    }, [])
 
+
+        GetFormInformation({
+            authToken: authToken,
+            projectName: projectSelected,
+            formName: formSelected,
+            setFormData: setFormData
+        })
+
+    }, [])
 
     return (
         <div id="project-management-container" className="sub-page-container">
@@ -809,7 +757,9 @@ export default function FormAdminComponent() {
                         setAdminData={setAdminData}
                         data={adminData}
                         formSelected={formSelected}
-                        projectSelected={projectSelected} />
+                        projectSelected={projectSelected}
+                        formData={formData}
+                        setFormData={setFormData} />
                 </Card.Body>
             </Card>
         </div >
