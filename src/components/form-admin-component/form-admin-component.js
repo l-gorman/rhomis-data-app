@@ -40,7 +40,6 @@ import UserContext from '../user-info-component/UserContext'
 // or could include things like units
 function renderTable(data) {
     // console.log(data)
-    console.log("Rendering user table")
 
 
     if (data !== null) {
@@ -110,7 +109,6 @@ function generateCSV(data) {
         return;
     }
 
-    // console.log("length " + data.length)
     if (data.length === undefined) {
         return;
     }
@@ -207,7 +205,6 @@ async function FetchData(props) {
             'Authorization': props.authToken
         }
     })
-    console.log(response)
 
     // If the response is null return null
     // Otherwise return the dataset.
@@ -235,8 +232,7 @@ function generateDataDownloadLink(dataToDownload, dataDownloadLink) {
 }
 
 async function ProcessData(props) {
-    const form = props.data.forms.filter((item) => item.name === props.formSelected)[0]
-    console.log(form)
+    const form = props.data.forms.filter((item) => item.name === props.formSelected && item.project === props.projectSelected)[0]
     const result = await axios({
         method: 'post',
         url: process.env.REACT_APP_API_URL + "api/process-data",
@@ -333,7 +329,250 @@ function UserForm(props) {
 
 }
 
+
+
+
+function SetInitialFormState(props) {
+
+    console.log("Initial form state props")
+    console.log(props)
+
+    function CheckFormCode(props) {
+        if (!props.data) {
+            return false
+        }
+        if (!props.data.forms) {
+            return false
+        }
+        let form = props.data.forms.filter((item) => item.name === props.formSelected & item.project === props.projectSelected)
+        if (form.length === 1) {
+            return true
+        }
+        return (false)
+    }
+
+    function CheckUnitsForm(props) {
+
+        if (!props.formData) {
+            return false
+        }
+        if (!props.formData.units) {
+            return false
+        }
+        if (props.formData.units.length > 0) {
+            console.log("Number of forms")
+            console.log(props.formData.units.length)
+            return (true)
+        }
+
+        return false
+    }
+
+
+
+    function CheckDataForm(props) {
+
+        // Checking if their is data for this form
+        // If so the render the data form
+        if (props.formData) {
+            if (props.formData.dataSets.length > 0) {
+                return (true)
+            }
+        }
+        return (false)
+    }
+
+    function CheckProjectManager(props) {
+        console.log("Project manager props")
+        console.log(props)
+
+        if (!props.data) {
+            return false
+        }
+        if (!props.data.user) {
+            return false
+        }
+
+        if (!props.data.user.roles) {
+            return false
+        }
+
+        if (!props.data.user.roles.projectManager) {
+            return false
+        }
+
+        if (props.data.user.roles.projectManager.includes(props.projectSelected)) {
+            return true
+        }
+
+
+        return false
+
+    }
+
+    function CheckDataAnalyst(props) {
+
+        if (!props.data) {
+            return false
+        }
+        if (!props.data.user) {
+            return false
+        }
+
+        if (!props.data.user.roles) {
+            return false
+        }
+
+        if (!props.data.user.roles.dataCollector) {
+            return false
+        }
+
+        if (props.data.user.roles.dataCollector.includes(props.formSelected)) {
+            return true
+        }
+        return false
+    }
+
+    function CheckODKConf(props) {
+        console.log("odk conf args")
+        console.log(props)
+        if (!props.data) {
+            return false
+        }
+
+        if (!props.data.forms) {
+            return false
+        }
+        let form = props.data.forms.filter((item) => item.name === props.formSelected && item.project === props.projectSelected)
+        if (form.length !== 1) {
+            return false
+        }
+
+        if (form[0].draft === true) {
+            return form[0].draftCollectionDetails
+
+        }
+        if (form[0].draft === false) {
+            return form[0].collectionDetails
+        }
+
+
+        return false
+    }
+
+    function CheckEncodedSettings(props) {
+
+        if (!props.data) {
+            return false
+        }
+
+        if (!props.data.forms) {
+            return false
+        }
+        let form = props.data.forms.filter((item) => item.name === props.formSelected && item.project === props.projectSelected)
+
+        if (form.length !== 1) {
+            return false
+        }
+
+        if (form[0].draft === true) {
+            let odkConf = form[0].draftCollectionDetails
+            return deflateSync(JSON.stringify(odkConf)).toString('base64')
+
+        }
+        if (form[0].draft === false) {
+            let odkConf = form[0].collectionDetails
+            return deflateSync(JSON.stringify(odkConf)).toString('base64')
+        }
+
+
+        return false
+
+    }
+
+    function CheckDraft(props) {
+
+        if (!props.data) {
+            return false
+        }
+
+        if (!props.data.forms) {
+            return false
+        }
+        let form = props.data.forms.filter((item) => item.name === props.formSelected && item.project === props.projectSelected)
+
+        if (form.length !== 1) {
+            return false
+        }
+
+        if (form[0].draft === true) {
+            return true
+
+        }
+        if (form[0].draft === false) {
+            return false
+        }
+        return false
+
+    }
+
+    // Check if a code for the form should be rendered
+
+    const renderODKFormCode = CheckFormCode({
+        data: props.data,
+        formSelected: props.formSelected,
+        projectSelected: props.projectSelected
+    })
+    const renderUnitsForm = CheckUnitsForm({
+        formData: props.formData
+    })
+
+    const renderDataForm = CheckDataForm({ formData: props.formData })
+
+    const projectManagerOfForm = CheckProjectManager({
+        data: props.data,
+        projectSelected: props.projectSelected
+    })
+    const dataAnalystOfForm = CheckDataAnalyst({
+        data: props.data,
+        formSelected: props.formSelected
+    })
+
+    const odkConf = CheckODKConf({
+        data: props.data,
+        projectSelected: props.projectSelected,
+        formSelected: props.formSelected
+    })
+
+    const encoded_settings = CheckEncodedSettings({
+        data: props.data,
+        projectSelected: props.projectSelected,
+        formSelected: props.formSelected
+    })
+
+    const draft = CheckDraft({
+        data: props.data,
+        projectSelected: props.projectSelected,
+        formSelected: props.formSelected
+    })
+
+    const stateToReturn = {
+        renderODKFormCode: renderODKFormCode,
+        renderUnitsForm: renderUnitsForm,
+        renderDataForm: renderDataForm,
+        projectManagerOfForm: projectManagerOfForm,
+        dataAnalystOfForm: dataAnalystOfForm,
+        odkConf: odkConf,
+        encoded_settings: encoded_settings,
+        draft: draft
+    }
+    return stateToReturn
+}
+
+
 function RenderFormAdmin(props) {
+
+    // const [formAdminState, setFormAdminState] = useState()
 
     const [renderInstallCode, setRenderInstallCode] = useState(false)
     const [renderODKFormCode, setRenderODKFormCode] = useState(true)
@@ -347,75 +586,11 @@ function RenderFormAdmin(props) {
     const [unitsDownloadLink, setUnitsDownloadLink] = useState('')
     const [dataDownloadLink, setDataDownloadLink] = useState('')
 
-    const [renderUnitsForm, setRenderUnitsForm] = useState(false)
-    const [renderDataForm, setRenderDataForm] = useState(false)
-    const [projectManagerOfForm, setProjectManagerOfForm] = useState(false)
-    const [dataAnalystOfForm, setDataAnalystOfForm] = useState(false)
-
-    const [odkConf, setODKConf] = useState(false)
-    const [draft, setDraft] = useState(false)
-
-    useEffect(() => {
-
-        // Checking whether units exist
-        // If they do then render the units form
-        if (props.formData) {
-            if (props.formData.units.length > 0) {
-                setRenderUnitsForm(true)
-            }
-
-            // Checking if their is data for this form
-            // If so the render the data form
-            if (props.formData) {
-                if (props.formData.dataSets.length > 0) {
-                    setRenderDataForm(true)
-                }
-            }
-        }
-
-        console.log("Props for form admin")
-        console.log(props)
-        if (props.data) {
-            if (props.data.user) {
-                if (props.data.user.roles) {
-                    if (props.data.user.roles.projectManager !== undefined) {
-                        if (props.data.user.roles.projectManager.includes(props.projectSelected)) {
-                            setProjectManagerOfForm(true)
-                            setDataAnalystOfForm(true)
-
-                        }
-                    }
-
-                    if (props.data.user.roles.dataCollector !== undefined) {
-                        if (props.data.user.roles.analyst.includes(props.formSelected)) {
-                            setDataAnalystOfForm(true)
-                        }
-
-                    }
 
 
-                }
-            }
-        }
+    // Checking what data is available when component loads
 
-        if (props.data) {
-            if (props.data.forms !== undefined) {
-                let form = props.data.forms.filter((item) => item.name === props.formSelected)
-                if (form.length === 1) {
-                    if (form[0].draft === true) {
-                        setODKConf(form[0].draftCollectionDetails)
-                        setDraft(true)
-                    }
-                    if (form[0].draft === false) {
-                        setODKConf(form[0].collectionDetails)
-                        setDraft(false)
-                    }
-                }
-            }
 
-        }
-
-    }, [])
 
     // Return nothing if there is no administrative data
     if (!props.data) {
@@ -423,26 +598,13 @@ function RenderFormAdmin(props) {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-    console.log(odkConf)
-    const encoded_settings = deflateSync(JSON.stringify(odkConf)).toString('base64');
-
     console.log("form props")
 
     console.log(props)
 
     return (
         <>
+
             <Card className="project-management-card">
                 <Card.Header>Collect Data</Card.Header>
                 <Card.Body>
@@ -484,7 +646,7 @@ function RenderFormAdmin(props) {
                         <>
                             <div className="qr-code-container">
 
-                                <QRCode value={encoded_settings} />
+                                <QRCode value={props.formState.encoded_settings} />
 
                             </div>
                             <div className="qr-code-container">
@@ -494,10 +656,10 @@ function RenderFormAdmin(props) {
                             </div>
                         </>
                         : <></>}
-                    {draft ? <h4>***Your form is currently saved as a draft. Any submissions you make
+                    {props.formState.draft ? <h4>***Your form is currently saved as a draft. Any submissions you make
                         will be removed once the form is finalised*** </h4> : <></>}
 
-                    {draft ?
+                    {props.formState.draft ?
                         <>
                             As this is a draft form. You might like to quickly see what the data you collect might look like. Click the button below to generate some mock data. Please note,
                             that values are randomly generated.
@@ -506,7 +668,7 @@ function RenderFormAdmin(props) {
                                 onClick={async () => {
                                     await ProcessData({
                                         commandType: "generate",
-                                        draft: draft,
+                                        draft: props.formState.draft,
                                         authToken: props.authToken,
                                         data: props.data,
                                         formSelected: props.formSelected,
@@ -520,7 +682,9 @@ function RenderFormAdmin(props) {
                 </Card.Body>
             </Card>
 
-            {dataAnalystOfForm | projectManagerOfForm ?
+
+
+            {props.formState.dataAnalystOfForm | props.formState.projectManagerOfForm ?
                 < Card className="project-management-card">
                     <Card.Header>Processing Data</Card.Header>
                     <Card.Body>
@@ -534,7 +698,7 @@ function RenderFormAdmin(props) {
                             onClick={async () => {
                                 await ProcessData({
                                     commandType: "units",
-                                    draft: draft,
+                                    draft: props.formState.draft,
                                     authToken: props.authToken,
                                     data: props.data,
                                     formSelected: props.formSelected,
@@ -553,7 +717,7 @@ function RenderFormAdmin(props) {
                             onClick={async () => {
                                 await ProcessData({
                                     commandType: "process",
-                                    draft: draft,
+                                    draft: props.formState.draft,
                                     authToken: props.authToken,
                                     data: props.data,
                                     formSelected: props.formSelected,
@@ -569,7 +733,7 @@ function RenderFormAdmin(props) {
                 </Card> : <></>
             }
 
-            {renderUnitsForm ? <Card className="project-management-card">
+            {props.formState.renderUnitsForm ? <Card className="project-management-card">
                 <Card.Header>Download Units</Card.Header>
                 <Card.Body>
                     <Form>
@@ -578,11 +742,7 @@ function RenderFormAdmin(props) {
 
                             <Form.Select defaultValue="Select"
                                 onChange={async (event) => {
-
                                     setUnitsSelect(event.target.value)
-
-
-
                                     const newUnitsData = await FetchData({
                                         authToken: props.authToken,
                                         dataType: event.target.value,
@@ -590,8 +750,6 @@ function RenderFormAdmin(props) {
                                         formID: props.formSelected,
                                         unit: true,
                                         data: false
-
-
                                     })
                                     const units_download_link = generateDataDownloadLink(newUnitsData, unitsDownloadLink)
                                     setUnitsDownloadLink(units_download_link)
@@ -637,7 +795,7 @@ function RenderFormAdmin(props) {
             }
 
             {
-                renderDataForm ? <Card className="project-management-card">
+                props.formState.renderDataForm ? <Card className="project-management-card">
                     <Card.Header>Download Data</Card.Header>
                     <Card.Body>
                         <Form>
@@ -686,7 +844,7 @@ function RenderFormAdmin(props) {
                     <></>
             }
             {
-                projectManagerOfForm ? <Card className="project-management-card">
+                props.formState.projectManagerOfForm ? <Card className="project-management-card">
                     <Card.Header as="h5">Manage Users</Card.Header>
                     <Card.Body>
                         {/* <UserTables /> */}
@@ -711,25 +869,66 @@ export default function FormAdminComponent() {
     const [authToken, setAuthToken] = useContext(AuthContext)
     const [adminData, setAdminData] = useContext(UserContext)
 
-    const [formData, setFormData] = useState(null)
+    const [formData, setFormData] = useState()
+
+    const [initialState, setInitialState] = useState({
+        renderODKFormCode: false,
+        renderUnitsForm: false,
+        renderDataForm: false,
+        projectManagerOfForm: false,
+        dataAnalystOfForm: false,
+        odkConf: false,
+        encoded_settings: false,
+        draft: false
+    })
 
 
     useEffect(() => {
-        console.log(authToken)
-        FetchUserInformation({
-            authToken: authToken,
-            setUserInfo: setAdminData
-        })
 
 
-        GetFormInformation({
-            authToken: authToken,
-            projectName: projectSelected,
-            formName: formSelected,
-            setFormData: setFormData
-        })
+        async function GetUserInfo() {
+            const response = await FetchUserInformation({
+                authToken: authToken,
+                setUserInfo: setAdminData
+            })
 
+
+        }
+
+        GetUserInfo()
     }, [])
+
+
+    useEffect(() => {
+
+        async function GetFormInfo() {
+
+            const response = await GetFormInformation({
+                authToken: authToken,
+                projectName: projectSelected,
+                formName: formSelected,
+                setFormData: setFormData
+            })
+        }
+
+        GetFormInfo()
+    }, [adminData])
+
+    useEffect(() => {
+        console.log("form data changed")
+        const new_form_state = SetInitialFormState({
+            data: adminData,
+            formData: formData,
+            formSelected: formSelected,
+            projectSelected: projectSelected
+        })
+        console.log("New form admin state")
+        console.log(new_form_state)
+
+        setInitialState(new_form_state)
+
+
+    }, [formData])
 
     return (
         <div id="project-management-container" className="sub-page-container">
@@ -759,7 +958,9 @@ export default function FormAdminComponent() {
                         formSelected={formSelected}
                         projectSelected={projectSelected}
                         formData={formData}
-                        setFormData={setFormData} />
+                        setFormData={setFormData}
+                        formState={initialState}
+                        setFormState={setInitialState} />
                 </Card.Body>
             </Card>
         </div >

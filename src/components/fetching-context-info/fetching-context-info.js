@@ -48,10 +48,8 @@ async function GetFormInformation(props) {
         }
     })
 
-    console.log("Form Data Response: ")
-    console.log(result.data)
+
     if (result.status === 200) {
-        console.log("Setting project information")
 
         props.setFormData(result.data)
     }

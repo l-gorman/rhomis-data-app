@@ -30,7 +30,6 @@ import MainNavbar from '../navigation-bar/navigation-bar-component'
 import FormCreationComponent from '../form-creation-component/form-creation-component';
 import AuthContext from '../authentication-component/AuthContext';
 import UserContext from '../user-info-component/UserContext';
-import axios from 'axios';
 import {
     HashRouter as Router,
     RouteProps,
