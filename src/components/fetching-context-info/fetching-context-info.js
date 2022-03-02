@@ -31,6 +31,8 @@ function CheckForLocalToken(props) {
     if (timeDifference < 60 * 60 * 1000) {
         props.setAuthToken(localToken)
     }
+
+    return localToken
 }
 
 
@@ -59,9 +61,24 @@ async function GetFormInformation(props) {
 
 }
 
+async function GetInformationForFormComponent(props){
+
+    const authToken = await CheckForLocalToken({setAuthToken:props.setAuthToken})
+    FetchUserInformation({authToken:authToken,
+    setUserInfo:props.setUserInfo})
+
+    GetFormInformation({
+        authToken:authToken,
+        projectName:props.projectName,
+        formName:props.formName,
+        setFormData:props.setFormData
+    })
+}
+
 
 export {
     CheckForLocalToken,
     FetchUserInformation,
-    GetFormInformation
+    GetFormInformation,
+    GetInformationForFormComponent
 }

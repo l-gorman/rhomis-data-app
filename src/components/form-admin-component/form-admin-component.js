@@ -26,7 +26,7 @@ import '../../App.css'
 import { useHistory } from 'react-router'
 import { useParams } from 'react-router-dom'
 
-import { FetchUserInformation, GetFormInformation } from '../fetching-context-info/fetching-context-info'
+import { FetchUserInformation, GetFormInformation, GetInformationForFormComponent} from '../fetching-context-info/fetching-context-info'
 
 
 import { AiOutlineArrowLeft } from 'react-icons/ai'
@@ -886,11 +886,19 @@ export default function FormAdminComponent() {
     useEffect(() => {
 
 
+
+
         async function GetUserInfo() {
-            const response = await FetchUserInformation({
+            await GetInformationForFormComponent({
+                setAuthToken:setAuthToken,
                 authToken: authToken,
                 setUserInfo: setAdminData
+
             })
+            // const response = await FetchUserInformation({
+            //     authToken: authToken,
+            //     setUserInfo: setAdminData
+            // })
 
 
         }
@@ -898,21 +906,6 @@ export default function FormAdminComponent() {
         GetUserInfo()
     }, [])
 
-
-    useEffect(() => {
-
-        async function GetFormInfo() {
-
-            const response = await GetFormInformation({
-                authToken: authToken,
-                projectName: projectSelected,
-                formName: formSelected,
-                setFormData: setFormData
-            })
-        }
-
-        GetFormInfo()
-    }, [adminData])
 
     useEffect(() => {
         console.log("form data changed")
@@ -928,7 +921,7 @@ export default function FormAdminComponent() {
         setInitialState(new_form_state)
 
 
-    }, [formData])
+    }, [formData, adminData, formSelected, projectSelected])
 
     return (
         <div id="project-management-container" className="sub-page-container">
