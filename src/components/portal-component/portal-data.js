@@ -66,7 +66,7 @@ export const PortalDataAll = [
         label: "help",
         text: "See guidance for more advanced use case and how to contribute to our system",
         icon: MdHelpOutline,
-        link: "https://rhomis-docs.readthedocs.io/en/latest/",
+        link: process.env.REACT_APP_DOCUMENTATION_URL,
         external: true,
     },
     {
