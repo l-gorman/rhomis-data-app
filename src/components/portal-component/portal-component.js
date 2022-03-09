@@ -125,7 +125,7 @@ function RenderPortalCards(props) {
 
     const portalCardData = []
     console.log(props.data[0])
-    console.log(props.userData)
+    console.log('userdata', props.userData)
 
     if (props.userData) {
         if (props.userData.basic === true) {

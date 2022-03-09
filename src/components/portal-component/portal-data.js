@@ -20,13 +20,15 @@ import { VscInspect } from 'react-icons/vsc'
 import { FcAcceptDatabase } from 'react-icons/fc'
 import { FiDatabase } from 'react-icons/fi'
 import { MdHelpOutline, MdOutlineDashboardCustomize, MdOutlineSendToMobile, MdOutlineCreate } from 'react-icons/md'
+
+console.log(process.env)
 export const PortalDataAll = [
     {
         name: "Build a Survey",
         label: "surveyBuilder",
         text: "Get started straight away. Build a survey, collect test-data, and view your data.",
         icon: RiSurveyFill,
-        link: "https://rhomis-survey.stats4sdtest.online/login/",
+        link: process.env.REACT_APP_SURVEY_BUILDER_URL,
         external: true,
     },
     {

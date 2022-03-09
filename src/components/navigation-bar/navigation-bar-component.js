@@ -49,7 +49,7 @@ async function GetAdminData(props) {
 
 
 export default function MainNavbar(props) {
-    console.log("Survey builder url: " + process.env.SURVEY_BUILDER_URL)
+    console.log("Survey builder url: " + process.env.REACT_APP_SURVEY_BUILDER_URL)
     // props.Logout()
     const [authToken, setAuthToken] = useContext(AuthContext)
     const [show, setShow] = useState(false)
@@ -107,7 +107,7 @@ export default function MainNavbar(props) {
                             <Nav.Link className="side-bar-link" as={Link} onClick={() => { handleClose() }} to="/">Portal</Nav.Link>
                         </div>
                         <div className="side-bar-item">
-                            <form style={{ "width": "100%" }} method="post" action={"https://rhomis-survey.stats4sdtest.online/login"} class="inline">
+                            <form style={{ "width": "100%" }} method="post" action={ process.env.REACT_APP_SURVEY_BUILDER_URL} class="inline">
                                 <input type="hidden" name="token" value={authToken} />
                                 <input type="hidden" name="redirect_url" value="/admin/xlsform/create" />
                                 <input className="form-link" type="submit" value="Design a Survey"
