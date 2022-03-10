@@ -15,7 +15,7 @@
 .DS_Store
 .env
 .vscode/
-.code-workspace
+*.code-workspace
 
 
 npm-debug.log*
