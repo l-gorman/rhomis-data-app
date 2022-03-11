@@ -16,7 +16,8 @@
 // along with rhomis-data-app.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useState, useEffect, useContext } from 'react'
-import { Form, Button, Card, Table } from 'react-bootstrap'
+import { Form, Button, Card, Table } from 'react-bootstrap'   
+import { Link } from 'react-router-dom';
 import axios from 'axios'
 import AuthContext from '../authentication-component/AuthContext'
 import '../project-management-component/project-management-component.css'
@@ -944,6 +945,11 @@ export default function FormAdminComponent() {
                     </div>
                 </Card.Header>
                 <Card.Body className="main-card-body">
+                    <form method="post" action={process.env.REACT_APP_SURVEY_BUILDER_URL} class="inline">
+                        <input type="hidden" name="token" value={authToken} />
+                        <input type="hidden" name="redirect_url" value={"/xlsform/"+formSelected+"/edit"}/>
+                        <Button type="submit">Edit form in Survey Builder</Button>
+                    </form>
                     <RenderFormAdmin
                         authToken={authToken}
                         setAdminData={setAdminData}
