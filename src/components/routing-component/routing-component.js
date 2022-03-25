@@ -68,6 +68,7 @@ export default function RoutingComponent() {
     console.log("Auth token context")
     console.log(authToken)
 
+    return (<RedirectComponets authToken={authToken} />)
 
     if (authToken) {
         return (
@@ -120,3 +121,60 @@ export default function RoutingComponent() {
     }
 }
 
+function RedirectComponets(props) {
+
+    console.log(props.authToken)
+    if (props.authToken) {
+        return (
+            < Router >
+                <MainNavbar />
+                {/* <Fade> */}
+                <Switch>
+                    <Route exact path="/">
+                        <Redirect from="/" to="/home" />
+                    </Route>
+                    <Route path="/home" component={PortalComponent} />
+                    <Route path="/register"><RegisterComponent /></Route>
+                    <Route path="/login"><LoginComponent /></Route>
+
+                    <Route path="/projects/:projectName/forms/:formName" component={FormAdminComponent} />
+                    <Route path="/projects/:projectName" component={FormManagementComponent} />
+
+                    <Route path="/projects" ><ProjectManagementComponent /></Route>
+
+
+                    {/* <Route path="/project/:projectName/form/:formName"><FormManagementComponent /></Route> */}
+
+                    <Route path="/data-querying" component={DataQueryComponent} />
+                    <Route path="/administration" component={FormCreationComponent} />
+
+                    {/* <Route path="*" component={NotFoundComponent} /> */}
+                    <Redirect from="*" to="/home" />
+
+                </Switch >
+                {/* </Fade> */}
+
+            </Router >
+        )
+    }
+
+    if (!props.authToken) {
+        return (
+            < Router >
+                {/* <Fade> */}
+                <Switch>
+                    <Route exact path="/">
+                        <Redirect from="/" to="/login" />
+                    </Route>
+                    <Route path="/register"><RegisterComponent /></Route>
+                    <Route path="/login"><LoginComponent /></Route>
+                    {/* <Redirect from="*" to="/login" /> */}
+                </Switch >
+                {/* </Fade> */}
+
+            </Router >
+        )
+    }
+
+
+}
