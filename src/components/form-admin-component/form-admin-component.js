@@ -26,7 +26,7 @@ import '../../App.css'
 import { useHistory } from 'react-router'
 import { useParams } from 'react-router-dom'
 
-import { FetchUserInformation, GetFormInformation, GetInformationForFormComponent} from '../fetching-context-info/fetching-context-info'
+import { GetInformationForFormComponent } from '../fetching-context-info/fetching-context-info'
 
 
 import { AiOutlineArrowLeft } from 'react-icons/ai'
@@ -188,8 +188,7 @@ function generateCSV(data) {
 async function FetchData(props) {
     // Basic post request, fetching information by: 
     //dataType: type of data we are looking for (e.g. indicator data),
-    console.log("Fetching unit data")
-    console.log(props)
+
 
     const response = await axios({
         method: "post",
@@ -294,7 +293,7 @@ function UserForm(props) {
                     <Form.Label>User email</Form.Label>
                     <Form.Control onChange={(event) => {
                         setEmail(event.target.value)
-                        console.log(event.target.value)
+
                     }}></Form.Control>
                 </Form.Group>
                 <Form.Group>
@@ -303,7 +302,6 @@ function UserForm(props) {
                         onChange={(event) => {
                             setUserType(event.target.value)
 
-                            console.log(event.target.value)
                         }}>
                         <option disabled={true}>Open this select menu</option>
                         <option value="dataCollector">Data Collector: Can access training materials and configure enumerator devices</option>
@@ -313,14 +311,12 @@ function UserForm(props) {
 
                 <Button className="bg-dark text-white border-0 float-right" style={{ "marginTop": "10px" }}
                     onClick={async () => {
-                        console.log(email)
                         const result = await AddFormUser({
                             authToken: props.authToken,
                             email: email,
                             formName: props.formSelected,
                             userType: userType
                         })
-                        console.log(result)
                     }}>Add User</Button>
 
             </Form >
@@ -334,8 +330,6 @@ function UserForm(props) {
 
 function SetInitialFormState(props) {
 
-    console.log("Initial form state props")
-    console.log(props)
 
     function CheckFormCode(props) {
         if (!props.data) {
@@ -375,16 +369,17 @@ function SetInitialFormState(props) {
         // Checking if their is data for this form
         // If so the render the data form
         if (props.formData) {
-            if (props.formData.dataSets.length > 0) {
-                return (true)
+            if (props.formData.dataSets) {
+                if (props.formData.dataSets.length > 0) {
+                    return (true)
+                }
             }
         }
         return (false)
     }
 
     function CheckProjectManager(props) {
-        console.log("Project manager props")
-        console.log(props)
+
 
         if (!props.data) {
             return false
@@ -434,8 +429,7 @@ function SetInitialFormState(props) {
     }
 
     function CheckODKConf(props) {
-        console.log("odk conf args")
-        console.log(props)
+
         if (!props.data) {
             return false
         }
@@ -598,9 +592,7 @@ function RenderFormAdmin(props) {
     }
 
 
-    console.log("form props")
 
-    console.log(props)
 
     return (
         <>
@@ -674,7 +666,7 @@ function RenderFormAdmin(props) {
                                         formSelected: props.formSelected,
                                         projectSelected: props.projectSelected
                                     })
-                                    console.log("gen data")
+                                    console.log("Finished Generating Data")
                                 }}
 
                             >Generate Data</Button> </> : <></>}
@@ -704,7 +696,7 @@ function RenderFormAdmin(props) {
                                     formSelected: props.formSelected,
                                     projectSelected: props.projectSelected
                                 })
-                                console.log("gen data")
+                                console.log("Finished Getting units")
                             }}
                         >
                             Extract Units
@@ -723,7 +715,7 @@ function RenderFormAdmin(props) {
                                     formSelected: props.formSelected,
                                     projectSelected: props.projectSelected
                                 })
-                                console.log("gen data")
+                                console.log("Finished Processing Data")
                             }}
                         >
                             Process Data
@@ -758,8 +750,7 @@ function RenderFormAdmin(props) {
 
 
 
-                                    console.log("units data")
-                                    console.log(newUnitsData)
+
 
 
 
@@ -815,8 +806,7 @@ function RenderFormAdmin(props) {
                                         const rhomis_download_link = generateDataDownloadLink(newRHoMISData, dataDownloadLink)
                                         setDataDownloadLink(rhomis_download_link)
                                         setRHoMISData(newRHoMISData)
-                                        console.log("rhomis data")
-                                        console.log(newRHoMISData)
+
                                     }}>
                                     <option key="default-select" disabled={true}>Select</option>
                                     {props.formData.dataSets.map((dataSet) => {
@@ -889,10 +879,15 @@ export default function FormAdminComponent() {
 
 
         async function GetUserInfo() {
+
             await GetInformationForFormComponent({
-                setAuthToken:setAuthToken,
+                setAuthToken: setAuthToken,
                 authToken: authToken,
-                setUserInfo: setAdminData
+                setUserInfo: setAdminData,
+                projectName: projectSelected,
+                formName: formSelected,
+                setFormData: setFormData
+
 
             })
             // const response = await FetchUserInformation({
@@ -908,15 +903,13 @@ export default function FormAdminComponent() {
 
 
     useEffect(() => {
-        console.log("form data changed")
         const new_form_state = SetInitialFormState({
             data: adminData,
             formData: formData,
             formSelected: formSelected,
             projectSelected: projectSelected
         })
-        console.log("New form admin state")
-        console.log(new_form_state)
+
 
         setInitialState(new_form_state)
 

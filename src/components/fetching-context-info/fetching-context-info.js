@@ -61,17 +61,21 @@ async function GetFormInformation(props) {
 
 }
 
-async function GetInformationForFormComponent(props){
+async function GetInformationForFormComponent(props) {
 
-    const authToken = await CheckForLocalToken({setAuthToken:props.setAuthToken})
-    FetchUserInformation({authToken:authToken,
-    setUserInfo:props.setUserInfo})
+    console.log("GET FORM INFO")
+    console.log(props)
+    const authToken = await CheckForLocalToken({ setAuthToken: props.setAuthToken })
+    await FetchUserInformation({
+        authToken: authToken,
+        setUserInfo: props.setUserInfo
+    })
 
-    GetFormInformation({
-        authToken:authToken,
-        projectName:props.projectName,
-        formName:props.formName,
-        setFormData:props.setFormData
+    await GetFormInformation({
+        authToken: authToken,
+        projectName: props.projectName,
+        formName: props.formName,
+        setFormData: props.setFormData
     })
 }
 
