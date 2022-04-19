@@ -18,6 +18,8 @@ async function FetchUserInformation(props) {
         props.setUserInfo(response.data)
     }
 
+
+
     // return (response.data)
 }
 
