@@ -102,7 +102,7 @@ function PortalCard(props) {
     if (props.data.external === true & props.data.label !== "surveyBuilder") {
         return (
             <div>
-                <a style={{ 'textDecoration': 'none' }} href={props.data.link}>
+                <a style={{ 'textDecoration': 'none' }} href={props.data.link} target="_blank">
                     < Card className="sub-card portal-card border-0">
                         <div className="portal-card-header-container">
                             <h4 className="portal-card-header">{props.data.name}</h4>
