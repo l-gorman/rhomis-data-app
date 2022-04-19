@@ -28,6 +28,10 @@ import FormAdminComponent from '../form-admin-component/form-admin-component';
 // import AccountManagementComponent from './components/account-management-component/account-management-component';
 import MainNavbar from '../navigation-bar/navigation-bar-component'
 import FormCreationComponent from '../form-creation-component/form-creation-component';
+
+import DataCollectionComponent from '../data-collection-component/data-collection-component';
+import DataAccessComponent from '../data-access-component/data-access-component';
+import UserManagementComponent from '../user-management-component/user-management-component';
 import AuthContext from '../authentication-component/AuthContext';
 import UserContext from '../user-info-component/UserContext';
 import {
@@ -87,9 +91,12 @@ function RedirectComponents(props) {
                     </Route>
                     <Route path="/home" component={PortalComponent} />
                     <Route path="/register"><RegisterComponent /></Route>
-                    <Route path="/login"><LoginComponent /></Route>
+                    {/* <Route path="/login"><LoginComponent /></Route> */}
 
-                    <Route path="/projects/:projectName/forms/:formName" component={FormAdminComponent} />
+                    <Route path="/projects/:projectName/forms/:formName/collect" component={DataCollectionComponent} />
+                    <Route path="/projects/:projectName/forms/:formName/users" component={UserManagementComponent} />
+                    <Route path="/projects/:projectName/forms/:formName/data" component={DataAccessComponent} />
+                    {/* <Route path="/projects/:projectName/forms/:formName" component={FormAdminComponent} /> */}
                     <Route path="/projects/:projectName" component={FormManagementComponent} />
 
                     <Route path="/projects" ><ProjectManagementComponent /></Route>
@@ -120,7 +127,7 @@ function RedirectComponents(props) {
                     </Route>
                     <Route path="/register"><RegisterComponent /></Route>
                     <Route path="/login"><LoginComponent /></Route>
-                    <Redirect from="*" to="/login" />
+                    {/* <Redirect from="*" to="/login" /> */}
                 </Switch >
                 {/* </Fade> */}
 

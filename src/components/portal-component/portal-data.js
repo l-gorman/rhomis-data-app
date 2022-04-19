@@ -30,7 +30,7 @@ export const PortalDataAll = [
         external: true,
     },
     {
-        name: "Manage My Projects",
+        name: "Manage Existing Projects",
         label: "projectManager",
         text: "Check up on your projects, download your data, and control user access.",
         icon: MdOutlineDashboardCustomize,
@@ -39,16 +39,16 @@ export const PortalDataAll = [
 
     },
 
-    {
-        name: "Collect Data",
-        label: "dataCollector",
-        text: "Collect data for an existing project and access enumerator training materials",
-        icon: MdOutlineSendToMobile,
-        link: "/projects",
-        external: false,
+    // {
+    //     name: "Collect Data",
+    //     label: "dataCollector",
+    //     text: "Collect data for an existing project and access enumerator training materials",
+    //     icon: MdOutlineSendToMobile,
+    //     link: "/projects",
+    //     external: false,
 
 
-    },
+    // },
     {
         name: "Global Dataset",
         label: "globalData",

@@ -16,6 +16,7 @@ async function FetchUserInformation(props) {
         console.log("user info")
         console.log(response.data)
         props.setUserInfo(response.data)
+
     }
 
 

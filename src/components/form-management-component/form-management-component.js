@@ -39,30 +39,44 @@ import { deflateSync } from 'zlib'
 // Generating a link to download the csv data
 
 
-async function FinalizeForm(props) {
+// async function FinalizeForm(props) {
 
-    console.log("Finalizing form")
+//     console.log("Finalizing form")
 
-    const result = await axios({
-        method: 'post',
-        url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/forms/publish",
-        headers: {
-            'Authorization': props.authToken
-        },
-        params: {
-            form_name: props.form,
-            project_name: props.project
-        }
-    })
+//     const result = await axios({
+//         method: 'post',
+//         url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/forms/publish",
+//         headers: {
+//             'Authorization': props.authToken
+//         },
+//         params: {
+//             form_name: props.form,
+//             project_name: props.project
+//         }
+//     })
 
-    FetchUserInformation({
-        authToken: props.authToken,
-        setUserInfo: props.setAdminData
-    })
+//     FetchUserInformation({
+//         authToken: props.authToken,
+//         setUserInfo: props.setAdminData
+//     })
 
-    // console.log("Finalization response")
-    // console.log(result)
+//     // console.log("Finalization response")
+//     // console.log(result)
 
+// }
+
+function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2)
+        month = '0' + month;
+    if (day.length < 2)
+        day = '0' + day;
+
+    return [day, month, year].join('/');
 }
 
 
@@ -133,14 +147,15 @@ function FormTables(props) {
                     <th>Status</th>
 
                     <th>Created At</th>
-                    <th style={{ "width": "40px" }}></th>
-                    <th style={{ "width": "40px" }}></th>
+                    <th ></th>
+                    <th ></th>
+                    <th ></th>
                 </tr>
             </thead>
             <tbody>
                 {formsExist ? props.data.forms.map((form) => {
-                    let date = new Date(form.createdAt)
-                    let dateString = date.toDateString()
+                    // let date = new Date(form.createdAt)
+                    let dateString = formatDate(form.createdAt)
                     if (form.project === props.projectSelected) {
 
                         let disableButton = true
@@ -155,35 +170,29 @@ function FormTables(props) {
 
                         return (
                             <tr>
-                                <td>{form.name}</td>
-                                <td>{form.draft ? "Draft" : "Finalized"}</td>
-                                <td >{dateString}</td>
-                                <td style={{ "width": "40px" }}>
-                                    <Button disabled={disableButton} className="bg-dark text-white border-0"
-                                        onClick={async () => {
+                                <td style={{ "vertical-align": "middle" }}>{form.name}</td>
+                                <td style={{ "vertical-align": "middle" }}>{form.draft ? "Draft" : "Finalized"}</td>
+                                <td style={{ "vertical-align": "middle" }}>{dateString}</td>
+                                <td style={{ "text-align": "center" }}>
+                                    <Button className="bg-dark text-white border-0"
+                                        onClick={() => {
+                                            history.push("/projects/" + props.projectSelected + "/forms/" + form.name + "/collect")
+                                        }}>Collect Data</Button></td>
 
-                                            const finalizedForm = await FinalizeForm({
-                                                form: form.name,
-                                                project: props.projectSelected,
-                                                authToken: props.authToken,
-                                                setAdminData: props.setAdminData
-                                            })
+                                <td style={{ "text-align": "center" }} >
+                                    <Button className="bg-dark text-white border-0"
+                                        onClick={() => {
 
-                                            // const metaData = await GetProjectInformation({
-                                            //     setAdminData: props.setAdminData,
-                                            //     authToken: props.authToken
-                                            // })
 
-                                        }}>Finalize</Button></td>
-                                <td style={{ "width": "40px" }}><Button className="bg-dark text-white border-0"
+                                            history.push("/projects/" + props.projectSelected + "/forms/" + form.name + "/users")
+
+                                        }}>Manage Users</Button></td>
+                                <td style={{ "text-align": "center" }}><Button className="bg-dark text-white border-0"
                                     onClick={() => {
 
-                                        history.push("/projects/" + props.projectSelected + "/forms/" + form.name)
-                                        // props.setFormSelected(form.name)
-                                        // const newFilters = props.filters
-                                        // newFilters.push("Form: " + form.name)
-                                        // props.setFilters(newFilters)
-                                    }}>Select</Button></td>
+                                        history.push("/projects/" + props.projectSelected + "/forms/" + form.name + "/data")
+
+                                    }}>Access Data</Button></td>
                             </tr>
                         )
                     }
@@ -248,29 +257,7 @@ function RenderProjectAdmin(props) {
             </Card.Body>
         </Card>
 
-        {renderUserForm ? <Card className="project-management-card">
-            <Card.Header as="h5">Add Project Manager</Card.Header>
-            <Card.Body>
-                <Form>
-                    <Form.Group>
-                        <Form.Label>User email</Form.Label>
-                        <Form.Control onChange={(event) => {
-                            setNewUser(event.target.value)
-                        }} />
-                    </Form.Group>
-                    <Button className="bg-dark text-white border-0 float-right" style={{ "marginTop": "10px" }}
-                        onClick={async () => {
-                            console.log(props.projectSelected)
-                            const result = await AddProjectManager({
-                                email: newUser,
-                                projectName: props.projectSelected,
-                                authToken: props.authToken
-                            })
-                            console.log(result)
-                        }}>Add Project Manager</Button>
-                </Form>
-            </Card.Body>
-        </Card> : <></>}
+
 
 
 
