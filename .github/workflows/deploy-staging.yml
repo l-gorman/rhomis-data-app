@@ -59,7 +59,7 @@ jobs:
           git commit -m 'deploy'
 
       - name: Mark directory as safe
-        run: git config --global --add safe.directory github/workspace/build
+        run: git config --global --add safe.directory /github/workspace/build
 
       - name: Force push to destination branch
         uses: ad-m/github-push-action@v0.5.0
