@@ -127,7 +127,6 @@ function RedirectComponents(props) {
                     </Route>
                     <Route path="/register"><RegisterComponent /></Route>
                     <Route path="/login"><LoginComponent /></Route>
-                    {/* <Redirect from="*" to="/login" /> */}
                 </Switch >
                 {/* </Fade> */}
 

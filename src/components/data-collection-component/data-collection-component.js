@@ -13,6 +13,28 @@ import { AiOutlineArrowLeft } from 'react-icons/ai'
 import QRCode from 'react-qr-code'
 import { deflateSync } from 'zlib'
 
+import axios from 'axios'
+
+
+async function ProcessData(props) {
+    const form = props.data.forms.filter((item) => item.name === props.formSelected && item.project === props.projectSelected)[0]
+    const result = await axios({
+        method: 'post',
+        url: process.env.REACT_APP_API_URL + "api/process-data",
+        headers: {
+            'Authorization': props.authToken
+        },
+        data: {
+            commandType: props.commandType,
+            projectName: props.projectSelected,
+            formName: props.formSelected,
+            formVersion: form.formVersion,
+            draft: props.draft,
+        }
+    })
+    return (result)
+}
+
 function SetInitialFormState(props) {
 
     // Check if the form code in the URL is correct
@@ -215,9 +237,36 @@ function CardBody(props) {
 
 
             {
-                props.formState.draft ? <p>***Your form is currently saved as a draft. Any submissions you make
-                    will be removed once the form is finalised*** </p> : <></>
+                props.formState.draft ? <>
+
+                    <br />
+
+
+                    < br />
+                    <Button className="bg-dark border-0" style={{ "margin": "10px" }}
+                        onClick={async () => {
+                            await ProcessData({
+                                commandType: "generate",
+                                draft: props.formState.draft,
+                                authToken: props.authToken,
+                                data: props.data,
+                                formSelected: props.formSelected,
+                                projectSelected: props.projectSelected
+                            })
+                            console.log("Finished Generating Data")
+                        }}
+
+                    >Generate Mock Submissions</Button>
+
+                    <br />
+                    <p>*Your form is currently saved as a draft. Any submissions you make
+                        will be removed once the form is finalised. Mock submissions are a useful way to see what your
+                        data might look like, they will also be deleted once you finalise the form* </p>
+                </>
+                    : <></>
             }
+
+
         </>
     )
 

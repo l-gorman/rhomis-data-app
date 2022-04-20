@@ -46,6 +46,10 @@ function CheckForLocalToken(props) {
     if (timeDifference < 60 * 60 * 1000) {
         props.setAuthToken(localToken)
     }
+    if (timeDifference > 60 * 60 * 1000) {
+        props.setAuthToken(null)
+        return null
+    }
 
     return localToken
 }

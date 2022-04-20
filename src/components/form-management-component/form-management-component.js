@@ -16,8 +16,9 @@
 // along with rhomis-data-app.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useParams } from "react-router-dom"
-import { FetchUserInformation } from '../fetching-context-info/fetching-context-info'
+import { FetchUserInformation, GetInformationForFormComponent } from '../fetching-context-info/fetching-context-info'
 
+import { } from '../fetching-context-info/fetching-context-info'
 
 
 import React, { useState, useEffect, useContext } from 'react'
@@ -147,6 +148,7 @@ function FormTables(props) {
                     <th>Status</th>
 
                     <th>Created At</th>
+                    <th>Submissions</th>
                     <th ></th>
                     <th ></th>
                     <th ></th>
@@ -160,6 +162,8 @@ function FormTables(props) {
 
                         let disableButton = true
 
+                        let noDataAccess = true
+
                         if (allowToFinalize === false) {
                             disableButton = false
                         }
@@ -168,11 +172,21 @@ function FormTables(props) {
                             disableButton = false
                         }
 
+                        if (form.submissions > 0) {
+
+                            noDataAccess = false
+
+                        }
+
+
+
                         return (
                             <tr>
                                 <td style={{ "vertical-align": "middle" }}>{form.name}</td>
                                 <td style={{ "vertical-align": "middle" }}>{form.draft ? "Draft" : "Finalized"}</td>
                                 <td style={{ "vertical-align": "middle" }}>{dateString}</td>
+                                <td style={{ "vertical-align": "middle" }}>{form.submissions}</td>
+
                                 <td style={{ "text-align": "center" }}>
                                     <Button className="bg-dark text-white border-0"
                                         onClick={() => {
@@ -192,7 +206,8 @@ function FormTables(props) {
 
                                         history.push("/projects/" + props.projectSelected + "/forms/" + form.name + "/data")
 
-                                    }}>Access Data</Button></td>
+                                    }}
+                                    disabled={noDataAccess}>Access Data</Button></td>
                             </tr>
                         )
                     }
@@ -279,6 +294,8 @@ function FormManagementComponent() {
     const [authToken, setAuthToken] = useContext(AuthContext)
     const [adminData, setAdminData] = useContext(UserContext)
 
+    const [formData, setFormData] = useState()
+
     console.log("admin data")
     console.log(adminData)
 
@@ -291,7 +308,17 @@ function FormManagementComponent() {
             authToken: authToken,
             setUserInfo: setAdminData
         })
+
     }, [])
+
+    useEffect(() => {
+        console.log("Form Data")
+        console.log(formData)
+
+    }, [formData])
+
+
+
 
     return (
 
