@@ -39,80 +39,27 @@ function CheckProjectManager(props) {
 }
 
 
-async function AddProjectManager(props) {
 
-    const result = await axios({
-        method: 'post',
-        url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/project-manager",
-        headers: {
-            'Authorization': props.authToken
-        },
-        data: {
-            projectName: props.projectName,
-            email: props.email
-        }
-    })
-    console.log("User addition result")
 
-    console.log(result)
-    if (result.status === 400) {
-        Store.addNotification({
-            title: "Error",
-            message: result.data,
-            type: "danger",
-            insert: "top",
-            container: "top-right",
-            animationIn: ["animate__animated", "animate__fadeIn"],
-            animationOut: ["animate__animated", "animate__fadeOut"],
-            dismiss: {
-                duration: 5000,
-                onScreen: true
-            }
-        });
-    }
-
-    if (result.status === 200) {
-        Store.addNotification({
-            title: "Success",
-            message: "User Added",
-            type: "success",
-            insert: "top",
-            container: "top-right",
-            animationIn: ["animate__animated", "animate__fadeIn"],
-            animationOut: ["animate__animated", "animate__fadeOut"],
-            dismiss: {
-                duration: 5000,
-                onScreen: true
-            }
-        });
-    }
-
-    return (result)
-
-}
-
-function BuildUrl(props) {
+function BuildRequest(props) {
+    console.log(props)
     if (props.userType === "projectManager") {
-        return process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/project-manager"
+        return {
+            method: 'post',
+            url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/project-manager",
+            headers: {
+                'Authorization': props.authToken
+            },
+            data: {
+                projectName: props.projectName,
+                email: props.email
+            }
+        }
     }
     if (props.userType === "dataCollector") {
-        return process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/data-collector"
-    }
-
-    if (props.userType === "analyst") {
-        return process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/analyst"
-    }
-
-}
-
-async function AddFormUser(props) {
-    let url = BuildUrl(props)
-
-
-    try {
-        const result = await axios({
+        return {
             method: 'post',
-            url: url,
+            url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/data-collector",
             headers: {
                 'Authorization': props.authToken
             },
@@ -120,23 +67,34 @@ async function AddFormUser(props) {
                 formName: props.formName,
                 email: props.email
             }
-        })
-
-        if (result.status === 400) {
-            Store.addNotification({
-                title: "Error",
-                message: result.data,
-                type: "danger",
-                insert: "top",
-                container: "top-right",
-                animationIn: ["animate__animated", "animate__fadeIn"],
-                animationOut: ["animate__animated", "animate__fadeOut"],
-                dismiss: {
-                    duration: 5000,
-                    onScreen: true
-                }
-            });
         }
+
+    }
+
+    if (props.userType === "analyst") {
+        return {
+            method: 'post',
+            url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/analyst",
+            headers: {
+                'Authorization': props.authToken
+            },
+            data: {
+                formName: props.formName,
+                email: props.email
+            }
+        }
+    }
+
+}
+
+async function AddFormUser(props) {
+    let request = BuildRequest(props)
+
+
+    try {
+        const result = await axios(request)
+
+
 
         if (result.status === 200) {
             Store.addNotification({
@@ -157,9 +115,10 @@ async function AddFormUser(props) {
         return (result)
 
     } catch (err) {
+        console.log(err)
         Store.addNotification({
             title: "Error",
-            message: err.message,
+            message: err.response.data,
             type: "danger",
             insert: "top",
             container: "top-right",
@@ -180,6 +139,7 @@ async function AddFormUser(props) {
 function UserForm(props) {
     const [newUser, setNewUser] = useState()
 
+    const [projectManagerEmail, setProjectManagerEmail] = useState()
 
     const [userType, setUserType] = useState('')
     const [email, setEmail] = useState('')
@@ -199,7 +159,7 @@ function UserForm(props) {
                                         <Form.Group>
                                             <Form.Label>User email</Form.Label>
                                             <Form.Control onChange={(event) => {
-                                                setNewUser(event.target.value)
+                                                setProjectManagerEmail(event.target.value)
                                             }} />
                                         </Form.Group>
                                         <Button className="bg-dark text-white border-0 float-right" style={{ "marginTop": "10px" }}
@@ -207,8 +167,9 @@ function UserForm(props) {
                                                 console.log(props.projectSelected)
                                                 const result = await AddFormUser({
                                                     authToken: props.authToken,
-                                                    email: email,
-                                                    formName: props.formSelected,
+                                                    email: projectManagerEmail,
+                                                    projectName: props.projectSelected,
+                                                    formName: null,
                                                     userType: "projectManager"
                                                 })
                                                 console.log(result)

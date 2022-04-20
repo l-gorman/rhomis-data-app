@@ -16,7 +16,7 @@ this with the Nav.Link component
 
 
 async function GetAdminData(props) {
-    console.log("authToken: ", props.authToken)
+
     const result = await axios({
         method: 'get',
         url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/meta-data",
@@ -25,10 +25,7 @@ async function GetAdminData(props) {
         }
     })
 
-    console.log("response: ")
-    console.log(result)
     if (result.status === 200) {
-        console.log("Setting project information")
         if (result.data.projects.length > 0) {
             props.setShowProjectManagement(true)
         }
@@ -49,7 +46,6 @@ async function GetAdminData(props) {
 
 
 export default function MainNavbar(props) {
-    console.log("Survey builder url: " + process.env.SURVEY_BUILDER_URL)
     // props.Logout()
     const [authToken, setAuthToken] = useContext(AuthContext)
     const [show, setShow] = useState(false)

@@ -10,24 +10,10 @@ import { FetchUserInformation } from '../fetching-context-info/fetching-context-
 
 import { GetInformationForFormComponent } from '../fetching-context-info/fetching-context-info'
 
-function RenderNoDataFound(props) {
-    return (
-
-        <Card>
-            <Card.Header>
-                No data found
-            </Card.Header>
-            <Card.Body>
-
-            </Card.Body>
-        </Card>
-    )
-}
-
 function RenderUnitsForm(props) {
 
     return (
-        <Card>
+        <Card style={{ "margin-top": "30px" }}>
             <Card.Header>
                 Units
             </Card.Header>
@@ -43,14 +29,14 @@ function RenderUnitsForm(props) {
 
 function RenderPriceAndCalorieConversions(props) {
     return (
-        <Card>
+        <Card style={{ "margin-top": "30px" }}>
             <Card.Header>
-                Price and Calori
+                Prices and Calories
             </Card.Header>
             <Card.Body>
 
             </Card.Body>
-        </Card>
+        </Card >
 
 
     )
@@ -58,7 +44,7 @@ function RenderPriceAndCalorieConversions(props) {
 
 function RenderFinalOutputs(props) {
     return (
-        <Card>
+        <Card style={{ "margin-top": "30px" }}>
             <Card.Header>
                 Final Outputs
             </Card.Header>
@@ -75,7 +61,6 @@ function RenderDataCard(props) {
 
     return (
         <>
-            <RenderNoDataFound />
             <RenderUnitsForm />
             <RenderPriceAndCalorieConversions />
 
@@ -327,7 +312,13 @@ export default function DataAccessComponent() {
                 </Card.Header>
                 <Card.Body>
 
-                    <RenderDataCard />
+                    <RenderDataCard
+                        authToken={authToken}
+                        formData={formData}
+                        projectSelected={projectSelected}
+                        formSelected={formSelected}
+
+                    />
 
                 </Card.Body>
             </Card>

@@ -17,8 +17,7 @@
 
 import { useParams } from "react-router-dom"
 import { FetchUserInformation, GetInformationForFormComponent } from '../fetching-context-info/fetching-context-info'
-
-import { } from '../fetching-context-info/fetching-context-info'
+import { Spinner } from "react-bootstrap"
 
 
 import React, { useState, useEffect, useContext } from 'react'
@@ -108,8 +107,7 @@ function NoInfoFound() {
 function FormTables(props) {
 
     const history = useHistory()
-    console.log("Render project admin props")
-    console.log(props)
+
 
     let allowToFinalize = false
     if (!props.data) {
@@ -134,8 +132,7 @@ function FormTables(props) {
             let formsForProject = props.data.forms.filter((form) => form.project === props.projectSelected)
             formsExist = formsForProject.length > 0
 
-            console.log("formsForProject")
-            console.log(formsForProject)
+
         }
     }
 
@@ -185,7 +182,11 @@ function FormTables(props) {
                                 <td style={{ "vertical-align": "middle" }}>{form.name}</td>
                                 <td style={{ "vertical-align": "middle" }}>{form.draft ? "Draft" : "Finalized"}</td>
                                 <td style={{ "vertical-align": "middle" }}>{dateString}</td>
-                                <td style={{ "vertical-align": "middle" }}>{form.submissions}</td>
+                                <td style={{ "vertical-align": "middle" }}>{props.submissionsLoading ? <Spinner as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true" /> : form.submissions}</td>
 
                                 <td style={{ "text-align": "center" }}>
                                     <DropdownButton title="Options" variant="dark" menuVariant="dark border-0" drop="end">
@@ -228,26 +229,7 @@ function FormTables(props) {
 
 
 
-async function AddProjectManager(props) {
 
-    try {
-        const result = await axios({
-            method: 'post',
-            url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/project-manager",
-            headers: {
-                'Authorization': props.authToken
-            },
-            data: {
-                projectName: props.projectName,
-                email: props.email
-            }
-        })
-        console.log(result)
-        return (result)
-    } catch (err) {
-        return (err)
-    }
-}
 
 function RenderProjectAdmin(props) {
     let renderUserForm = false
@@ -274,7 +256,7 @@ function RenderProjectAdmin(props) {
             <Card.Header as="h5">Select a Form</Card.Header>
             <Card.Body>
                 {/* <Card.Title>Special title treatment</Card.Title> */}
-                <FormTables projectSelected={props.projectSelected} authToken={props.authToken} setAdminData={props.setAdminData} data={props.data} filters={props.filters} setFilters={props.setFilters} setFormSelected={props.setFormSelected} />
+                <FormTables submissionsLoading={props.submissionsLoading} projectSelected={props.projectSelected} authToken={props.authToken} setAdminData={props.setAdminData} data={props.data} filters={props.filters} setFilters={props.setFilters} setFormSelected={props.setFormSelected} />
             </Card.Body>
         </Card>
 
@@ -300,6 +282,8 @@ function FormManagementComponent() {
     const [authToken, setAuthToken] = useContext(AuthContext)
     const [adminData, setAdminData] = useContext(UserContext)
 
+    const [submissionsLoading, setSubmissionLoading] = useState(true)
+
     const [formData, setFormData] = useState()
 
     console.log("admin data")
@@ -310,18 +294,31 @@ function FormManagementComponent() {
     const data = null
 
     useEffect(() => {
-        FetchUserInformation({
-            authToken: authToken,
-            setUserInfo: setAdminData
-        })
+
+
+
+
+        async function GetUserInfo() {
+
+            await FetchUserInformation({
+                authToken: authToken,
+                setUserInfo: setAdminData,
+                getSubmissionCount: true
+            })
+
+            setSubmissionLoading(false)
+
+        }
+
+        GetUserInfo()
 
     }, [])
 
-    useEffect(() => {
-        console.log("Form Data")
-        console.log(formData)
+    // useEffect(() => {
+    //     console.log("Form Data")
+    //     console.log(formData)
 
-    }, [formData])
+    // }, [formData])
 
 
 
@@ -353,7 +350,8 @@ function FormManagementComponent() {
                         data={adminData}
                         setFormSelected={setFormSelected}
                         filters={filters}
-                        setFilters={setFilters} />
+                        setFilters={setFilters}
+                        submissionsLoading={submissionsLoading} />
                 </Card.Body>
             </Card>
         </div >
