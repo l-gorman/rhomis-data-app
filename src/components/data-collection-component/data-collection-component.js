@@ -7,7 +7,7 @@ import UserContext from '../user-info-component/UserContext'
 
 import { GetInformationForFormComponent, Set } from '../fetching-context-info/fetching-context-info'
 
-
+import { FetchUserInformation } from '../fetching-context-info/fetching-context-info'
 import { AiOutlineArrowLeft } from 'react-icons/ai'
 
 import QRCode from 'react-qr-code'
@@ -206,7 +206,7 @@ function CardBody(props) {
                 {props.formState.encoded_settings ? <QRCode value={props.formState.encoded_settings} /> : <Spinner
                     as="span"
                     animation="border"
-                    size="sm"
+                    size="100px"
                     role="status"
                     aria-hidden="true"
                 />}
@@ -250,7 +250,12 @@ export default function DataCollectionComponent() {
 
 
 
-
+    useEffect(() => {
+        FetchUserInformation({
+            authToken: authToken,
+            setUserInfo: setAdminData
+        })
+    }, [])
 
     useEffect(() => {
         const new_form_state = SetInitialFormState({

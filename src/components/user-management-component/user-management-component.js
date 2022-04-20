@@ -41,55 +41,54 @@ function CheckProjectManager(props) {
 
 async function AddProjectManager(props) {
 
-    try {
-        const result = await axios({
-            method: 'post',
-            url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/project-manager",
-            headers: {
-                'Authorization': props.authToken
-            },
-            data: {
-                projectName: props.projectName,
-                email: props.email
+    const result = await axios({
+        method: 'post',
+        url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/project-manager",
+        headers: {
+            'Authorization': props.authToken
+        },
+        data: {
+            projectName: props.projectName,
+            email: props.email
+        }
+    })
+    console.log("User addition result")
+
+    console.log(result)
+    if (result.status === 400) {
+        Store.addNotification({
+            title: "Error",
+            message: result.data,
+            type: "danger",
+            insert: "top",
+            container: "top-right",
+            animationIn: ["animate__animated", "animate__fadeIn"],
+            animationOut: ["animate__animated", "animate__fadeOut"],
+            dismiss: {
+                duration: 5000,
+                onScreen: true
             }
-        })
-
-        if (result.status === 400) {
-            Store.addNotification({
-                title: "Error",
-                message: result.data,
-                type: "danger",
-                insert: "top",
-                container: "top-right",
-                animationIn: ["animate__animated", "animate__fadeIn"],
-                animationOut: ["animate__animated", "animate__fadeOut"],
-                dismiss: {
-                    duration: 5000,
-                    onScreen: true
-                }
-            });
-        }
-
-        if (result.status === 200) {
-            Store.addNotification({
-                title: "Success",
-                message: "User Added",
-                type: "success",
-                insert: "top",
-                container: "top-right",
-                animationIn: ["animate__animated", "animate__fadeIn"],
-                animationOut: ["animate__animated", "animate__fadeOut"],
-                dismiss: {
-                    duration: 5000,
-                    onScreen: true
-                }
-            });
-        }
-
-        return (result)
-    } catch (err) {
-        return (err)
+        });
     }
+
+    if (result.status === 200) {
+        Store.addNotification({
+            title: "Success",
+            message: "User Added",
+            type: "success",
+            insert: "top",
+            container: "top-right",
+            animationIn: ["animate__animated", "animate__fadeIn"],
+            animationOut: ["animate__animated", "animate__fadeOut"],
+            dismiss: {
+                duration: 5000,
+                onScreen: true
+            }
+        });
+    }
+
+    return (result)
+
 }
 
 function BuildUrl(props) {
