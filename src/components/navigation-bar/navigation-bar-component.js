@@ -107,11 +107,11 @@ export default function MainNavbar(props) {
                             <Nav.Link className="side-bar-link" as={Link} onClick={() => { handleClose() }} to="/">Portal</Nav.Link>
                         </div>
                         <div className="side-bar-item">
-
-                            <form style={{ "width": "100%" }} method="post" action={"https://rhomis-survey.stats4sdtest.online/login/"} class="inline">
+                            <form style={{ "width": "100%" }} method="post" action={"https://rhomis-survey.stats4sdtest.online/login"} class="inline">
                                 <input type="hidden" name="token" value={authToken} />
                                 <input type="hidden" name="redirect_url" value="/admin/xlsform/create" />
-                                <input type="submit" value="Build a Survey" />
+                                <input className="form-link" type="submit" value="Build a Survey"
+                                />
                             </form>
                         </div>
 

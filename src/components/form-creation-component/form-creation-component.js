@@ -334,6 +334,126 @@ function NewDraftFormEntry(props) {
 }
 
 
+function FinalizeFormEntry(props) {
+
+
+    console.log("Draft form data")
+
+    const [formList, setFormList] = useState([])
+
+
+    console.log(props.data)
+    let projectList = ["No Projects"]
+    let projectDisabled = true
+
+    if (props.data !== undefined & props.data !== null) {
+        if (props.data.projects !== undefined) {
+            projectList = props.data.projects.map((project) => {
+                return project.name
+            })
+            projectDisabled = false
+        }
+
+        if (props.data.projects.length === 0) {
+            projectList = ["No Projects"]
+            projectDisabled = true
+
+        }
+    }
+    console.log(projectList)
+
+    console.log(props.data)
+
+
+    return (
+        <>
+            <Form>
+                <Form.Group>
+                    <Form.Label>
+                        Select a project
+                    </Form.Label>
+                    <Form.Select defaultValue="Select a Project" onChange={(event) => {
+
+                        props.setSelectedDraftProject(event.target.value)
+
+                        const newFormList = []
+                        if (props.data !== undefined & props.data !== null) {
+                            if (props.data.forms !== undefined) {
+                                props.data.forms.map((form) => {
+                                    if (form.project === event.target.value) {
+                                        newFormList.push(form.name)
+                                    }
+                                })
+                                setFormList(newFormList)
+                            }
+
+                            if (props.data.projects.length === 0) {
+                                setFormList([])
+                            }
+                        }
+                    }
+                    } disabled={projectDisabled} aria-label="Default select example">
+                        <option disabled={true}>Select a Project</option>
+                        {projectList.map((option) => {
+                            return <option>{option}</option>
+                        })}
+                    </Form.Select>
+                </Form.Group>
+
+                <Form.Group>
+                    <Form.Label>
+                        Select the form you would like to finalize
+                    </Form.Label>
+                    <Form.Select defaultValue="Select a form" onChange={(event) => {
+                        console.log("Form name seleceted")
+                        console.log(event.target.value)
+                        props.setNewDraftFormName(event.target.value)
+                    }
+                    } aria-label="Default select example">
+                        <option disabled={true}>Select a form</option>
+                        {formList.map((option) => {
+                            return <option>{option}</option>
+                        })}
+                    </Form.Select>
+                </Form.Group>
+
+
+                <Button onClick={async () => {
+                    await FinalizeForm({
+                        authToken: props.authToken,
+                        project: props.selectedDraftProject,
+                        form: props.newDraftFormName
+                    })
+                    await props.GetProjectInformation({ authToken: props.authToken, setProjectInformation: props.setProjectInformation })
+                }}>Finalise</Button>
+            </Form>
+        </>
+    )
+}
+
+
+async function FinalizeForm(props) {
+
+    console.log("Finalizing form")
+    console.log(props)
+    const result = await axios({
+        method: 'post',
+        url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/forms/publish",
+        headers: {
+            'Authorization': props.authToken
+        },
+        params: {
+            form_name: props.form,
+            project_name: props.project
+        }
+    })
+
+
+
+
+
+}
+
 function RenderProjectInformation(props) {
 
     console.log(props)
@@ -522,6 +642,21 @@ export default function FormCreationComponent() {
                         </Accordion.Item>
 
                         <Accordion.Item eventKey="4">
+                            <Accordion.Header>Finalize a Form</Accordion.Header>
+                            <Accordion.Body>
+                                <FinalizeFormEntry
+                                    GetProjectInformation={GetProjectInformation}
+                                    setProjectInformation={setProjectInformation}
+                                    authToken={authToken}
+                                    data={projectInformation}
+                                    setSelectedDraftProject={setSelectedDraftProject}
+                                    selectedDraftProject={selectedDraftProject}
+                                    setNewDraftFormName={setNewDraftFormName}
+                                    newDraftFormName={newDraftFormName}
+                                />
+                            </Accordion.Body>
+                        </Accordion.Item>
+                        <Accordion.Item eventKey="5">
                             <Accordion.Header>Add Administrator</Accordion.Header>
                             <Accordion.Body>
                                 <Form>

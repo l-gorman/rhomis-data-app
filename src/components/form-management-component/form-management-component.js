@@ -22,7 +22,7 @@ import { } from '../fetching-context-info/fetching-context-info'
 
 
 import React, { useState, useEffect, useContext } from 'react'
-import { Form, Button, Card, Table, CardGroup } from 'react-bootstrap'
+import { Form, Button, Card, Table, CardGroup, DropdownButton, Dropdown } from 'react-bootstrap'
 import axios from 'axios'
 import AuthContext from '../authentication-component/AuthContext'
 import UserContext from "../user-info-component/UserContext"
@@ -150,8 +150,8 @@ function FormTables(props) {
                     <th>Created At</th>
                     <th>Submissions</th>
                     <th ></th>
-                    <th ></th>
-                    <th ></th>
+
+
                 </tr>
             </thead>
             <tbody>
@@ -162,7 +162,7 @@ function FormTables(props) {
 
                         let disableButton = true
 
-                        let noDataAccess = true
+                        let accessData = false
 
                         if (allowToFinalize === false) {
                             disableButton = false
@@ -174,7 +174,7 @@ function FormTables(props) {
 
                         if (form.submissions > 0) {
 
-                            noDataAccess = false
+                            accessData = true
 
                         }
 
@@ -188,26 +188,32 @@ function FormTables(props) {
                                 <td style={{ "vertical-align": "middle" }}>{form.submissions}</td>
 
                                 <td style={{ "text-align": "center" }}>
-                                    <Button className="bg-dark text-white border-0"
-                                        onClick={() => {
-                                            history.push("/projects/" + props.projectSelected + "/forms/" + form.name + "/collect")
-                                        }}>Collect Data</Button></td>
+                                    <DropdownButton title="Options" variant="dark" menuVariant="dark border-0" drop="end">
+                                        <Dropdown.Item className="dark text-white border-0"
+                                            onClick={() => {
+                                                history.push("/projects/" + props.projectSelected + "/forms/" + form.name + "/collect")
+                                            }}>Collect Data</Dropdown.Item>
+                                        <Dropdown.Item className="dark text-white border-0"
+                                            onClick={() => {
+                                            }}>Edit Form</Dropdown.Item>
 
-                                <td style={{ "text-align": "center" }} >
-                                    <Button className="bg-dark text-white border-0"
-                                        onClick={() => {
+                                        <Dropdown.Item className="dark text-white border-0"
+                                            onClick={() => {
 
 
-                                            history.push("/projects/" + props.projectSelected + "/forms/" + form.name + "/users")
+                                                history.push("/projects/" + props.projectSelected + "/forms/" + form.name + "/users")
 
-                                        }}>Manage Users</Button></td>
-                                <td style={{ "text-align": "center" }}><Button className="bg-dark text-white border-0"
-                                    onClick={() => {
+                                            }}>Manage Users</Dropdown.Item>
+                                        {accessData ?
+                                            <Dropdown.Item className="dark text-white border-0"
+                                                onClick={() => {
 
-                                        history.push("/projects/" + props.projectSelected + "/forms/" + form.name + "/data")
+                                                    history.push("/projects/" + props.projectSelected + "/forms/" + form.name + "/data")
 
-                                    }}
-                                    disabled={noDataAccess}>Access Data</Button></td>
+                                                }}
+                                            >Access Data</Dropdown.Item> : <></>}
+                                    </DropdownButton>
+                                </td>
                             </tr>
                         )
                     }

@@ -249,37 +249,7 @@ async function ProcessData(props) {
     return (result)
 }
 
-async function AddFormUser(props) {
-    let url = ""
-    if (props.userType === "dataCollector") {
-        url = process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/data-collector"
-    }
 
-    if (props.userType === "analyst") {
-        url = process.env.REACT_APP_AUTHENTICATOR_URL + "api/user/analyst"
-    }
-
-    try {
-        const result = await axios({
-            method: 'post',
-            url: url,
-            headers: {
-                'Authorization': props.authToken
-            },
-            data: {
-                formName: props.formName,
-                email: props.email
-            }
-        })
-        console.log(result)
-        return (result)
-
-    } catch (err) {
-        return (err)
-
-    }
-
-}
 
 function UserForm(props) {
 
@@ -311,12 +281,12 @@ function UserForm(props) {
 
                 <Button className="bg-dark text-white border-0 float-right" style={{ "marginTop": "10px" }}
                     onClick={async () => {
-                        const result = await AddFormUser({
-                            authToken: props.authToken,
-                            email: email,
-                            formName: props.formSelected,
-                            userType: userType
-                        })
+                        // const result = await AddFormUser({
+                        //     authToken: props.authToken,
+                        //     email: email,
+                        //     formName: props.formSelected,
+                        //     userType: userType
+                        // })
                     }}>Add User</Button>
 
             </Form >
@@ -887,8 +857,6 @@ export default function FormAdminComponent() {
                 projectName: projectSelected,
                 formName: formSelected,
                 setFormData: setFormData
-
-
             })
             // const response = await FetchUserInformation({
             //     authToken: authToken,
