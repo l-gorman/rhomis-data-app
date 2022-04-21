@@ -68,8 +68,15 @@ export default function RoutingComponent() {
     console.log("Auth token context")
     console.log(authToken)
 
+    return (<RedirectComponents authToken={authToken} />)
 
-    if (authToken) {
+
+}
+
+function RedirectComponents(props) {
+
+    console.log(props.authToken)
+    if (props.authToken) {
         return (
             < Router >
                 <MainNavbar />
@@ -79,6 +86,8 @@ export default function RoutingComponent() {
                         <Redirect from="/" to="/home" />
                     </Route>
                     <Route path="/home" component={PortalComponent} />
+                    <Route path="/register"><RegisterComponent /></Route>
+                    <Route path="/login"><LoginComponent /></Route>
 
                     <Route path="/projects/:projectName/forms/:formName" component={FormAdminComponent} />
                     <Route path="/projects/:projectName" component={FormManagementComponent} />
@@ -92,7 +101,7 @@ export default function RoutingComponent() {
                     <Route path="/administration" component={FormCreationComponent} />
 
                     {/* <Route path="*" component={NotFoundComponent} /> */}
-                    {/* <Redirect from="*" to="/home" /> */}
+                    <Redirect from="*" to="/home" />
 
                 </Switch >
                 {/* </Fade> */}
@@ -101,7 +110,7 @@ export default function RoutingComponent() {
         )
     }
 
-    if (!authToken) {
+    if (!props.authToken) {
         return (
             < Router >
                 {/* <Fade> */}
@@ -111,12 +120,13 @@ export default function RoutingComponent() {
                     </Route>
                     <Route path="/register"><RegisterComponent /></Route>
                     <Route path="/login"><LoginComponent /></Route>
-                    {/* <Redirect from="*" to="/login" /> */}
+                    <Redirect from="*" to="/login" />
                 </Switch >
                 {/* </Fade> */}
 
             </Router >
         )
     }
-}
 
+
+}
