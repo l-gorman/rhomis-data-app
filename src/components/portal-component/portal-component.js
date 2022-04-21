@@ -141,10 +141,6 @@ function RenderPortalCards(props) {
             portalCardData.push(...cardToAdd)
         }
 
-        if (props.userData.researcher.length > 0) {
-            const cardToAdd = props.data.filter(item => item.label === "globalData")
-            portalCardData.push(...cardToAdd)
-        }
 
         if (props.userData.administrator === true) {
             const cardToAdd = props.data.filter(item => item.label === "administrator")
@@ -152,6 +148,11 @@ function RenderPortalCards(props) {
         }
 
 
+        if (props.userData.researcher.length > 0 |
+            props.userData.basic === true) {
+            const cardToAdd = props.data.filter(item => item.label === "globalData")
+            portalCardData.push(...cardToAdd)
+        }
         if (props.userData.basic === true) {
             const cardToAdd = props.data.filter(item => item.label === "help")
             portalCardData.push(...cardToAdd)
