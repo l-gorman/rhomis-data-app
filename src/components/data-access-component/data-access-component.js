@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { Card, Button, Nav, Accordion, Table } from 'react-bootstrap'
+import { Card, Button, Nav, Accordion, Table, Spinner} from 'react-bootstrap'
 import { AiOutlineArrowLeft } from 'react-icons/ai'
 import { useParams, useHistory } from 'react-router-dom'
 
@@ -9,6 +9,68 @@ import UserContext from '../user-info-component/UserContext'
 import { FetchUserInformation } from '../fetching-context-info/fetching-context-info'
 
 import { GetInformationForFormComponent } from '../fetching-context-info/fetching-context-info'
+
+import axios from 'axios'
+
+import {Store} from 'react-notifications-component';
+
+async function ProcessData(props) {
+    const form = props.data.forms.filter((item) => item.name === props.formSelected && item.project === props.projectSelected)[0]
+
+    try{
+        const result = await axios({
+            method: 'post',
+            url: process.env.REACT_APP_API_URL + "api/process-data",
+            headers: {
+                'Authorization': props.authToken
+            },
+            data: {
+                commandType: props.commandType,
+                projectName: props.projectSelected,
+                formName: props.formSelected,
+                formVersion: form.formVersion,
+                draft: form.draft,
+            }
+        })
+
+        if (result.status === 200) {
+            Store.addNotification({
+                title: "Success",
+                message: props.process_label + "Completed",
+                type: "success",
+                insert: "top",
+                container: "top-right",
+                animationIn: ["animate__animated", "animate__fadeIn"],
+                animationOut: ["animate__animated", "animate__fadeOut"],
+                dismiss: {
+                    duration: 5000,
+                    onScreen: true
+                }
+            });
+        }
+        return (result)
+    }catch(err){
+        console.log(err.response)
+            Store.addNotification({
+                title: "Error",
+                message: err.response.data,
+                type: "danger",
+                insert: "top",
+                container: "top-right",
+                animationIn: ["animate__animated", "animate__fadeIn"],
+                animationOut: ["animate__animated", "animate__fadeOut"],
+                dismiss: {
+                    duration: 5000,
+                    onScreen: true
+                }
+            });
+        
+
+
+    }
+    
+}
+
 
 function RenderUnitsForm(props) {
 
@@ -61,10 +123,9 @@ function RenderDataCard(props) {
 
     return (
         <>
-            <RenderUnitsForm />
-            <RenderPriceAndCalorieConversions />
-
-            <RenderFinalOutputs />
+           {props.showUnits?<RenderUnitsForm />:<></>}
+            {props.showPrices?<RenderPriceAndCalorieConversions />:<></>}
+            {props.showOutputs?<RenderFinalOutputs />:<></>}
         </>
 
     )
@@ -244,6 +305,49 @@ function generateDataDownloadLink(dataToDownload, dataDownloadLink) {
     return (window.URL.createObjectURL(data))
 }
 
+
+
+function CheckFormData(props){
+    if (props.formData.unitsExtracted==false){
+        // Extract Units
+        Store.addNotification({
+            title: "Extracting Units",
+            message: "Please wait while we extract units from the dataset",
+            type: "success",
+            insert: "top",
+            container: "top-right",
+            animationIn: ["animate__animated", "animate__fadeIn"],
+            animationOut: ["animate__animated", "animate__fadeOut"],
+            dismiss: {
+                duration: 5000,
+                onScreen: true
+            }
+        });
+      
+        ProcessData({
+            commandType: "units",
+            formSelected: props.formSelected,
+            projectSelected: props.projectSelected,
+            process_label: "Unit Extraction",
+            data: props.data,
+            authToken:props.authToken
+
+        })      
+
+
+    }
+    if (props.formData.pricesCalculated==false){
+
+
+        
+    }
+    if (props.formData.finalIndicators==false){
+        
+    }
+
+}
+
+
 export default function DataAccessComponent() {
 
     const projectSelected = useParams().projectName
@@ -255,15 +359,19 @@ export default function DataAccessComponent() {
     const history = useHistory()
 
 
-    const [formData, setFormData] = useState()
+    const [formData, setFormData] = useState({
+        
+        
+    })
 
-
-
-
+    const [loading, setLoading] = useState(true)
+    const [showUnits, setShowUnits] = useState(false)
+    const [showPrices, setShowPrices] = useState(false)
+    const [showOutputs, setShowOutputs] = useState(false)
 
     useEffect(() => {
-        async function GetUserInfo() {
-
+ 
+            async function GetUserInfo(){
             await GetInformationForFormComponent({
                 setAuthToken: setAuthToken,
                 authToken: authToken,
@@ -271,7 +379,11 @@ export default function DataAccessComponent() {
                 projectName: projectSelected,
                 formName: formSelected,
                 setFormData: setFormData
-            })
+            }
+            
+            
+            )
+            setLoading(false)
             // const response = await FetchUserInformation({
             //     authToken: authToken,
             //     setUserInfo: setAdminData
@@ -279,16 +391,29 @@ export default function DataAccessComponent() {
 
 
         }
-
         GetUserInfo()
+        
+      
+
+        
     }, [])
 
 
     useEffect(() => {
         console.log("Form Data")
         console.log(formData)
-
+        
+        CheckFormData({
+            formData:formData,
+            data: adminData,
+            authToken: authToken,
+            projectSelected: projectSelected,
+            formSelected: formSelected
+        })
+     
     }, [formData])
+
+
     return (
         <div id="project-management-container" className="sub-page-container">
 
@@ -311,14 +436,24 @@ export default function DataAccessComponent() {
                     </div>
                 </Card.Header>
                 <Card.Body>
-
+                   
+                    {loading?
+                    <Spinner 
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"/>:
                     <RenderDataCard
                         authToken={authToken}
                         formData={formData}
                         projectSelected={projectSelected}
                         formSelected={formSelected}
+                        showUnits={showUnits}
+                        showPrices={showPrices}
+                        showOutputs={showOutputs}
 
-                    />
+                    />}
 
                 </Card.Body>
             </Card>
