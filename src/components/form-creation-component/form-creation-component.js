@@ -28,7 +28,7 @@ import AuthContext from '../authentication-component/AuthContext'
 async function GetProjectInformation(props) {
     console.log("authToken: ", props.authToken)
     const result = await axios({
-        method: 'get',
+        method: 'post',
         url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/meta-data",
         headers: {
             'Authorization': props.authToken
@@ -570,8 +570,20 @@ export default function FormCreationComponent() {
 
     const [newAdmin, setNewAdmin] = useState(null)
 
-    useEffect(async () => {
+    useEffect(() => {
+
+
+        async function GetUserInfo() {
         await GetProjectInformation({ authToken: authToken, setProjectInformation: setProjectInformation })
+        // const response = await FetchUserInformation({
+        //     authToken: authToken,
+        //     setUserInfo: setAdminData
+        // })
+
+
+    }
+
+    GetUserInfo()
     }, [])
 
 

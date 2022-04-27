@@ -17,6 +17,7 @@ import axios from 'axios'
 
 
 async function ProcessData(props) {
+    console.log(props)
     const form = props.data.forms.filter((item) => item.name === props.formSelected && item.project === props.projectSelected)[0]
     const result = await axios({
         method: 'post',
@@ -294,16 +295,27 @@ export default function DataCollectionComponent() {
         dataAnalystOfForm: false,
         odkConf: false,
         encoded_settings: false,
-        draft: false
+        draft: false,
+        data:{
+            forms:[],
+            users:[],
+            projects:[]
+        }
     })
 
 
 
     useEffect(() => {
-        FetchUserInformation({
-            authToken: authToken,
-            setUserInfo: setAdminData
-        })
+
+        async function FetchUserInfo(){
+            await FetchUserInformation({
+                authToken: authToken,
+                setUserInfo: setAdminData
+            })
+        }
+
+        FetchUserInfo()
+        
     }, [])
 
     useEffect(() => {
@@ -320,7 +332,7 @@ export default function DataCollectionComponent() {
         setInitialState(new_form_state)
 
 
-    }, [adminData, formSelected, projectSelected])
+    }, [adminData])
 
     return (
         <div id="project-management-container" className="sub-page-container">
@@ -348,7 +360,12 @@ export default function DataCollectionComponent() {
 
 
 
-                    <CardBody formState={initialState} />
+                    <CardBody formState={initialState} 
+                    data={adminData}
+                    authToken={authToken}
+                    formSelected={formSelected}
+                    projectSelected={projectSelected}/>
+
                 </Card.Body>
             </Card>
         </div >

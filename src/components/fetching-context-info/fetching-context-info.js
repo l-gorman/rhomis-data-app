@@ -13,6 +13,7 @@ async function FetchUserInformation(props) {
     console.log(getSubmissionCount)
 
     if (props.authToken) {
+        try{
         const response = await axios({
             method: "post",
             url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/meta-data/",
@@ -25,7 +26,12 @@ async function FetchUserInformation(props) {
         })
         console.log("user info")
         console.log(response.data)
-        props.setUserInfo(response.data)
+        let result = JSON.parse(JSON.stringify(response.data))
+        console.log(result)
+        props.setUserInfo(result)
+    }catch(err){
+        console.log(err)
+    }
 
     }
 
