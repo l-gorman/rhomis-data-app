@@ -143,7 +143,6 @@ async function SubmitUnitsData(props){
         formSelected:props.formSelected,
         unitType: props.unitsSelect,
         unitsData:props.unitsData
-
       },
     });
 
@@ -193,6 +192,20 @@ function ShowUnitsForm(props) {
   const [submitAllUnits, setSubmitAllUnits] = useState(false)
   console.log(props);
 
+  const pricesNames = [
+      'mean_crop_price_lcu_per_kg',
+      'mean_livestock_price_per_animal',
+      'mean_meat_price_per_kg',
+      'mean_milk_price_per_litre',
+      'mean_eggs_price_per_kg',
+      'mean_bees_honey_price_per_kg',
+      'crop_calories',
+      'milk_calories',
+      'eggs_calories',
+      'honey_calories',
+      'meat_calories',
+      'staple_crop'
+  ]
   useEffect(()=>{
       console.log("Units")
       console.log(unitsData)
@@ -229,7 +242,19 @@ function ShowUnitsForm(props) {
             Select
           </option>
           {props.formData.units.map((unitType) => {
-            return <option key={"unit-option-" + unitType}>{unitType}</option>;
+            if(props.formType==="units"){
+                if (pricesNames.some((priceName)=>priceName==unitType)===false){
+                  return <option key={"unit-option-" + unitType}>{unitType}</option>;
+
+                }
+            }
+            if(props.formType==="prices"){
+              if (pricesNames.some((priceName)=>priceName==unitType)===true){
+                return <option key={"unit-option-" + unitType}>{unitType}</option>;
+
+              }
+            }
+            // return <option key={"unit-option-" + unitType}>{unitType}</option>;
           })}
         </Form.Select>
       </Form>
@@ -357,7 +382,8 @@ function RenderUnitsForm(props) {
     <Card style={{ "marginTop": "30px" }}>
       <Card.Header>Units</Card.Header>
       <Card.Body>
-        <ShowUnitsForm {...props} 
+        <ShowUnitsForm {...props}
+        formType='units' 
         formLabel="Select the type of unit"
         checkBoxLabel="I confirm that I have verified and submitted all units, proceed to (re)calculate product prices"
         submissionLabel="Calculate Prices"
@@ -374,7 +400,8 @@ function RenderPriceAndCalorieConversions(props) {
     <Card style={{ "marginTop": "30px" }}>
       <Card.Header>Prices and Calories</Card.Header>
       <Card.Body>
-      <ShowUnitsForm {...props} 
+      <ShowUnitsForm {...props}
+        formType='prices' 
         formLabel="Select the price/calorie conversion"
         checkBoxLabel="I confirm that I have verified and submitted all price and calorie conversions, proceed to (re)calculate RHoMIS indicators"
         submissionLabel="Calculate Indicators"
