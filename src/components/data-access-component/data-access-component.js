@@ -7,6 +7,8 @@ import {
   Table,
   Spinner,
   Form,
+  InputGroup,
+  FormControl
 } from "react-bootstrap";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { useParams, useHistory } from "react-router-dom";
@@ -54,108 +56,141 @@ async function FetchData(props) {
   }
 }
 
-function renderUnitsTable(data) {
-  // console.log(data)
+function RenderConversionTable(props) {
+   console.log(props)
 
-  if (data !== null) {
-    var full_data_set = data;
-    var column_names = [];
+    return(
+      <div className="table-div">
+      <Table className="units-table">
+        <thead>
+          <tr key="row_1">
+            <th  >Survey Value</th>
+            <th  >Conversion</th>
 
-    // Looping through households
-    for (
-      let household_index = 0;
-      household_index < full_data_set.length;
-      household_index++
-    ) {
-      // All of the column names for this individual household
-      var household_column_names = Object.keys(full_data_set[household_index]);
-      //Looping through individual column names for the individual household
-      for (
-        let column_index = 0;
-        column_index < household_column_names.length;
-        column_index++
-      ) {
-        // The new column name for that household
-        var new_column = household_column_names[column_index];
+          </tr>
+        </thead>
+        <tbody>
 
-        if (!column_names.some((column) => column === new_column)) {
-          if (household_index === 0) {
-            column_names.splice(column_index, 0, new_column);
-          }
+            {props.unitsData.map((unit)=>{
+                return(<tr key={"unit-row-"+unit.survey_value+ unit.id_rhomis_dataset}>
+                    <td style={{"vertical-align":"middle"}} key={"unit-row-"+unit.survey_value+"-survey-value-"+unit.id_rhomis_dataset}>{unit.survey_value}</td>
 
-          if (household_index > 0) {
-            // Check if the previous column was in the column index
-            if (!household_column_names[column_index - 1] !== undefined) {
-              var index_of_previous_column_name = column_names.indexOf(
-                household_column_names[column_index - 1]
-              );
-              column_names.splice(
-                index_of_previous_column_name + 1,
-                0,
-                new_column
-              );
-            } else {
-              column_names.splice(column_index + 1, 0, new_column);
+                    <td style={{"vertical-align":"middle"}}key={"unit-row-"+unit.survey_value+"-conversion-"+unit.id_rhomis_dataset}><form>
+                <input class="form-control" type="text" defaultValue={unit.conversion} 
+                onChange={(event)=>{
+
+                  UpdateUnitsData({
+                    ...props,
+                    update:event.target.value,
+                    unit:unit
+                  })
+
+                  
+
+                }}/>
+              </form> </td>
+                    {/* <td key={"unit-row-"+unit.survey_value+"-survey-value"}>{unit.conversion}</td> */}
+
+
+                </tr>)
+            })
+            
+            
             }
-          }
-        }
-      }
-    }
-    return (
-      <>
-        <Table striped hover size="sm" responsive>
-          {/* Table header */}
-          <thead>
-            <tr key="row_1">
-              {column_names.map((column, column_key) => {
-                return (
-                  <th className="col-md-1" key={"row_1_column_" + column_key}>
-                    {column}
-                  </th>
-                );
-              })}
-            </tr>
-          </thead>
-          {/* Table Body */}
-          <tbody>
-            {full_data_set.map((household, household_key) => {
-              return (
-                <tr key={"row_" + household_key}>
-                  {column_names.map((column, column_key) => {
-                    return (
-                      <td
-                        height="10px"
-                        key={
-                          "row_" +
-                          household_key +
-                          "column_" +
-                          column_key +
-                          "_" +
-                          "household_" +
-                          household_key
-                        }
-                      >
-                        {household[column] ? household[column] : "NA"}
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
-      </>
+         
+        </tbody>
+      </Table>
+      </div>
+
     );
   }
+  
+function UpdateUnitsData(props){
+  console.log(props)
+
+  let changing_units = props.unitsData
+
+  let index = changing_units.findIndex((elem)=>{
+    if (elem.unit_type===props.unit.unit_type &&
+      elem.survey_value===props.unit.survey_value &&
+      elem.id_rhomis_dataset===props.unit.id_rhomis_dataset
+      ){
+        return true
+      }
+  })
+  console.log(index)
+ 
+  changing_units[index].conversion = props.update
+  
+  props.setUnitsData(changing_units)
+
+  
+}
+
+
+async function SubmitUnitsData(props){
+  console.log(props)
+
+  try {
+    const result = await axios({
+      method: "post",
+      url: process.env.REACT_APP_API_URL + "api/conversions",
+      headers: {
+        Authorization: props.authToken,
+      },
+      data: {
+        projectSelected:props.projectSelected,
+        formSelected:props.formSelected,
+        unitType: props.unitsSelect,
+        unitsData:props.unitsData
+
+      },
+    });
+
+    if (result.status === 200) {
+      Store.addNotification({
+        title: "Success",
+        message: props.process_label + "Completed",
+        type: "success",
+        insert: "top",
+        container: "top-right",
+        animationIn: ["animate__animated", "animate__fadeIn"],
+        animationOut: ["animate__animated", "animate__fadeOut"],
+        dismiss: {
+          duration: 5000,
+          onScreen: true,
+        },
+      });
+    }
+    return result;
+  } catch (err) {
+    console.log(err.response);
+    Store.addNotification({
+      title: "Error",
+      message: err.response.data,
+      type: "danger",
+      insert: "top",
+      container: "top-right",
+      animationIn: ["animate__animated", "animate__fadeIn"],
+      animationOut: ["animate__animated", "animate__fadeOut"],
+      dismiss: {
+        duration: 5000,
+        onScreen: true,
+      },
+    });
+  }
+
 }
 
 function ShowUnitsForm(props) {
-  const [unitsSelect, setUnitsSelect] = useState();
+  const [unitsSelect, setUnitsSelect] = useState(null);
   const [unitsDownloadLink, setUnitsDownloadLink] = useState();
   const [unitsData, setUnitsData] = useState([{
-      survey_value: "Loading",
+      survey_value: "",
       conversion: ""
   }]);
+
+  const [submitAllUnits, setSubmitAllUnits] = useState(false)
   console.log(props);
 
   useEffect(()=>{
@@ -167,7 +202,7 @@ function ShowUnitsForm(props) {
   return (
     <>
       <Form>
-        <Form.Label>Select the Type of Unit</Form.Label>
+        <Form.Label>{props.formLabel}</Form.Label>
 
         <Form.Select
           defaultValue="Select"
@@ -199,42 +234,64 @@ function ShowUnitsForm(props) {
         </Form.Select>
       </Form>
       <br />
-      <div className="table-div">
-      <Table >
-        <thead>
-          <tr key="row_1">
-            <th  >Survey Value</th>
-            <th  >Conversion</th>
+      {unitsSelect?<RenderConversionTable unitsData={unitsData} setUnitsData={setUnitsData}/>
+     
+            :<></>}
 
-          </tr>
-        </thead>
-        <tbody>
-
-            {unitsData.map((unit)=>{
-                return(<tr key={"unit-row-"+unit.survey_value+ unit.id_rhomis_dataset}>
-                    <td style={{"vertical-align":"middle"}} key={"unit-row-"+unit.survey_value+"-survey-value-"+unit.id_rhomis_dataset}>{unit.survey_value}</td>
-
-                    <td style={{"vertical-align":"middle"}}key={"unit-row-"+unit.survey_value+"-conversion-"+unit.id_rhomis_dataset}><form>
-                <input class="form-control" type="text" defaultValue={unit.conversion}/>
-              </form> </td>
-                    {/* <td key={"unit-row-"+unit.survey_value+"-survey-value"}>{unit.conversion}</td> */}
-
-
-                </tr>)
-            })
-            
-            
-            }
-         
-        </tbody>
-      </Table>
-      </div>
       <br/>
-      <div style={{ "width":"100%"}}>
-      <Button className="bg-dark border-0" style={{"display": "block","margin-left": "auto", "margin-right": 0}}>Download</Button>
-      <br/>
-      <Button className="bg-dark border-0" style={{"display": "block","margin-left": "auto", "margin-right": 0}}>Submit</Button>
+      <Form >
+          <Form.Group className="mb-3" controlId="formBasicCheckbox">
+            <Form.Check type="checkbox" label={props.checkBoxLabel}
+            onChange={()=>{
+              let currentState = submitAllUnits
+
+              setSubmitAllUnits(!currentState)
+
+
+            }}/>
+          </Form.Group>
+        </Form>
+      <div style={{ "display":"inline-grid","width":"100%"}}>
+        
+        <div style={{"marginLeft": "auto", "marginRight": 0}}>
+        {!submitAllUnits?
+        <>
+        <a
+                            // Name of the file to download
+                            download={props.projectSelected + '_' + props.formSelected + '_' + unitsSelect + '.csv'}
+                            // link to the download URL
+                            href={unitsDownloadLink}
+                        >
+
+<Button style={{"margin":"2px"}} className="bg-dark border-0" >Download</Button></a>
+      
+     
+      <Button className="bg-dark border-0" 
+      onClick={async()=>{
+        await SubmitUnitsData({
+          ...props,
+          unitsData:unitsData,
+          unitsSelect:unitsSelect
+        })
+      }}
+      >Submit</Button></>
+      :
+      <>
+      <Button className="bg-dark border-0" onClick={async ()=>{
+        await ProcessData({
+          commandType: props.commandType,
+          formSelected: props.formSelected,
+          projectSelected: props.projectSelected,
+          process_label: props.processLabel,
+          data: props.userInfo,
+          authToken: props.authToken,
+        });
+        
+      }}>{props.submissionLabel}</Button>
+      </>}
       </div>
+      </div>
+
     </>
   );
 }
@@ -297,10 +354,16 @@ async function ProcessData(props) {
 
 function RenderUnitsForm(props) {
   return (
-    <Card style={{ "margin-top": "30px" }}>
+    <Card style={{ "marginTop": "30px" }}>
       <Card.Header>Units</Card.Header>
       <Card.Body>
-        <ShowUnitsForm {...props} />
+        <ShowUnitsForm {...props} 
+        formLabel="Select the type of unit"
+        checkBoxLabel="I confirm that I have verified and submitted all units, proceed to (re)calculate product prices"
+        submissionLabel="Calculate Prices"
+        commandType="prices"
+        processLabel= "Price Calculations"
+        />
       </Card.Body>
     </Card>
   );
@@ -308,18 +371,73 @@ function RenderUnitsForm(props) {
 
 function RenderPriceAndCalorieConversions(props) {
   return (
-    <Card style={{ "margin-top": "30px" }}>
+    <Card style={{ "marginTop": "30px" }}>
       <Card.Header>Prices and Calories</Card.Header>
-      <Card.Body></Card.Body>
+      <Card.Body>
+      <ShowUnitsForm {...props} 
+        formLabel="Select the price/calorie conversion"
+        checkBoxLabel="I confirm that I have verified and submitted all price and calorie conversions, proceed to (re)calculate RHoMIS indicators"
+        submissionLabel="Calculate Indicators"
+        commandType="indicators"
+        processLabel= "Indicator Calculations"
+        />
+      </Card.Body>
     </Card>
   );
 }
 
 function RenderFinalOutputs(props) {
+  const [rhomisDataSelect, setRHoMISSelect] = useState(null)
+  const [rhomisData, setRHoMISData] = useState(null)
+  const [dataDownloadLink, setDataDownloadLink] = useState('')
   return (
     <Card style={{ "margin-top": "30px" }}>
       <Card.Header>Final Outputs</Card.Header>
-      <Card.Body></Card.Body>
+
+      <Card.Body>
+                        <Form>
+                            <Form.Group>
+                                <Form.Label>Select the type of data</Form.Label>
+                                <Form.Select defaultValue="Select"
+                                    onChange={async (event) => {
+                                        setRHoMISSelect(event.target.value)
+                                        const newRHoMISData = await FetchData({
+                                            authToken: props.authToken,
+                                            dataType: event.target.value,
+                                            projectID: props.projectSelected,
+                                            formID: props.formSelected,
+                                            unit: false,
+                                            data: true
+                                        })
+                                        const rhomis_download_link = generateDataDownloadLink(newRHoMISData, dataDownloadLink)
+                                        setDataDownloadLink(rhomis_download_link)
+                                        setRHoMISData(newRHoMISData)
+
+                                    }}>
+                                    <option key="default-select" disabled={true}>Select</option>
+                                    {props.formData.dataSets.map((dataSet) => {
+                                        return <option key={"data-option-" + dataSet}>{dataSet}</option>
+                                    })}
+                                </Form.Select>
+                            </Form.Group>
+
+                        </Form>
+
+                        {rhomisData ? <>
+                            <br />
+                            {renderTable(rhomisData)}
+                            <div style={{ "display":"inline-grid","width":"100%"}}>
+        
+        <div style={{"marginLeft": "auto", "marginRight": 0, "marginTop":"2px"}}><a
+                                // Name of the file to download
+                                download={props.projectSelected + '_' + props.formSelected + '_' + rhomisDataSelect + '.csv'}
+                                // link to the download URL
+                                href={dataDownloadLink}
+                            >
+                                <Button className="bg-dark border-0">Download Data</Button></a></div></div>
+                        </>
+                            : <></>}
+                    </Card.Body>
     </Card>
   );
 }
@@ -328,11 +446,7 @@ function RenderDataCard(props) {
   return (
     <>
       {props.showUnits ? <RenderUnitsForm {...props} /> : <></>}
-      {props.showPrices ? (
-        <RenderPriceAndCalorieConversions {...props} />
-      ) : (
-        <></>
-      )}
+      {props.showPrices ? <RenderPriceAndCalorieConversions {...props} /> : <></>}
       {props.showOutputs ? <RenderFinalOutputs {...props} /> : <></>}
     </>
   );
@@ -343,95 +457,66 @@ function CheckDataStatus() {}
 function renderTable(data) {
   // console.log(data)
 
+
   if (data !== null) {
-    var full_data_set = data.slice(0, 9);
-    var column_names = [];
+      var full_data_set = data
+      var column_names = []
 
-    // Looping through households
-    for (
-      let household_index = 0;
-      household_index < full_data_set.length;
-      household_index++
-    ) {
-      // All of the column names for this individual household
-      var household_column_names = Object.keys(full_data_set[household_index]);
-      //Looping through individual column names for the individual household
-      for (
-        let column_index = 0;
-        column_index < household_column_names.length;
-        column_index++
-      ) {
-        // The new column name for that household
-        var new_column = household_column_names[column_index];
+      // Looping through households
+      for (let household_index = 0; household_index < full_data_set.length; household_index++) {
+          // All of the column names for this individual household
+          var household_column_names = Object.keys(full_data_set[household_index])
+          //Looping through individual column names for the individual household
+          for (let column_index = 0; column_index < household_column_names.length; column_index++) {
+              // The new column name for that household
+              var new_column = household_column_names[column_index]
 
-        if (!column_names.some((column) => column === new_column)) {
-          if (household_index === 0) {
-            column_names.splice(column_index, 0, new_column);
+              if (!column_names.some(column => column === new_column)) {
+
+                  if (household_index === 0) {
+                      column_names.splice(column_index, 0, new_column)
+                  }
+
+                  if (household_index > 0) {
+
+                      // Check if the previous column was in the column index
+                      if (!household_column_names[column_index - 1] !== undefined) {
+                          var index_of_previous_column_name = column_names.indexOf(household_column_names[column_index - 1])
+                          column_names.splice(index_of_previous_column_name + 1, 0, new_column)
+
+                      } else {
+                          column_names.splice(column_index + 1, 0, new_column)
+                      }
+                  }
+              }
+
           }
-
-          if (household_index > 0) {
-            // Check if the previous column was in the column index
-            if (!household_column_names[column_index - 1] !== undefined) {
-              var index_of_previous_column_name = column_names.indexOf(
-                household_column_names[column_index - 1]
-              );
-              column_names.splice(
-                index_of_previous_column_name + 1,
-                0,
-                new_column
-              );
-            } else {
-              column_names.splice(column_index + 1, 0, new_column);
-            }
-          }
-        }
       }
-    }
-    return (
-      <>
-        <Table striped hover size="sm" responsive>
-          {/* Table header */}
-          <thead>
-            <tr key="row_1">
-              {column_names.map((column, column_key) => {
-                return (
-                  <th className="col-md-1" key={"row_1_column_" + column_key}>
-                    {column}
-                  </th>
-                );
-              })}
-            </tr>
-          </thead>
-          {/* Table Body */}
-          <tbody>
-            {full_data_set.map((household, household_key) => {
-              return (
-                <tr key={"row_" + household_key}>
-                  {column_names.map((column, column_key) => {
-                    return (
-                      <td
-                        height="10px"
-                        key={
-                          "row_" +
-                          household_key +
-                          "column_" +
-                          column_key +
-                          "_" +
-                          "household_" +
-                          household_key
-                        }
-                      >
-                        {household[column] ? household[column] : "NA"}
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
-      </>
-    );
+      return (
+          <div className="table-div">  
+              
+              <Table striped hover size="sm" responsive>
+                  {/* Table header */}
+                  <thead>
+                      <tr key="row_1">
+                          {column_names.map((column, column_key) => {
+                              return (<th className="col-md-1" key={"row_1_column_" + column_key}>{column}</th>)
+                          })}
+                      </tr>
+                  </thead>
+                  {/* Table Body */}
+                  <tbody>
+                      {full_data_set.map((household, household_key) => {
+                          return (<tr key={"row_" + household_key}>
+                              {column_names.map((column, column_key) => {
+                                  return (<td height="10px" key={"row_" + household_key + "column_" + column_key + "_" + "household_" + household_key}>{household[column] ? household[column] : "NA"}</td>)
+                              })}
+                          </tr>)
+                      })}
+
+                  </tbody>
+              </Table>
+          </ div>)
   }
 }
 
@@ -580,10 +665,10 @@ async function CheckFormData(props) {
     });
   }
 
-  if (props.formData.pricesConfirmed == true) {
+  if (props.formData.pricesCalculated == true) {
     props.setShowPrices(true);
   }
-  if (props.formData.pricesConfirmed == false) {
+  if (props.formData.pricesCalculated == false) {
   }
 
   if (props.formData.finalIndicators == true) {
