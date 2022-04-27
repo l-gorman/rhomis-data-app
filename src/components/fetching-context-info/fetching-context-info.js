@@ -34,11 +34,6 @@ async function FetchUserInformation(props) {
     // return (response.data)
 }
 
-function CheckUserInformation() {
-
-
-
-}
 
 function CheckForLocalToken(props) {
     const localToken = localStorage.getItem("userToken")

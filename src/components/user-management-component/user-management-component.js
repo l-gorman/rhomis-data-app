@@ -106,8 +106,7 @@ async function AddFormUser(props) {
                 animationIn: ["animate__animated", "animate__fadeIn"],
                 animationOut: ["animate__animated", "animate__fadeOut"],
                 dismiss: {
-                    duration: 5000,
-                    onScreen: true
+                    duration: 2000
                 }
             });
         }
@@ -125,8 +124,7 @@ async function AddFormUser(props) {
             animationIn: ["animate__animated", "animate__fadeIn"],
             animationOut: ["animate__animated", "animate__fadeOut"],
             dismiss: {
-                duration: 5000,
-                onScreen: true
+                duration: 2000
             }
         });
         return (err)

@@ -149,15 +149,14 @@ async function SubmitUnitsData(props){
     if (result.status === 200) {
       Store.addNotification({
         title: "Success",
-        message: props.process_label + "Completed",
+        message: props.process_label + " Completed",
         type: "success",
         insert: "top",
         container: "top-right",
         animationIn: ["animate__animated", "animate__fadeIn"],
         animationOut: ["animate__animated", "animate__fadeOut"],
         dismiss: {
-          duration: 5000,
-          onScreen: true,
+          duration: 2000,
         },
       });
     }
@@ -173,8 +172,7 @@ async function SubmitUnitsData(props){
       animationIn: ["animate__animated", "animate__fadeIn"],
       animationOut: ["animate__animated", "animate__fadeOut"],
       dismiss: {
-        duration: 5000,
-        onScreen: true,
+        duration: 2000,
       },
     });
   }
@@ -296,7 +294,8 @@ function ShowUnitsForm(props) {
         await SubmitUnitsData({
           ...props,
           unitsData:unitsData,
-          unitsSelect:unitsSelect
+          unitsSelect:unitsSelect,
+          process_label: "Conversion Submission"
         })
       }}
       >Submit</Button></>
@@ -327,6 +326,17 @@ async function ProcessData(props) {
       item.name === props.formSelected && item.project === props.projectSelected
   )[0];
 
+  Store.addNotification({
+    title: "Processing data",
+    type: "default",
+    insert: "top",
+    container: "top-right",
+    animationIn: ["animate__animated", "animate__fadeIn"],
+    animationOut: ["animate__animated", "animate__fadeOut"],
+    dismiss: {
+      duration: 2000,
+    },
+  });
   try {
     const result = await axios({
       method: "post",
@@ -346,15 +356,14 @@ async function ProcessData(props) {
     if (result.status === 200) {
       Store.addNotification({
         title: "Success",
-        message: props.process_label + "Completed",
+        message: props.process_label + " Completed",
         type: "success",
         insert: "top",
         container: "top-right",
         animationIn: ["animate__animated", "animate__fadeIn"],
         animationOut: ["animate__animated", "animate__fadeOut"],
         dismiss: {
-          duration: 5000,
-          onScreen: true,
+          duration: 2000,
         },
       });
     }
@@ -370,8 +379,7 @@ async function ProcessData(props) {
       animationIn: ["animate__animated", "animate__fadeIn"],
       animationOut: ["animate__animated", "animate__fadeOut"],
       dismiss: {
-        duration: 5000,
-        onScreen: true,
+        duration: 2000,
       },
     });
   }
@@ -668,8 +676,7 @@ async function CheckFormData(props) {
       animationIn: ["animate__animated", "animate__fadeIn"],
       animationOut: ["animate__animated", "animate__fadeOut"],
       dismiss: {
-        duration: 5000,
-        onScreen: true,
+        duration: 2000,
       },
     });
 

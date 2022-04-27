@@ -1,8 +1,7 @@
 
 
 
-table{
-}
+
 
 .units-table{
     table-layout: fixed !important;
@@ -18,6 +17,10 @@ table{
     border-color: lightgrey;
     border-style: solid;
 
+}
+
+.data-table{
+    
 }
 
 
