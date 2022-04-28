@@ -310,6 +310,15 @@ function ShowUnitsForm(props) {
           data: props.userInfo,
           authToken: props.authToken,
         });
+
+        GetInformationForFormComponent({
+          setAuthToken: props.setAuthToken,
+          authToken: props.authToken,
+          setUserInfo: props.setUserInfo,
+          projectName: props.projectSelected,
+          formName: props.formSelected,
+          setFormData: props.setFormData,
+        });
         
       }}>{props.submissionLabel}</Button>
       </>}
@@ -367,7 +376,7 @@ async function ProcessData(props) {
         },
       });
     }
-    return result;
+    return true;
   } catch (err) {
     console.log(err.response);
     Store.addNotification({
@@ -382,6 +391,8 @@ async function ProcessData(props) {
         duration: 2000,
       },
     });
+    return false;
+
   }
 }
 
@@ -680,7 +691,7 @@ async function CheckFormData(props) {
       },
     });
 
-    await ProcessData({
+    const processing_result = await ProcessData({
       commandType: "units",
       formSelected: props.formSelected,
       projectSelected: props.projectSelected,
@@ -689,6 +700,7 @@ async function CheckFormData(props) {
       authToken: props.authToken,
     });
 
+    if (processing_result===true){
     await GetInformationForFormComponent({
       setAuthToken: props.setAuthToken,
       authToken: props.authToken,
@@ -697,6 +709,7 @@ async function CheckFormData(props) {
       formName: props.formSelected,
       setFormData: props.setFormData,
     });
+  }
   }
 
   if (props.formData.pricesCalculated == true) {
@@ -821,6 +834,8 @@ export default function DataAccessComponent() {
               userInfo={adminData}
               showPrices={showPrices}
               showOutputs={showOutputs}
+              setAuthToken={setAuthToken}
+              setFormData={setFormData}
             />
           )}
         </Card.Body>
