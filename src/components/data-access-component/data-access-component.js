@@ -701,14 +701,14 @@ async function CheckFormData(props) {
     });
 
     if (processing_result===true){
-    await GetInformationForFormComponent({
-      setAuthToken: props.setAuthToken,
-      authToken: props.authToken,
-      setUserInfo: props.setUserInfo,
-      projectName: props.projectSelected,
-      formName: props.formSelected,
-      setFormData: props.setFormData,
-    });
+      await GetInformationForFormComponent({
+        setAuthToken: props.setAuthToken,
+        authToken: props.authToken,
+        setUserInfo: props.setUserInfo,
+        projectName: props.projectSelected,
+        formName: props.formSelected,
+        setFormData: props.setFormData,
+      });
   }
   }
 
@@ -741,6 +741,8 @@ export default function DataAccessComponent() {
   const [showUnits, setShowUnits] = useState(false);
   const [showPrices, setShowPrices] = useState(false);
   const [showOutputs, setShowOutputs] = useState(false);
+
+
 
   useEffect(() => {
     async function GetUserInfo() {
