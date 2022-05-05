@@ -215,6 +215,7 @@ function FormTables(props) {
                      
                            
                       {/* <Dropdown.Item className="dark text-white border-0"> */}
+                      {form.draft?
                       <form
                           method="post"
                           action={"https://rhomis-survey.stats4sdtest.online/login"}
@@ -238,7 +239,7 @@ function FormTables(props) {
                           >
                             Edit Form
                             </button>
-                            </form>
+                            </form>:<></>}
 
                       {/* </Dropdown.Item> */}
 
