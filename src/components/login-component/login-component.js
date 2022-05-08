@@ -119,6 +119,7 @@ function LoginCard(props) {
                             />
                             Loading</Button> :
                             <Button className="login-buttons"
+                                type="submit"
                                 variant="dark"
                                 onClick={async (event) => {
                                     setLoading(true)
