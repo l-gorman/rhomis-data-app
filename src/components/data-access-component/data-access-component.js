@@ -129,7 +129,7 @@ function UpdateUnitsData(props){
 
 
 async function SubmitUnitsData(props){
-  console.log(props)
+  console.log(props.unitsData)
 
   try {
     const result = await axios({

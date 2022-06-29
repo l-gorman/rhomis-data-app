@@ -4,13 +4,18 @@ import { useFilters } from 'react-table/dist/react-table.development'
 
 
 async function FetchUserInformation(props) {
+   
 
     let getSubmissionCount = false
+    let projectName = false
     if (props.getSubmissionCount === true) {
         getSubmissionCount = true
+        projectName = props.projectName
     }
+
     console.log("Get Submissions Count")
-    console.log(getSubmissionCount)
+    console.log(projectName)
+    
 
     if (props.authToken) {
         try{
@@ -18,7 +23,9 @@ async function FetchUserInformation(props) {
             method: "post",
             url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/meta-data/",
             data: {
-                getSubmissionCount: getSubmissionCount
+                getSubmissionCount: getSubmissionCount,
+                projectName: projectName
+
             },
             headers: {
                 'Authorization': props.authToken

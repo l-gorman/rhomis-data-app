@@ -359,11 +359,14 @@ function FormManagementComponent() {
   const data = null;
 
   useEffect(() => {
+    console.log('projectSelected:  ' + projectSelected)
+
     async function GetUserInfo() {
       await FetchUserInformation({
         authToken: authToken,
         setUserInfo: setAdminData,
         getSubmissionCount: true,
+        projectName: projectSelected
       });
 
       setSubmissionLoading(false);
