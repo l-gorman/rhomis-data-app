@@ -1,37 +1,18 @@
-// Copyright (C) 2022 Léo Gorman
-//
-// This file is part of rhomis-data-app.
-//
-// rhomis-data-app is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// rhomis-data-app is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with rhomis-data-app.  If not, see <http://www.gnu.org/licenses/>.
-
 import { useParams } from "react-router-dom";
 import {
   FetchUserInformation,
-  GetInformationForFormComponent,
 } from "../fetching-context-info/fetching-context-info";
 import { Spinner } from "react-bootstrap";
 
 import React, { useState, useEffect, useContext } from "react";
 import {
-  Form,
   Button,
   Card,
   Table,
-  CardGroup,
   DropdownButton,
   Dropdown,
 } from "react-bootstrap";
+
 import axios from "axios";
 import AuthContext from "../authentication-component/AuthContext";
 import UserContext from "../user-info-component/UserContext";
@@ -46,34 +27,10 @@ import { AiOutlineArrowLeft } from "react-icons/ai";
 import QRCode from "react-qr-code";
 import { deflateSync } from "zlib";
 
-// Generating a link to download the csv data
 
-// async function FinalizeForm(props) {
-
-//     console.log("Finalizing form")
-
-//     const result = await axios({
-//         method: 'post',
-//         url: process.env.REACT_APP_AUTHENTICATOR_URL + "api/forms/publish",
-//         headers: {
-//             'Authorization': props.authToken
-//         },
-//         params: {
-//             form_name: props.form,
-//             project_name: props.project
-//         }
-//     })
-
-//     FetchUserInformation({
-//         authToken: props.authToken,
-//         setUserInfo: props.setAdminData
-//     })
-
-//     // console.log("Finalization response")
-//     // console.log(result)
-
-// }
-
+ /*
+ Format date so it appears correctly 
+ */
 function formatDate(date) {
   var d = new Date(date),
     month = "" + (d.getMonth() + 1),
@@ -375,11 +332,7 @@ function FormManagementComponent() {
     GetUserInfo();
   }, []);
 
-  // useEffect(() => {
-  //     console.log("Form Data")
-  //     console.log(formData)
 
-  // }, [formData])
 
   return (
     <div id="project-management-container" className="sub-page-container">
