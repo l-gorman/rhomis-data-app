@@ -106,7 +106,7 @@ function AuthenticatedComponents(props){
                 <Route path="/home" component={PortalComponent} />
                 <Route path="/register"><RegisterComponent /></Route>
 
-                <Route path="/projects/:projectName/forms/:formName/collect" component={DataCollectionComponent} />
+                <Route path="/projects/:projectName/forms/:formName/collect/:draftOrLive" component={DataCollectionComponent} />
                 <Route path="/projects/:projectName/forms/:formName/users" component={UserManagementComponent} />
                 <Route path="/projects/:projectName/forms/:formName/data" component={DataAccessComponent} />
                 <Route path="/projects/:projectName" component={FormManagementComponent} />
